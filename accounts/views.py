@@ -3,10 +3,10 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import User
 from django.http import JsonResponse
+from rest_framework.exceptions import AuthenticationFailed
 
 from .models import User
 from .serializers import MinervaUserSerializer
-from ast import literal_eval
 from django.contrib.auth.hashers import make_password
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -23,17 +23,22 @@ def login_view(request) -> JsonResponse:
     Returns:
         response: http response (json format)
     """
-    user_data: dict = literal_eval(request.body.decode('utf-8'))
+    user_data: dict = request.data
+    password: str = user_data['password']
 
     # TODO: cuando el email sea unique, filtrar por email
     user : User | None = User.objects.filter(username=user_data['username']).first()
-    if user:
-        token: dict[str, str] = get_tokens_for_user(user)
-        return JsonResponse(token)
+
+    if not user:
+        raise AuthenticationFailed("User not found, check credentials.")
+
+    if not user.check_password(password):
+        raise AuthenticationFailed("Incorrect password.")
+
 
     # TODO: definir un estandar de respuesta para todas las responses de la API
-    response = Response("No se encontró el usuario", status=404)
-    return response
+    token: dict[str, str] = get_tokens_for_user(user)
+    return JsonResponse(token)
 
 def get_tokens_for_user(user: User | None) -> dict[str, str]:
     """
