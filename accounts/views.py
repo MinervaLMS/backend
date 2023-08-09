@@ -48,7 +48,7 @@ def register_view(request) -> JsonResponse:
     View to user register
 
     Args:
-        request: request http with user data login
+        request: request http with user data register
 
     Returns:
         response: http response (json format)

@@ -1,7 +1,6 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 
-# TODO: cuando se cambie el uso de unique de username a email, cambiar todos los "username" a "email"
 class MinervaUserManager(BaseUserManager):
     """
     Minerva User manager

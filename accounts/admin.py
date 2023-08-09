@@ -4,8 +4,6 @@ from .models import User
 
 from .forms import MinervaUserChangeForm, MinervaUserCreationForm
 
-# TODO: cuando se cambie el uso de unique de username a email, cambiar todos los "username" a "email"
-
 class MinervaUserAdmin(UserAdmin):
     """
     Class to custumize the user administration panel
