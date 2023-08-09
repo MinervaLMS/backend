@@ -13,7 +13,7 @@ class MinervaUserAdmin(UserAdmin):
     add_form = MinervaUserCreationForm
     form = MinervaUserChangeForm
     model = User
-    list_display = ("email", "first_name", "last_name", "is_staff", "is_active",)
+    list_display = ("id" ,"email", "first_name", "last_name", "is_staff", "is_active",)
     list_filter = ("email", "first_name", "last_name", "is_staff", "is_active",)
     fieldsets = (
         (None, {"fields": ("email", "password", "first_name", "last_name")}),
