@@ -10,6 +10,8 @@ from .serializers import MinervaUserSerializer
 from django.contrib.auth.hashers import make_password
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.parsers import JSONParser
 # Create your views here.
 
 @api_view(['POST'])
@@ -39,6 +41,24 @@ def login_view(request) -> JsonResponse:
     # TODO: definir un estandar de respuesta para todas las responses de la API
     token: dict[str, str] = get_tokens_for_user(user)
     return JsonResponse(token)
+
+@api_view(['POST'])
+def register_view(request) -> JsonResponse:
+    """
+    View to user register
+
+    Args:
+        request: request http with user data login
+
+    Returns:
+        response: http response (json format)
+    """
+    data = JSONParser().parse(request)
+    serializer = MinervaUserSerializer(data=data)
+    if serializer.is_valid():
+        serializer.save()
+        return JsonResponse(serializer.data, status=201)
+    return JsonResponse(serializer.errors, status=400)
 
 def get_tokens_for_user(user: User | None) -> dict[str, str]:
     """

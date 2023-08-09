@@ -9,11 +9,11 @@ class MinervaUserCreationForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ("username",)
+        fields = ("email",)
 
 
 class MinervaUserChangeForm(UserChangeForm):
 
     class Meta:
         model = User
-        fields = ("username",)
+        fields = ("email",)
