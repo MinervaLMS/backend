@@ -1,14 +1,12 @@
 from django.shortcuts import render
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from .models import User
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework import status
 from django.http import JsonResponse
-from rest_framework.exceptions import AuthenticationFailed
 
 from .models import User
-from .serializers import MinervaUserSerializer
-from django.contrib.auth.hashers import make_password
+from .serializers import MinervaUserSerializer, MinervaUserLoginSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
 
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
@@ -20,27 +18,23 @@ def login_view(request) -> JsonResponse:
     View to user login
 
     Args:
-        request: request http with user data login
+        request: http request with user data for login
 
     Returns:
-        response: http response (json format)
+        response: http response {json format}
     """
-    user_data: dict = request.data
-    password: str = user_data['password']
 
-    # TODO: cuando el email sea unique, filtrar por email
-    user : User | None = User.objects.filter(username=user_data['username']).first()
+    serializer = MinervaUserLoginSerializer(data=request.data)
 
-    if not user:
-        raise AuthenticationFailed("User not found, check credentials.")
+    if serializer.is_valid(raise_exception=True):
 
-    if not user.check_password(password):
-        raise AuthenticationFailed("Incorrect password.")
+        user = serializer.validated_data
+        serializer = MinervaUserSerializer(user)
+        tokens: dict[str, str] = get_tokens_for_user(user)
+        data = serializer.data
+        data["tokens"] = tokens
 
-
-    # TODO: definir un estandar de respuesta para todas las responses de la API
-    token: dict[str, str] = get_tokens_for_user(user)
-    return JsonResponse(token)
+        return JsonResponse(data=data, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def register_view(request) -> JsonResponse:
@@ -57,8 +51,8 @@ def register_view(request) -> JsonResponse:
     serializer = MinervaUserSerializer(data=data)
     if serializer.is_valid():
         serializer.save()
-        return JsonResponse(serializer.data, status=201)
-    return JsonResponse(serializer.errors, status=400)
+        return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+    return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def get_tokens_for_user(user: User | None) -> dict[str, str]:
     """
@@ -71,16 +65,25 @@ def get_tokens_for_user(user: User | None) -> dict[str, str]:
         tokens: Refresh token and access token.
     """
     refresh = RefreshToken.for_user(user)
-    refresh["email"] = user.email
 
     return {
         'refresh': str(refresh),
         'access': str(refresh.access_token),
     }
 
+# Used to test view for login functionality
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def lista_usuarios(request) -> JsonResponse:
+    """
+    Get all users in the Minerva database, but only the MinervaUserSerializer fields
+    ("email", "first_name", "last_name").
 
-# @api_view(['GET'])
-# def lista_usuarios(request):
-#     usuarios = User.objects.all()
-#     serializer = MinervaUserSerializer(usuarios, many=True)
-#     return Response(serializer.data)
+    Returns:
+        Json response with the fields of the serialized users if the user making the request is Authenticated,
+        else throws 401 Unauthorized status
+    """
+
+    usuarios = User.objects.all()
+    serializer = MinervaUserSerializer(usuarios, many=True)
+    return JsonResponse(serializer.data, safe=False)
