@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, schema
 from rest_framework import status
 from django.http import JsonResponse
 
@@ -10,9 +10,12 @@ from rest_framework.permissions import IsAuthenticated
 
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
+from . import schemas
+
 # Create your views here.
 
 @api_view(['POST'])
+@schema(schemas.login_schema)
 def login_view(request) -> JsonResponse:
     """
     View to user login
@@ -37,6 +40,7 @@ def login_view(request) -> JsonResponse:
         return JsonResponse(data=data, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
+@schema(schemas.register_schema)
 def register_view(request) -> JsonResponse:
     """
     View to user register
