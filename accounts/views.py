@@ -109,6 +109,10 @@ def send_email(request) -> JsonResponse:
     Returns:
         Json response saying that the email was sent if the email was found, else throws a 404 error (Not found)
     '''
+
+    if not "email" in request.data:
+        return JsonResponse({"message": "Email was sent"}, status=status.HTTP_400_BAD_REQUEST)
+
     email: str = request.data["email"]
     user_using = User.objects.filter(email=email).first()
     if not user_using:
