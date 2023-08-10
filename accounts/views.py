@@ -111,7 +111,7 @@ def send_email(request) -> JsonResponse:
     '''
 
     if not "email" in request.data:
-        return JsonResponse({"message": "Email was sent"}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({"message": "Email was not sent"}, status=status.HTTP_400_BAD_REQUEST)
 
     email: str = request.data["email"]
     user_using = User.objects.filter(email=email).first()
