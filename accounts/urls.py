@@ -9,5 +9,6 @@ urlpatterns = [
     # path('lista/', lista_usuarios, name='minerva_user_list'),
     path('register/', register_view, name="minerva_register"),
     path('forget-password', send_email, name="password_forgotten"),
-    path('password-reset/<token>', modify_password_forgotten, name="modify_password")
+    path('password-reset/<uidb64>/<token>',
+         modify_password_forgotten, name="modify_password")
 ]
