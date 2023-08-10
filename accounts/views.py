@@ -57,8 +57,7 @@ def register_view(request) -> JsonResponse:
     Returns:
         response: http response (json format)
     """
-    data = JSONParser().parse(request)
-    serializer = MinervaUserSerializer(data=data)
+    serializer = MinervaUserSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
         return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
@@ -110,8 +109,7 @@ def send_email(request) -> JsonResponse:
     Returns:
         Json response saying that the email was sent if the email was found, else throws a 404 error (Not found)
     '''
-    data = JSONParser().parse(request)
-    email: str = data["email"]
+    email: str = request.data["email"]
     user_using = User.objects.filter(email=email).first()
     if not user_using:
         return JsonResponse({"message": "No user with this email"}, status=status.HTTP_404_NOT_FOUND)

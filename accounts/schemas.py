@@ -12,14 +12,14 @@ login_schema = AutoSchema(manual_fields=[
 ])
 # Register Schema
 register_schema = AutoSchema(manual_fields=[
-    coreapi.Field("first_name", required=True, location="form", type="string",
-                  schema=coreschema.String(description="User first name")),
-    coreapi.Field("last_name", required=True, location="form", type="string",
-                  schema=coreschema.String(description="User last name")),
     coreapi.Field("email", required=True, location="form", type="string",
                   schema=coreschema.String(description="User email")),
     coreapi.Field("password", required=True, location="form", type="string",
-                  schema=coreschema.String(description="User password"))
+                  schema=coreschema.String(description="User password")),
+    coreapi.Field("first_name", required=True, location="form", type="string",
+                  schema=coreschema.String(description="User first name")),
+    coreapi.Field("last_name", required=True, location="form", type="string",
+                  schema=coreschema.String(description="User last name"))
 ])
 # Email send forgot pass Schema
 pass_forgot_schema = AutoSchema(manual_fields=[
