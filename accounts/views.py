@@ -11,8 +11,10 @@ from rest_framework.permissions import IsAuthenticated
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from . import schemas
-
+from .helpers import send_forgot_email
+from django.contrib.auth.tokens import default_token_generator
 # Create your views here.
+
 
 @api_view(['POST'])
 @schema(schemas.login_schema)
@@ -39,6 +41,7 @@ def login_view(request) -> JsonResponse:
 
         return JsonResponse(data=data, status=status.HTTP_200_OK)
 
+
 @api_view(['POST'])
 @schema(schemas.register_schema)
 def register_view(request) -> JsonResponse:
@@ -58,6 +61,7 @@ def register_view(request) -> JsonResponse:
         return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
     return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 def get_tokens_for_user(user: User | None) -> dict[str, str]:
     """
     Create refresh and access token with email
@@ -75,6 +79,7 @@ def get_tokens_for_user(user: User | None) -> dict[str, str]:
         'access': str(refresh.access_token),
     }
 
+
 # Used to test view for login functionality
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -91,3 +96,41 @@ def lista_usuarios(request) -> JsonResponse:
     usuarios = User.objects.all()
     serializer = MinervaUserSerializer(usuarios, many=True)
     return JsonResponse(serializer.data, safe=False)
+
+
+@api_view(['POST'])
+@schema(schemas.pass_forgot_schema)
+def send_email(request) -> JsonResponse:
+    '''
+    Send an email to the user after he introduces his email, if the email is not in DB then it returns an error message
+
+    Returns:
+        Json response saying that the email was sent if the email was found, else throws a 404 error (Not found)
+    '''
+    data = JSONParser().parse(request)
+    email: str = data["email"]
+    user_using = User.objects.filter(email=email).first()
+    if not user_using:
+        return JsonResponse({"message": "No user with this email"}, status=status.HTTP_404_NOT_FOUND)
+    token: str = default_token_generator.make_token(user_using)
+    send_forgot_email(email, token)
+    return JsonResponse({"message": "Email was sent"}, status=status.HTTP_200_OK)
+
+
+@api_view(['PATCH'])
+@schema(schemas.pass_forgot_modify)
+def modify_password_forgotten(request, token: str) -> JsonResponse:
+    '''
+    After getting into the link the request read the token to get the user, then it changes the password
+
+    Returns:
+        Json response saying that the password was changed, else throws a 404 error if the user was not found or 400 error
+    '''
+    user = default_token_generator.check_token(User, token)
+    if not user:
+        return JsonResponse({"message": "Invalid token"}, status=status.HTTP_404_NOT_FOUND)
+    data = JsonResponse().parse(request)
+    new_password: str = data["password"]
+    if new_password == '':
+        return JsonResponse({"message": "Password is not valid"}, status=status.HTTP_400_BAD_REQUEST)
+    return JsonResponse({"message": "Password was changed successfully"}, status=status.HTTP_200_OK)
