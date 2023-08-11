@@ -11,8 +11,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 # TODO: Añadir permisos de CORS
 
-from pathlib import Path
 import os
+from pathlib import Path
 from datetime import timedelta
 import dj_database_url
 import environ
@@ -23,10 +23,6 @@ environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', default=env('SECRET_KEY'))
@@ -41,20 +37,25 @@ if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # Application definition
-
-INSTALLED_APPS = [
+DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+]
+DEPENDENCIES_APPS = [
     'rest_framework_simplejwt',
     'rest_framework',
     'corsheaders',
     'coreapi',
+]
+MINERVA_APPS = [
     'accounts',
 ]
+
+INSTALLED_APPS = DJANGO_APPS + DEPENDENCIES_APPS + MINERVA_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -74,7 +75,6 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
-
 
 # restframework_simple-jwt module variable.
 # Dictionary of access and refresh token configs, lifetime, algorithm...
@@ -118,8 +118,6 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
 
-ROOT_URLCONF = 'minerva.urls'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -136,12 +134,11 @@ TEMPLATES = [
     },
 ]
 
+ROOT_URLCONF = 'minerva.urls'
+
 WSGI_APPLICATION = 'minerva.wsgi.application'
 
-
 # Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
 DATABASES = {
     'default': dj_database_url.config(
         # Feel free to alter this value to suit your needs.
@@ -149,11 +146,7 @@ DATABASES = {
     )
 }
 
-
-
 # Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS: list[dict[str, str]] = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -169,32 +162,21 @@ AUTH_PASSWORD_VALIDATORS: list[dict[str, str]] = [
     },
 ]
 
-
-# Media files
+# Media files management
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
-
-# User extended model
+# User extended model defined on accounts app
 AUTH_USER_MODEL = 'accounts.User'
 
 # Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
+TIME_ZONE = 'America/Bogota'
 USE_I18N = True
-
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
 STATIC_URL = 'static/'
-
 
 if not DEBUG:
     # Tell Django to copy statics to the `staticfiles` directory
@@ -206,8 +188,6 @@ if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Schema for API documentation
@@ -215,5 +195,13 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
 }
 
-# CORS configuration
+# Email configuration
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_POST = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('EMAIL_URL')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
+
+# CORS configuration (Change this in production)
 CORS_ALLOW_ALL_ORIGINS = True
