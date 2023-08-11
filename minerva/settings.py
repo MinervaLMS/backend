@@ -70,13 +70,6 @@ MIDDLEWARE = [
 ]
 
 # restframework_simple-jwt module variable.
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
-}
-
-# restframework_simple-jwt module variable.
 # Dictionary of access and refresh token configs, lifetime, algorithm...
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
@@ -199,11 +192,15 @@ DEFAULT_RENDERER_CLASSES = (
 if DEBUG:
     DEFAULT_RENDERER_CLASSES = DEFAULT_RENDERER_CLASSES + (
         'rest_framework.renderers.BrowsableAPIRenderer',
-    )
+        )
+
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
-    'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES
-}
+    'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        )
+    }
 
 # Email configuration
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
