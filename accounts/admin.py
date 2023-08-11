@@ -1,15 +1,15 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+
 from .models import User
+from .forms import CustomUserChangeForm, CustomUserCreationForm
 
-from .forms import MinervaUserChangeForm, MinervaUserCreationForm
-
-class MinervaUserAdmin(UserAdmin):
+class CustomUserAdmin(UserAdmin):
     """
-    Class to custumize the user administration panel
+    Class to customize the user administration panel
     """
-    add_form = MinervaUserCreationForm
-    form = MinervaUserChangeForm
+    add_form = CustomUserCreationForm
+    form = CustomUserChangeForm
     model = User
     list_display = ("id" ,"email", "first_name", "last_name", "is_staff", "is_active",)
     list_filter = ("email", "first_name", "last_name", "is_staff", "is_active",)
@@ -30,4 +30,4 @@ class MinervaUserAdmin(UserAdmin):
     ordering = ("email",)
 
 # Register your models here.
-admin.site.register(User, MinervaUserAdmin)
+admin.site.register(User, CustomUserAdmin)
