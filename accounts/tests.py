@@ -82,19 +82,33 @@ class PasswordResetTestCase(TestCase):
 
     def test_password_reset_correct(self):
         register = self.client.post('/register/', self.user_data, format='json')
-        response = self.client.post('/forget-password/', self.user_data, format='json')
+        response = self.client.post('/forgot-my-password/', self.user_data, format='json')
         self.assertEqual(response.status_code, 200)
 
     def test_password_reset_incorrect(self):
         register = self.client.post('/register/', self.user_data, format='json')
-        response = self.client.post('/forget-password/', self.incorrect_credentials, format='json')
+        response = self.client.post('/forgot-my-password/', self.incorrect_credentials, format='json')
         self.assertEqual(response.status_code, 404)
 
     def test_password_reset_blank(self):
         register = self.client.post('/register/', self.user_data, format='json')
-        response = self.client.post('/forget-password/', {}, format='json')
+        response = self.client.post('/forgot-my-password/', {}, format='json')
         self.assertEqual(response.status_code, 400)
 
     def test_password_reset_no_user(self):
-        response = self.client.post('/forget-password/', self.user_data, format='json')
+        response = self.client.post('/forgot-my-password/', self.user_data, format='json')
         self.assertEqual(response.status_code, 404)
+
+class ListTestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(email='test@example.com', password='testpassword')
+
+    def test_list_correct(self):
+        self.client.force_authenticate(self.user)
+        response = self.client.get('/list/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_list_no_auth(self):
+        response = self.client.get('/list/')
+        self.assertEqual(response.status_code, 403)
