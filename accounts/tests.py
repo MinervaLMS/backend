@@ -1,6 +1,6 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
-from rest_framework_simplejwt.tokens import RefreshToken
+
 from .models import User
 
 class RegisterTestCase(TestCase):
