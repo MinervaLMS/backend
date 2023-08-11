@@ -146,6 +146,7 @@ DATABASES = {
     )
 }
 
+
 # Password validation
 AUTH_PASSWORD_VALIDATORS: list[dict[str, str]] = [
     {
@@ -191,8 +192,17 @@ if not DEBUG:
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Schema for API documentation
+DEFAULT_RENDERER_CLASSES = (
+    'rest_framework.renderers.JSONRenderer',
+)
+
+if DEBUG:
+    DEFAULT_RENDERER_CLASSES = DEFAULT_RENDERER_CLASSES + (
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    )
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES
 }
 
 # Email configuration
@@ -205,3 +215,4 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 
 # CORS configuration (Change this in production)
 CORS_ALLOW_ALL_ORIGINS = True
+
