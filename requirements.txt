@@ -21,6 +21,7 @@ psycopg2-binary==2.9.7
 PyJWT==2.8.0
 pytz==2023.3
 requests==2.31.0
+resend==0.5.2
 sqlparse==0.4.4
 typing_extensions==4.7.1
 tzdata==2023.3

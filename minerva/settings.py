@@ -210,6 +210,10 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL_URL')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 
+# Resend API configuration
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
+RESEND_DOMAIN = os.environ.get("RESEND_DOMAIN")
+
 # CORS configuration (Change this in production)
 CORS_ALLOW_ALL_ORIGINS = True
 
