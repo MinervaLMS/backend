@@ -66,7 +66,7 @@ pass_forgot_schema = AutoSchema(manual_fields=[
 ])
 
 # Reset password Schema
-pass_forgot_modify = AutoSchema(manual_fields=[
+pass_forgot_modify_schema = AutoSchema(manual_fields=[
     coreapi.Field(
         "uidb64",
         required=True,
@@ -88,4 +88,36 @@ pass_forgot_modify = AutoSchema(manual_fields=[
         type="string",
         schema=coreschema.String(description="User password")
     )
+])
+
+# Email send contact Schema
+contact_schema = AutoSchema(manual_fields=[
+    coreapi.Field(
+        "sender_email",
+        required=True,
+        location="form",
+        type="string",
+        schema=coreschema.String(description="Sender email")
+    ),
+    coreapi.Field(
+        "sender_name",
+        required=True,
+        location="form",
+        type="string",
+        schema=coreschema.String(description="Sender name")
+    ),
+    coreapi.Field(
+        "subject",
+        required=True,
+        location="form",
+        type="string",
+        schema=coreschema.String(description="Subject of the email")
+    ),
+    coreapi.Field(
+        "email_body",
+        required=True,
+        location="form",
+        type="string",
+        schema=coreschema.String(description="Text of the contact email written by the user")
+    ),
 ])
