@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-# TODO: Añadir permisos de CORS
+# TODO: Add CORS permissions in production
 
 import os
 from pathlib import Path
@@ -53,6 +53,7 @@ DEPENDENCIES_APPS = [
 ]
 MINERVA_APPS = [
     'accounts',
+    'courses',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + DEPENDENCIES_APPS + MINERVA_APPS
