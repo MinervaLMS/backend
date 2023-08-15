@@ -5,16 +5,18 @@ from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ValidationError
 from django.core.validators import EmailValidator
 from django.http import JsonResponse
+
 from rest_framework.decorators import api_view, permission_classes, schema
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import JSONParser
 from rest_framework import status
 
 
-from .helpers import send_forgot_email, get_tokens_for_user, send_contact_email
+from .helpers import send_confirmation_email, send_forgot_email, send_contact_email, get_tokens_for_user, confirmation_token_generator
 from .serializers import UserSerializer, UserLoginSerializer
 from .models import User
 from . import schemas
+
 
 @api_view(['POST'])
 @schema(schemas.login_schema)
@@ -40,11 +42,12 @@ def login_view(request) -> JsonResponse:
 
         return JsonResponse(data=data, status=status.HTTP_200_OK)
 
+
 @api_view(['POST'])
 @schema(schemas.register_schema)
 def register_view(request) -> JsonResponse:
     """
-    View to user register in the database
+    View to user register in the database and send an email to confirm the account
 
     Args:
         request: request http with user data for register
@@ -55,11 +58,45 @@ def register_view(request) -> JsonResponse:
 
     serializer = UserSerializer(data=request.data)
 
-    if serializer.is_valid():
-        serializer.save()
-        return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+    if not serializer.is_valid():
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    user = serializer.save()
+
+    token: str = confirmation_token_generator.make_token(user)
+    uidb64: str = urlsafe_base64_encode(force_bytes(user.email))
+
+    try:
+        send_confirmation_email(user.email, user.first_name, token, uidb64)
+        return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+    except Exception:
+        return JsonResponse({"message": "Email was not sent"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+@schema(schemas.confirmation_email_schema)
+def confirm_email(request, uidb64: str, token: str) -> JsonResponse:
+    """
+    Confirm the user email after reading the token and uidb64 from the url
+
+    Args:
+        request: request http
+        uidb64 (str): Base 64 encode of user email
+        token (str): Temporary token to confirm email
+
+    Returns:
+        response (JsonResponse): HTTP response in JSON format
+    """
+
+    email: str = force_str(urlsafe_base64_decode(uidb64))
+    user = User.objects.filter(email=email).first()
+
+    if user is None or not confirmation_token_generator.check_token(user, token):
+        return JsonResponse({"message": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+
+    user.is_active = True
+    user.save()
+
+    return JsonResponse({"message": "Email was confirmed successfully"}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 @schema(schemas.pass_forgot_schema)
@@ -126,6 +163,7 @@ def modify_password_forgotten(request, uidb64: str, token: str) -> JsonResponse:
 
     return JsonResponse({"message": "Password was changed successfully"}, status=status.HTTP_200_OK)
 
+
 @api_view(['POST'])
 @schema(schemas.contact_schema)
 def contact_email(request) -> JsonResponse:
@@ -167,6 +205,7 @@ def contact_email(request) -> JsonResponse:
         return JsonResponse({"message": "Email was not sent"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return JsonResponse({"message": "Email was sent"}, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

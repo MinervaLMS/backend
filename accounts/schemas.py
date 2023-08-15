@@ -121,3 +121,20 @@ contact_schema = AutoSchema(manual_fields=[
         schema=coreschema.String(description="Text of the contact email written by the user")
     ),
 ])
+
+confirmation_email_schema = AutoSchema(manual_fields=[
+    coreapi.Field(
+        "uidb64",
+        required=True,
+        location="path",
+        type="string",
+        schema=coreschema.String(description="User email encoded")
+    ),
+    coreapi.Field(
+        "token",
+        required=True,
+        location="path",
+        type="string",
+        schema=coreschema.String(description="User token link")
+    ),
+])

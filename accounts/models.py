@@ -13,6 +13,7 @@ class User(AbstractUser):
     email = models.EmailField(max_length=50, blank=False, unique=True)
     first_name = models.CharField(max_length=50, blank=False)
     last_name = models.CharField(max_length=50, blank=False)
+    is_active = models.BooleanField(default=False)
 
     # Remove username field and use email as unique identifier
     username=None

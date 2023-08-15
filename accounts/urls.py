@@ -5,6 +5,7 @@ from . import views
 
 urlpatterns = [
     path('register/', views.register_view, name="user_register"),
+    path('confirm-email/<uidb64>/<token>', views.confirm_email, name="user_confirm_email"),
     path('login/', views.login_view, name='user_login'),
     path('list/', views.user_list, name='user_list'),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

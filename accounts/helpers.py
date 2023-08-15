@@ -3,6 +3,8 @@ from datetime import datetime
 from django.core.mail import send_mail
 from django.conf import settings
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+
 
 from .models import User
 
@@ -30,6 +32,46 @@ from .models import User
 #     return True
 
 
+def send_confirmation_email(email: str, name: str, token: str, uidb64: str) -> bool:
+    """Send an email to user with link to confirm email using Resend API and test domain (Change in production)
+
+    Args:
+        email (str): Non active user email
+        Name (str): Non active user full name
+        token (str): Temporary token to confirm the email
+        uidb64 (str): Base 64 encode of user id
+
+    Returns:
+        bool: True
+    """
+
+    resend.api_key = settings.RESEND_API_KEY
+
+    params = {
+        "from": f"MinervaLMS <{settings.RESEND_DOMAIN}>",
+        "to": email,
+        "subject": "MinervaLMS - Confirm your email",
+        "html": f"""
+        <p>Dear {name},<br>
+        Welcome to MinervaLMS! We're thrilled to have you as part of our learning community. To ensure the security of your account and provide you with a seamless experience, we kindly ask you to confirm your email address.</p>
+
+        <p>Please click on the link below to verify your email:</p>
+        <a href="http://frontend-two-rosy.vercel.app/confirm-email/{uidb64}/{token}">
+        http://frontend-two-rosy.vercel.app/confirm-email/{uidb64}/{token}</a>
+
+        <p>If you didn't sign up for MinervaLMS or have received this email by mistake, please disregard it.
+        Thank you for choosing MinervaLMS for your educational journey. </p>
+
+        <The>Best regards,<br>
+        The MinervaLMS Team</p>
+        """,
+    }
+
+    email = resend.Emails.send(params)
+
+    return True
+
+
 def send_forgot_email(email: str, token: str, uidb64: str) -> bool:
     """Send email to user with link to reset password using Resend API and test domain (Change in production)
 
@@ -52,7 +94,8 @@ def send_forgot_email(email: str, token: str, uidb64: str) -> bool:
         <p>We hope this email finds you well. It appears that you have requested a password reset for your MinervaLMS account. If you did not make this request, please ignore this message.</p>
 
         <p>If you did request a password reset, please use the following link to reset your password:</p>
-        <a href="http://frontend-two-rosy.vercel.app/password-reset/{uidb64}/{token}">http://frontend-two-rosy.vercel.app/password-reset/{uidb64}/{token}</a>
+        <a href="http://frontend-two-rosy.vercel.app/password-reset/{uidb64}/{token}">
+        http://frontend-two-rosy.vercel.app/password-reset/{uidb64}/{token}</a>
 
         <p>Thank you for using MinervaLMS.</p>
 
@@ -64,6 +107,8 @@ def send_forgot_email(email: str, token: str, uidb64: str) -> bool:
     email = resend.Emails.send(params)
 
     return True
+
+
 def send_contact_email(sender_email: str, sender_name: str, subject: str, email_body: str) -> bool:
     """Send email to our contact email using Resend API and test domain (Change in production)
 
@@ -121,3 +166,13 @@ def get_tokens_for_user(user: User | None) -> dict[str, str]:
         'refresh': str(refresh),
         'access': str(refresh.access_token),
     }
+
+
+class CustomTokenGenerator(PasswordResetTokenGenerator):
+    def _make_hash_value(self, user, timestamp):
+        return (
+            str(user.pk) + user.email + str(timestamp) +
+            str(user.is_active)
+        )
+
+confirmation_token_generator = CustomTokenGenerator()

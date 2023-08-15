@@ -13,7 +13,6 @@ class Module(models.Model):
     course_id = models.ForeignKey(Course, on_delete=models.CASCADE, blank=False)
     name = models.CharField(max_length=100, blank=False)
     order = models.IntegerField(blank=False)
-
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -26,7 +25,6 @@ class Module(models.Model):
 
     def __str__(self):
         return f'{self.course_id}: {self.name}'
-
 
 class Material(models.Model):
     module_id = models.ForeignKey(Module, on_delete=models.CASCADE, blank=False)
@@ -43,4 +41,4 @@ class Material(models.Model):
         ]
 
     def __str__(self):
-        return self.name
+        return f'{self.module_id}: {self.name}'
