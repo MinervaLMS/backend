@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-# TODO: Añadir permisos de CORS
+# TODO: Add CORS permissions in production
 
 import os
 from pathlib import Path
@@ -53,6 +53,7 @@ DEPENDENCIES_APPS = [
 ]
 MINERVA_APPS = [
     'accounts',
+    'courses',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + DEPENDENCIES_APPS + MINERVA_APPS
@@ -72,8 +73,8 @@ MIDDLEWARE = [
 # restframework_simple-jwt module variable.
 # Dictionary of access and refresh token configs, lifetime, algorithm...
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=3),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
     "UPDATE_LAST_LOGIN": False,
@@ -209,6 +210,7 @@ EMAIL_POST = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL_URL')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
+SUPPORT_EMAIL = os.environ.get('SUPPORT_EMAIL')
 
 # Resend API configuration
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY")

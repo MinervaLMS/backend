@@ -1,12 +1,13 @@
 import resend
+from datetime import datetime
 from django.core.mail import send_mail
 from django.conf import settings
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
 
-# TODO: Change domain of URL message
-# TODO: Use Django SMTP in production
+# TODO: Use Django send_email SMTP in production
+# TODO: Change domain of URL message in production
 
 # def send_forgot_email(email: str, token: str, uidb64: str) -> bool:
 #     """Send email to user with link to reset password
@@ -54,6 +55,44 @@ def send_forgot_email(email: str, token: str, uidb64: str) -> bool:
         <a href="http://frontend-two-rosy.vercel.app/password-reset/{uidb64}/{token}">http://frontend-two-rosy.vercel.app/password-reset/{uidb64}/{token}</a>
 
         <p>Thank you for using MinervaLMS.</p>
+
+        <The>Best regards,<br>
+        The MinervaLMS Team</p>
+        """,
+    }
+
+    email = resend.Emails.send(params)
+
+    return True
+def send_contact_email(sender_email: str, sender_name: str, subject: str, email_body: str) -> bool:
+    """Send email to our contact email using Resend API and test domain (Change in production)
+
+    Args:
+        sender_email (str): Sender email
+        subject (str): Subject of the email
+        email_body (str): Text of the email
+
+    Returns:
+        bool: True
+    """
+
+    resend.api_key = settings.RESEND_API_KEY
+    ticket_id = int(datetime.now().timestamp() * 1000)
+
+    params = {
+        "from": f"MinervaLMS <{settings.RESEND_DOMAIN}>",
+        "to": settings.SUPPORT_EMAIL,
+        "cc": sender_email,
+        "subject": f"MinervaLMS Support - Ticket #{ticket_id}",
+        "html": f"""
+        <p>Dear {sender_name},<br>
+        <p>Thank you for getting in touch with our support team. We appreciate the opportunity to assist you.<br>
+        Here is the text of your inquiry:</p>
+
+        <p><i><b>Subject:</b> {subject}<br>
+        "{email_body}"</i></p>
+
+        <p>Our team is already hard at work investigating your issue and finding the best possible solution. We understand how important this matter is to you, and we are committed to resolving it promptly.</p>
 
         <The>Best regards,<br>
         The MinervaLMS Team</p>

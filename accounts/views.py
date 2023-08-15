@@ -2,14 +2,17 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.hashers import make_password
+from django.core.exceptions import ValidationError
+from django.core.validators import EmailValidator
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes, schema
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import JSONParser
 from rest_framework import status
 
+
+from .helpers import send_forgot_email, get_tokens_for_user, send_contact_email
 from .serializers import UserSerializer, UserLoginSerializer
-from .helpers import send_forgot_email, get_tokens_for_user
 from .models import User
 from . import schemas
 
@@ -82,13 +85,17 @@ def forgot_my_password(request) -> JsonResponse:
 
     token: str = default_token_generator.make_token(user_using)
     uidb64: str = urlsafe_base64_encode(force_bytes(user_using.pk))
-    send_forgot_email(email, token, uidb64)
+
+    try:
+        send_forgot_email(email, token, uidb64)
+    except Exception:
+        return JsonResponse({"message": "Email was not sent"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return JsonResponse({"message": "Email was sent"}, status=status.HTTP_200_OK)
 
 
 @api_view(['PATCH'])
-@schema(schemas.pass_forgot_modify)
+@schema(schemas.pass_forgot_modify_schema)
 def modify_password_forgotten(request, uidb64: str, token: str) -> JsonResponse:
     """
     Changes the user password after reading the token and uidb64 from the url
@@ -106,7 +113,7 @@ def modify_password_forgotten(request, uidb64: str, token: str) -> JsonResponse:
     user = User.objects.filter(pk=uid).first()
 
     if user is None or not default_token_generator.check_token(user, token):
-        return JsonResponse({"message": "Invalid token"}, status=status.HTTP_404_NOT_FOUND)
+        return JsonResponse({"message": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
 
     data = JSONParser().parse(request)
     new_password: str = data["password"]
@@ -118,6 +125,48 @@ def modify_password_forgotten(request, uidb64: str, token: str) -> JsonResponse:
     user.save()
 
     return JsonResponse({"message": "Password was changed successfully"}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@schema(schemas.contact_schema)
+def contact_email(request) -> JsonResponse:
+    """
+    Send an email to our support email with the user email and message
+
+    Args:
+        request: request http with user email
+
+    Returns:
+        response (JsonResponse): HTTP response in JSON format
+    """
+
+    email_validator = EmailValidator()
+
+    required_fields = ["sender_email", "sender_name", "subject", "email_body"]
+    error_messages: dict = {}
+
+    for field in required_fields:
+        if field not in request.data:
+            error_messages[field] = ["This field is required."]
+        elif field == "sender_email":
+            try:
+                email_validator(request.data[field])
+            except ValidationError:
+                error_messages[field] = ["Enter a valid email address."]
+
+    if error_messages:
+        return JsonResponse(error_messages, status=status.HTTP_400_BAD_REQUEST)
+
+    sender_email: str = request.data["sender_email"]
+    sender_name: str = request.data["sender_name"]
+    subject: str = request.data["subject"]
+    email_body: str = request.data["email_body"]
+
+    try:
+        send_contact_email(sender_email, sender_name, subject, email_body)
+    except Exception:
+        return JsonResponse({"message": "Email was not sent"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    return JsonResponse({"message": "Email was sent"}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
