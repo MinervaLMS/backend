@@ -8,26 +8,26 @@ class CustomUserAdmin(UserAdmin):
     """
     Class to customize the user administration panel
     """
+    model = User
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
-    model = User
     list_display = ("id" ,"email", "first_name", "last_name", "is_staff", "is_active",)
-    list_filter = ("email", "first_name", "last_name", "is_staff", "is_active",)
+    list_filter = ("is_staff", "is_active",)
     fieldsets = (
-        (None, {"fields": ("email", "password", "first_name", "last_name")}),
+        ("Information", {"fields": ("email", "password", "first_name", "last_name")}),
         ("Permissions", {"fields": ("is_staff", "is_active", "groups", "user_permissions")}),
     )
     add_fieldsets = (
         (None, {
             "classes": ("wide",),
             "fields": (
-                "email", "first_name", "last_name", "password1", "password2", "is_staff",
-                "is_active", "groups", "user_permissions"
+                "email","first_name", "last_name", "password1", "password2",
+                "is_staff", "is_active", "groups", "user_permissions"
             )}
         ),
     )
-    search_fields = ("email",)
-    ordering = ("email",)
+    search_fields = ("email", "first_name", "last_name")
+    ordering = ("id",)
 
 # Register your models here.
 admin.site.register(User, CustomUserAdmin)

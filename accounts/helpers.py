@@ -5,8 +5,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
 
-# TODO: Change domain of URL message
-# TODO: Use Django SMTP in production
+# TODO: Use Django send_email SMTP in production
+# TODO: Change domain of URL message in production
 
 # def send_forgot_email(email: str, token: str, uidb64: str) -> bool:
 #     """Send email to user with link to reset password
