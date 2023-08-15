@@ -8,8 +8,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import JSONParser
 from rest_framework import status
 
+from .helpers import send_forgot_email, get_tokens_for_user, send_contact_email
 from .serializers import UserSerializer, UserLoginSerializer
-from .helpers import send_forgot_email, get_tokens_for_user
 from .models import User
 from . import schemas
 
@@ -88,7 +88,7 @@ def forgot_my_password(request) -> JsonResponse:
 
 
 @api_view(['PATCH'])
-@schema(schemas.pass_forgot_modify)
+@schema(schemas.pass_forgot_modify_schema)
 def modify_password_forgotten(request, uidb64: str, token: str) -> JsonResponse:
     """
     Changes the user password after reading the token and uidb64 from the url
@@ -118,6 +118,42 @@ def modify_password_forgotten(request, uidb64: str, token: str) -> JsonResponse:
     user.save()
 
     return JsonResponse({"message": "Password was changed successfully"}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@schema(schemas.contact_schema)
+def contact_email(request) -> JsonResponse:
+    """
+    Send an email to our support email with the user email and message
+
+    Args:
+        request: request http with user email
+
+    Returns:
+        response (JsonResponse): HTTP response in JSON format
+    """
+
+    error_message: dict = {}
+
+    if not "sender_email" in request.data:
+        error_message["sender_email"] = ["This field is required."]
+    if not "sender_name" in request.data:
+        error_message["sender_name"] = ["This field is required."]
+    if not "subject" in request.data:
+        error_message["subject"] = ["This field is required."]
+    if not "email_body" in request.data:
+        error_message["email_body"] = ["This field is required."]
+
+    if error_message != {}:
+        return JsonResponse(error_message, status=status.HTTP_400_BAD_REQUEST)
+
+    sender_email: str = request.data["sender_email"]
+    sender_name: str = request.data["sender_name"]
+    subject: str = request.data["subject"]
+    email_body: str = request.data["email_body"]
+
+    send_contact_email(sender_email, sender_name, subject, email_body)
+
+    return JsonResponse({"message": "Email was sent"}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

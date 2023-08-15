@@ -11,4 +11,5 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('forgot-my-password/', views.forgot_my_password, name="forgot_my_password"),
     path('password-reset/<uidb64>/<token>', views.modify_password_forgotten, name="modify_password"),
+    path('contact/', views.contact_email, name="contact"),
 ]
