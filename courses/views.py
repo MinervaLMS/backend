@@ -8,22 +8,23 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import JSONParser
 from rest_framework import status
 from collections import defaultdict
-from .models import Material
 
 from .serializers import MaterialSerializer
 from .models import Material
 from . import schemas
 
-"TODO: Eliminar material (¿Eliminar o simplemnte añadir un campo para desactivarlo?)"
+#TODO: Eliminar material (¿Eliminar o simplemnte añadir un campo para desactivarlo?)
+#TODO: A views to edits material order must be created and it should not do in the materialChange view
 
 @api_view(['POST'])
 @schema(schemas.postMaterial_schema)
+@permission_classes([IsAuthenticated])
 def postMaterial_view(request) -> JsonResponse:
     """
-    View to post new material from a module in the database
+    View to create a new material from a module in the database
 
     Args:
-        request: request http with material data for post it
+        request: request http with material data 
 
     Returns:
         response (JsonResponse): HTTP response in JSON format
@@ -33,7 +34,7 @@ def postMaterial_view(request) -> JsonResponse:
 
     if serializer.is_valid():
         serializer.save()
-        return JsonResponse({"message": "Material created succesfully"}, status=status.HTTP_201_CREATED)
+        return JsonResponse({"message": "Material created successfully"}, status=status.HTTP_201_CREATED)
 
     return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -41,11 +42,10 @@ def postMaterial_view(request) -> JsonResponse:
 @permission_classes([IsAuthenticated])
 def material_list(request) -> JsonResponse:
     """
-    Get all materials in the database, but only returns the MaterialSerializer
-    fields ("email", "first_name", "last_name") ordered by module_id and order.
+    Get all materials in the database ordered by module_id and order.
 
     Args:
-        request: request http with user email
+        request: request http 
 
     Returns:
         Json response with the fields of the serialized materials if the user making
@@ -96,3 +96,26 @@ def materialChange(request, material_id) -> JsonResponse:
     material.save()
     serializer = MaterialSerializer(material)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+@schema(schemas.delete_material_schema)
+def delete_material_view(request, material_id: int) -> JsonResponse:
+    """
+    Deletes material with passed id
+
+    Args:
+        request: http request
+        material_id: material's id to be removed
+
+    Returns:
+        response (JsonResponse): HTTP response in JSON format
+    """
+
+    try:
+        material = Material.objects.get(pk=material_id)
+        material.delete()
+        return JsonResponse({"message": f"Material with id:{material_id} deletes successfully"}, status=status.HTTP_204_NO_CONTENT)
+    except Material.DoesNotExist:
+        return JsonResponse({"message": "Material does not exist"}, status=status.HTTP_404_NOT_FOUND)

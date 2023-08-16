@@ -81,3 +81,14 @@ editMaterial_schema = AutoSchema(manual_fields=[
         schema=coreschema.String(description="Material order")
     )
 ])
+
+# Delete material Schema
+delete_material_schema = AutoSchema(manual_fields=[
+    coreapi.Field(
+        "material_id",
+        required=True,
+        location="path",
+        type="integer",
+        schema=coreschema.String(description="Material id")
+    ),
+])
