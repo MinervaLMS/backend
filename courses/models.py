@@ -82,7 +82,8 @@ class Material(models.Model):
 
 
 class Enrollment(models.Model):
-    user_id = models.ForeignKey("accounts.User", on_delete=models.CASCADE, blank=False)
+    user_id = models.ForeignKey(
+        "accounts.User", on_delete=models.CASCADE, blank=False)
     course_id = models.ForeignKey(
         Course, on_delete=models.CASCADE, blank=False)
     enrollment_date = models.DateTimeField(auto_now_add=True, blank=False)
@@ -95,4 +96,4 @@ class Enrollment(models.Model):
         ]
 
     def __str__(self):
-        return f'{self.course_id} - {self.user_id}'
+        return f'{self.user_id} enrollment in course {self.course_id}'
