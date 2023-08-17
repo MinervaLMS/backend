@@ -10,16 +10,16 @@ from rest_framework import status
 from collections import defaultdict
 
 from .serializers import MaterialSerializer
-from .models import Material
+from .models import Material, Module
 from . import schemas
 
 #TODO: Eliminar material (¿Eliminar o simplemnte añadir un campo para desactivarlo?)
-#TODO: A views to edits material order must be created and it should not do in the materialChange view
+#TODO: A view to edits material order must be created and it should not do in the materialChange view
 
 @api_view(['POST'])
-@schema(schemas.postMaterial_schema)
+@schema(schemas.create_material_schema)
 @permission_classes([IsAuthenticated])
-def postMaterial_view(request) -> JsonResponse:
+def create_material(request) -> JsonResponse: 
     """
     View to create a new material from a module in the database
 
@@ -40,28 +40,57 @@ def postMaterial_view(request) -> JsonResponse:
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def material_list(request) -> JsonResponse:
+def get_materials_by_module(request, module_id: int) -> JsonResponse:
     """
-    Get all materials in the database ordered by module_id and order.
+    Get all materials from a module in the database
 
     Args:
         request: request http 
+        module_id: module's id to get all materials from it
 
     Returns:
         Json response with the fields of the serialized materials if the user making
         the request is Authenticated, else throws 401 Unauthorized status
     """
-
-    materials_by_module = Material.objects.all().order_by('module_id', 'order')
-
+    try:
+        Module.objects.get(id=module_id)
+    except Module.DoesNotExist:
+        return JsonResponse({"message": "There is not a module with that id"}, status=status.HTTP_404_NOT_FOUND)
+    
+    materials_by_module = Material.objects.filter(module_id=module_id).order_by('order')
+    if not materials_by_module:
+        return JsonResponse({"message": "There are not materials in this module"}, status=status.HTTP_404_NOT_FOUND)
     serializer = MaterialSerializer(materials_by_module, many=True)
 
-    return JsonResponse(serializer.data, safe=False)
+    return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
 
-@api_view(['PUT'])
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
-@schema(schemas.editMaterial_schema)
-def materialChange(request, material_id) -> JsonResponse:
+def get_material(request, material_id: int) -> JsonResponse:
+    """
+    Get material by its id
+
+    Args:
+        request: request http 
+        material_id: material's id to get it
+
+    Returns:
+        Json response with the fields of the serialized material if the user making
+        the request is Authenticated, else throws 401 Unauthorized status
+    """
+
+    try:
+        material = Material.objects.get(id=material_id)
+        material = MaterialSerializer(material)
+        return JsonResponse(material.data, safe=False, status=status.HTTP_200_OK)
+    except Material.DoesNotExist:
+        return JsonResponse({"message": "There is not a material with that id"}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+@schema(schemas.update_material_schema)
+def update_material(request, material_id: int) -> JsonResponse:
     """
     View to change material data from a module in the database
 
@@ -69,13 +98,11 @@ def materialChange(request, material_id) -> JsonResponse:
         In the url must be the id of the material
         request: request http with material data for post it
         Here is an example of how has to be Json request data:
+
         {
-        "fields_to_update": {
             "name": "Nuevo nombre",
             "material_type": "Nuevo tipo"
-            }
         }
-
     Returns:
         response (JsonResponse): HTTP response in JSON format
     """
@@ -85,23 +112,71 @@ def materialChange(request, material_id) -> JsonResponse:
     except Material.DoesNotExist:
         return JsonResponse({"message": "There is not a material with that id"}, status=status.HTTP_404_NOT_FOUND)
     
-    fields_to_update = request.data.get('fields_to_update', {})
-
-    for field_name, new_value in fields_to_update.items():
+    if 'order' in request.data:
+        return JsonResponse({"message": "You can not change the order of a material through this url"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    for field_name, new_value in request.data.items():
         if hasattr(material, field_name):
             setattr(material, field_name, new_value)
         else:
-            return JsonResponse(status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({"message": f"{field_name} attribute does not exist in material"}, status=status.HTTP_400_BAD_REQUEST)
 
     material.save()
     serializer = MaterialSerializer(material)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
 
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def update_material_order(request, module_id: int) -> JsonResponse:
+    """_summary_
+
+    Args:
+        request : request http
+        module_id (int): module's id to update order of its materials
+
+        {
+            material1_id: order, material2_id: order, material3_id: order
+        }
+
+    Returns:
+        JsonResponse: _description_
+    """
+    
+    try:
+        Module.objects.get(id=module_id)
+    except Module.DoesNotExist:
+        return JsonResponse({"message": "There is not a module with that id"}, status=status.HTTP_404_NOT_FOUND)
+    
+    orders:list = list(request.data.values())
+    orders.sort()
+    correct_orders: list = [n for n in range(len(orders))]
+
+    if orders != correct_orders:
+        return JsonResponse({"message": "This materials order is not valid"}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+    materials = Material.objects.filter(module_id=module_id)
+    for material in materials:
+        material.order *= -1 
+        material.save()
+    
+    for material in materials:
+        material.order = request.data[str(material.id)]
+        material.save()
+
+    materials = MaterialSerializer(materials, many=True)
+
+    return JsonResponse(materials.data, safe=False, status=status.HTTP_200_OK)
+
+
+
+
+
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 @schema(schemas.delete_material_schema)
-def delete_material_view(request, material_id: int) -> JsonResponse:
+def delete_material(request, material_id: int) -> JsonResponse:
     """
     Deletes material with passed id
 
@@ -115,7 +190,17 @@ def delete_material_view(request, material_id: int) -> JsonResponse:
 
     try:
         material = Material.objects.get(pk=material_id)
+        materials_ahead = Material.objects.filter(module_id=material.module_id, order__gt=material.order).order_by('order')
+        material.order *= -1
+        material.save()
+
+        for material_ahead in materials_ahead:
+            material_ahead.order -= 1
+            material_ahead.save()
+
         material.delete()
-        return JsonResponse({"message": f"Material with id:{material_id} deletes successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+        return JsonResponse({"message": f"Material deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+    
     except Material.DoesNotExist:
         return JsonResponse({"message": "Material does not exist"}, status=status.HTTP_404_NOT_FOUND)

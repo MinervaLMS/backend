@@ -4,8 +4,8 @@ from rest_framework.schemas import AutoSchema
 
 # Schemas used for API documentation
 
-# Post material Schema
-postMaterial_schema = AutoSchema(manual_fields=[
+# Create material Schema
+create_material_schema = AutoSchema(manual_fields=[
     coreapi.Field(
         "module_id",
         required=True,
@@ -43,8 +43,8 @@ postMaterial_schema = AutoSchema(manual_fields=[
     )
 ])
 
-# Edit material Schema
-editMaterial_schema = AutoSchema(manual_fields=[
+# Update material Schema
+update_material_schema = AutoSchema(manual_fields=[
     coreapi.Field(
         "module_id",
         required=False,
