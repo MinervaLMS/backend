@@ -1,18 +1,24 @@
 from django.db import models
 
+# TODO: Complete all courses related models with the rest of the fields and constraints needed
+
 
 class Course(models.Model):
-    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID', editable=False)
+    id = models.BigAutoField(auto_created=True, primary_key=True,
+                             serialize=False, verbose_name='ID', editable=False)
     name = models.CharField(max_length=100, blank=False, unique=True)
     alias = models.CharField(max_length=20, blank=False, unique=True)
     description = models.TextField(blank=True)
+
+    enrollments = models.ManyToManyField("accounts.User", through='Enrollment')
 
     def __str__(self):
         return self.alias
 
 
 class Module(models.Model):
-    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID', editable=False)
+    id = models.BigAutoField(auto_created=True, primary_key=True,
+                             serialize=False, verbose_name='ID', editable=False)
     course_id = models.ForeignKey(
         Course, on_delete=models.CASCADE, blank=False)
     name = models.CharField(max_length=100, blank=False)
@@ -44,7 +50,8 @@ class Module(models.Model):
 
 
 class Material(models.Model):
-    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID', editable=False)
+    id = models.BigAutoField(auto_created=True, primary_key=True,
+                             serialize=False, verbose_name='ID', editable=False)
     module_id = models.ForeignKey(
         Module, on_delete=models.CASCADE, blank=False)
     name = models.CharField(max_length=100, blank=False)
@@ -72,3 +79,20 @@ class Material(models.Model):
 
     def __str__(self):
         return f'{self.module_id}: {self.name}'
+
+
+class Enrollment(models.Model):
+    user_id = models.ForeignKey("accounts.User", on_delete=models.CASCADE, blank=False)
+    course_id = models.ForeignKey(
+        Course, on_delete=models.CASCADE, blank=False)
+    enrollment_date = models.DateTimeField(auto_now_add=True, blank=False)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                # (user_id, course_id) pair is the primary key or the enrollment
+                fields=['user_id', 'course_id'], name='unique_enrollment'),
+        ]
+
+    def __str__(self):
+        return f'{self.course_id} - {self.user_id}'
