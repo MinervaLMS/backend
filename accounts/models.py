@@ -29,11 +29,15 @@ class User(AbstractUser):
     # Use custom user manager
     objects = UserManager()
 
-    # Temporary enroll all users to ED20241 course
+    # Temporary enroll all registered users to ED20241 course
     def save(self, *args, **kwargs):
         course = apps.get_model('courses', 'Course').objects.get(alias="ED20241")
-        enrollment = Enrollment(user_id=self, course_id=course)
-        enrollment.save()
+        already_enrolled = Enrollment.objects.filter(user_id=self, course_id=course).exists()
+
+        if not already_enrolled:
+            enrollment = Enrollment(user_id=self, course_id=course)
+            enrollment.save()
+
         super().save(*args, **kwargs)
 
 
