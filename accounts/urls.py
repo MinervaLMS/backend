@@ -1,15 +1,25 @@
 from django.urls import path
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
+from rest_framework_simplejwt.views import TokenRefreshView
 
 from . import views
 
+# TODO: Change contact/ endpoint to an independent app in the future
+
 urlpatterns = [
-    path('register/', views.register_view, name="user_register"),
-    path('login/', views.login_view, name='user_login'),
-    path('list/', views.user_list, name='user_list'),
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('forgot-my-password/', views.forgot_my_password, name="forgot_my_password"),
-    path('password-reset/<uidb64>/<token>', views.modify_password_forgotten, name="modify_password"),
-    path('contact/', views.contact_email, name="contact"),
+    path('register/', views.user_register, name="user_register"),
+    path('register/confirm/<uidb64>/<token>',
+         views.confirm_email, name="user_confirm_email"),
+
+    path('login/', views.user_login, name='user_login'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='user_token_refresh'),
+
+    path('forgot-my-password/', views.forgot_my_password,
+         name="user_forgot_my_password"),
+    path('password-reset/<uidb64>/<token>',
+         views.modify_forgotten_password, name="user_modify_password"),
+
+    path('users/', views.get_all_users, name='user_list'),
+
+    path('contact/', views.contact_support_email, name="support_contact"),
 ]
