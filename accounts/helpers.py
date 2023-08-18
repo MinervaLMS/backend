@@ -24,7 +24,7 @@ from . import emails
 #     """
 
 #     subject = 'Link to recover password'
-#     message = f'Hi, click on the link to reset your password http://127.0.0.1:8000/password-reset/{uidb64}/{token}'
+#     message = f'Hi, click on the link to reset your password http://127.0.0.1:8000/forgot-my-password/{uidb64}/{token}'
 #     email_from = settings.EMAIL_HOST_USER
 #     recipient_list = [email]
 #     send_mail(subject, message, email_from, recipient_list)
