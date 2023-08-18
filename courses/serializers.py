@@ -2,7 +2,17 @@ from django.contrib.auth import authenticate
 from rest_framework.serializers import ModelSerializer, Serializer
 from rest_framework import serializers
 
+from rest_framework import serializers
+from .models import Course
+
 from .models import Material
+
+class CourseSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Course
+        fields = ['id', 'name', 'alias', 'description']
+        
 
 class MaterialSerializer(ModelSerializer):
     class Meta:
