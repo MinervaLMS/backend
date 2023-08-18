@@ -33,8 +33,8 @@ def forgot_email(email: str, token: str, uidb64: str) -> dict:
         <p>We hope this email finds you well. It appears that you have requested a password reset for your MinervaLMS account. If you did not make this request, please ignore this message.</p>
 
         <p>If you did request a password reset, please use the following link to reset your password:</p>
-        <a href="http://frontend-two-rosy.vercel.app/password-reset/{uidb64}/{token}">
-        http://frontend-two-rosy.vercel.app/password-reset/{uidb64}/{token}</a>
+        <a href="http://frontend-two-rosy.vercel.app/forgot-my-password/{uidb64}/{token}">
+        http://frontend-two-rosy.vercel.app/forgot-my-password/{uidb64}/{token}</a>
 
         <p>Thank you for using MinervaLMS.</p>
 

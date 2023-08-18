@@ -102,6 +102,32 @@ def confirm_email(request, uidb64: str, token: str) -> JsonResponse:
 
     return JsonResponse({"message": "Email was confirmed successfully"}, status=status.HTTP_200_OK)
 
+@api_view(['POST'])
+@schema(schemas.resend_confirmation_email_schema)
+def resend_confirmation_email(request, uidb64: str) -> JsonResponse:
+    """
+    Resend the confirmation email after reading the uidb64 from the url
+
+    Args:
+        request: request http
+        uidb64 (str): Base 64 encode of user email
+
+    Returns:
+        response (JsonResponse): HTTP response in JSON format
+    """
+
+
+    email: str = force_str(urlsafe_base64_decode(uidb64))
+    user = User.objects.filter(email=email).first()
+    token: str = confirmation_token_generator.make_token(user)
+
+    try:
+        send_confirmation_email(user.email, user.first_name, token, uidb64)
+
+        return JsonResponse({"message": "Email was sent"}, status=status.HTTP_201_CREATED)
+    except Exception:
+        return JsonResponse({"message": "Email was not sent"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @api_view(['POST'])
 @schema(schemas.forgot_my_password_schema)
