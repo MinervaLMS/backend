@@ -4,14 +4,14 @@ from rest_framework.schemas import AutoSchema
 
 # Schemas used for API documentation
 
-# Create material Schema
+# Create material 
 create_material_schema = AutoSchema(manual_fields=[
     coreapi.Field(
         "module_id",
         required=True,
         location="form",
         type="integer",
-        schema=coreschema.String(description="Module id")
+        schema=coreschema.String(description="Module's id from which you want to create the material")
     ),
     coreapi.Field(
         "name",
@@ -32,7 +32,7 @@ create_material_schema = AutoSchema(manual_fields=[
         required=True,
         location="form",
         type="boolean",
-        schema=coreschema.String(description="Material is extra")
+        schema=coreschema.String(description="Material is extra or not")
     ),
     coreapi.Field(
         "order",
@@ -43,46 +43,71 @@ create_material_schema = AutoSchema(manual_fields=[
     )
 ])
 
-# Update material Schema
-update_material_schema = AutoSchema(manual_fields=[
+# Get materials by module 
+get_materials_by_module_schema = AutoSchema(manual_fields=[
     coreapi.Field(
         "module_id",
-        required=False,
-        location="form",
+        required=True,
+        location="path",
         type="integer",
-        schema=coreschema.String(description="Module id")
+        schema=coreschema.String(description="Module's id from which you want to get the materials")
+    ),
+])
+
+# get_material by id
+get_material_schema = AutoSchema(manual_fields=[
+    coreapi.Field(
+        "material_id",
+        required=True,
+        location="path",
+        type="integer",
+        schema=coreschema.String(description="Material's id to get it")
+    ),
+])
+
+update_material_schema = AutoSchema(manual_fields=[
+    coreapi.Field(
+        "material_id",
+        required=True,
+        location="path",
+        type="integer",
+        schema=coreschema.String(description="Material's id to update it")
     ),
     coreapi.Field(
         "name",
         required=False,
         location="form",
         type="string",
-        schema=coreschema.String(description="Material name")
+        schema=coreschema.String(description="New material name")
     ),
     coreapi.Field(
         "material_type",
         required=False,
         location="form",
         type="string",
-        schema=coreschema.String(description="Material type")
+        schema=coreschema.String(description="New material type")
     ),
     coreapi.Field(
         "is_extra",
         required=False,
         location="form",
         type="boolean",
-        schema=coreschema.String(description="Material is extra")
+        schema=coreschema.String(description="Material is extra or not")
     ),
-    coreapi.Field(
-        "order",
-        required=False,
-        location="form",
-        type="integer",
-        schema=coreschema.String(description="Material order")
-    )
 ])
 
-# Delete material Schema
+# Update material order
+update_material_order_schema = AutoSchema(manual_fields=[
+    coreapi.Field(
+        "module_id",
+        required=True,
+        location="path",
+        type="integer",
+        schema=coreschema.String(description="Module's id from which you want to update material order")
+    ),
+])
+
+# Delete material 
 delete_material_schema = AutoSchema(manual_fields=[
     coreapi.Field(
         "material_id",
