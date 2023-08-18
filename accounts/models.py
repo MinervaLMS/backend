@@ -35,6 +35,7 @@ class User(AbstractUser):
 
     # Temporary enroll all registered users to ED20241 course
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
         course = apps.get_model(
             'courses', 'Course').objects.get(alias="ED20241")
         already_enrolled = Enrollment.objects.filter(
@@ -44,7 +45,6 @@ class User(AbstractUser):
             enrollment = Enrollment(user_id=self, course_id=course)
             enrollment.save()
 
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return (self.get_full_name())
