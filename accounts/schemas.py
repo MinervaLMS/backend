@@ -69,6 +69,16 @@ confirm_email_schema = AutoSchema(manual_fields=[
     ),
 ])
 
+resend_confirmation_email_schema = AutoSchema(manual_fields=[
+    coreapi.Field(
+        "uidb64",
+        required=True,
+        location="path",
+        type="string",
+        schema=coreschema.String(description="User email encoded")
+    ),
+])
+
 forgot_my_password_schema = AutoSchema(manual_fields=[
     coreapi.Field(
         "email",
