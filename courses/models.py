@@ -41,4 +41,5 @@ class Material(models.Model):
         ]
 
     def __str__(self):
-        return f'{self.module_id}: {self.name}'
+        return f'{self.id} - {self.name}'
+
