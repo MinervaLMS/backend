@@ -78,7 +78,7 @@ class Material(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.module_id}: {self.name}'
+        return f'{self.module_id} - {self.name}'
 
 
 class Enrollment(models.Model):

@@ -8,6 +8,7 @@ from courses.models import Course, Enrollment
 # TODO: Add many to many relationship with courses using instructor
 # TODO: Delete the temporary enrollment to ED20241 course
 
+
 class User(AbstractUser):
     """
     Edited user model to use email as username, timestamp as id and change required fields
