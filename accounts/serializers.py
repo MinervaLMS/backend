@@ -4,8 +4,11 @@ from rest_framework import serializers
 
 from .models import User
 
+
 class UserSerializer(ModelSerializer):
-    password = serializers.CharField(write_only=True) # write_only means that the field will not be returned in the response
+    # write_only means that the field will not be returned in the response
+    password = serializers.CharField(write_only=True)
+
     class Meta:
         model = User
         fields = ['email', 'password', 'first_name', 'last_name']
@@ -14,6 +17,7 @@ class UserSerializer(ModelSerializer):
         user = User.objects.create_user(**validated_data)
 
         return user
+
 
 class UserLoginSerializer(Serializer):
     """
@@ -24,8 +28,13 @@ class UserLoginSerializer(Serializer):
     password = serializers.CharField(write_only=True)
 
     def validate(self, data):
-        user = authenticate(**data)
-        if user and user.is_active:
-            return user
+        user_auth = authenticate(**data)
+        user_active = User.objects.filter(email=data['email'], is_active=True).exists()
 
-        raise serializers.ValidationError("Incorrect Credentials")
+        if not user_active:
+            raise serializers.ValidationError("Please verify your email to login")
+
+        if not user_auth:
+            raise serializers.ValidationError("Incorrect Credentials")
+
+        return user_auth

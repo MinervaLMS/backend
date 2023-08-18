@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractUser
 
 from .managers import UserManager
 
+
 class User(AbstractUser):
     """
     Edited user model to use email as username, timestamp as id and change required fields
@@ -16,7 +17,7 @@ class User(AbstractUser):
     is_active = models.BooleanField(default=False)
 
     # Remove username field and use email as unique identifier
-    username=None
+    username = None
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
 
@@ -24,4 +25,4 @@ class User(AbstractUser):
     objects = UserManager()
 
     def __str__(self):
-        return(self.get_full_name())
+        return (self.get_full_name())
