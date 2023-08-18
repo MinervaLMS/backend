@@ -4,8 +4,7 @@ from rest_framework.schemas import AutoSchema
 
 # Schemas used for API documentation
 
-# Login Schema
-login_schema = AutoSchema(manual_fields=[
+user_login_schema = AutoSchema(manual_fields=[
     coreapi.Field(
         "email",
         required=True,
@@ -22,8 +21,7 @@ login_schema = AutoSchema(manual_fields=[
     )
 ])
 
-# Register Schema
-register_schema = AutoSchema(manual_fields=[
+user_register_schema = AutoSchema(manual_fields=[
     coreapi.Field(
         "email",
         required=True,
@@ -54,8 +52,24 @@ register_schema = AutoSchema(manual_fields=[
     )
 ])
 
-# Email send forgot password Schema
-pass_forgot_schema = AutoSchema(manual_fields=[
+confirm_email_schema = AutoSchema(manual_fields=[
+    coreapi.Field(
+        "uidb64",
+        required=True,
+        location="path",
+        type="string",
+        schema=coreschema.String(description="User email encoded")
+    ),
+    coreapi.Field(
+        "token",
+        required=True,
+        location="path",
+        type="string",
+        schema=coreschema.String(description="User token link")
+    ),
+])
+
+forgot_my_password_schema = AutoSchema(manual_fields=[
     coreapi.Field(
         "email",
         required=True,
@@ -66,7 +80,7 @@ pass_forgot_schema = AutoSchema(manual_fields=[
 ])
 
 # Reset password Schema
-pass_forgot_modify_schema = AutoSchema(manual_fields=[
+modify_forgotten_password_schema = AutoSchema(manual_fields=[
     coreapi.Field(
         "uidb64",
         required=True,
@@ -91,7 +105,7 @@ pass_forgot_modify_schema = AutoSchema(manual_fields=[
 ])
 
 # Email send contact Schema
-contact_schema = AutoSchema(manual_fields=[
+contact_support_email_schema = AutoSchema(manual_fields=[
     coreapi.Field(
         "sender_email",
         required=True,
@@ -118,23 +132,8 @@ contact_schema = AutoSchema(manual_fields=[
         required=True,
         location="form",
         type="string",
-        schema=coreschema.String(description="Text of the contact email written by the user")
+        schema=coreschema.String(
+            description="Text of the contact email written by the user")
     ),
 ])
 
-confirmation_email_schema = AutoSchema(manual_fields=[
-    coreapi.Field(
-        "uidb64",
-        required=True,
-        location="path",
-        type="string",
-        schema=coreschema.String(description="User email encoded")
-    ),
-    coreapi.Field(
-        "token",
-        required=True,
-        location="path",
-        type="string",
-        schema=coreschema.String(description="User token link")
-    ),
-])

@@ -16,13 +16,13 @@ class CourseAdmin(admin.ModelAdmin):
     inlines = [ModuleInline]
 
 class ModuleAdmin(admin.ModelAdmin):
-    list_display = ('name', 'course_id',)
+    list_display = ('id', 'name', 'course_id',)
     list_filter = ('course_id',)
     search_fields = ('name', 'course__name')
     inlines = [MaterialInline]
 
 class MaterialAdmin(admin.ModelAdmin):
-    list_display = ('name', 'material_type', 'module_id', 'is_extra',)
+    list_display = ('id', 'name', 'material_type', 'module_id', 'is_extra',)
     list_filter = ('material_type',)
     search_fields = ('name', 'module_id')
 
