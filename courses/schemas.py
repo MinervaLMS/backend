@@ -4,7 +4,7 @@ from rest_framework.schemas import AutoSchema
 
 # Schemas used for API documentation
 
-#Create Course Schema
+# Create Course Schema
 create_course_schema = AutoSchema(manual_fields=[
     coreapi.Field(
         "name",
@@ -26,7 +26,7 @@ create_course_schema = AutoSchema(manual_fields=[
     )
 ])
 
-#Read Course Schema
+# Read Course Schema
 get_course_schema = AutoSchema(manual_fields=[
     coreapi.Field(
         "alias",
@@ -36,7 +36,7 @@ get_course_schema = AutoSchema(manual_fields=[
     )
 ])
 
-#Update Course Schema
+# Update Course Schema
 update_course_schema = AutoSchema(manual_fields=[
     coreapi.Field(
         "name",
@@ -58,7 +58,7 @@ update_course_schema = AutoSchema(manual_fields=[
     )
 ])
 
-#Delete Course Schema
+# Delete Course Schema
 delete_course_schema = AutoSchema(manual_fields=[
     coreapi.Field(
         "alias",
@@ -68,14 +68,15 @@ delete_course_schema = AutoSchema(manual_fields=[
     )
 ])
 
-# Create material 
+# Create material
 create_material_schema = AutoSchema(manual_fields=[
     coreapi.Field(
         "module_id",
         required=True,
         location="form",
         type="integer",
-        schema=coreschema.String(description="Module's id from which you want to create the material")
+        schema=coreschema.String(
+            description="Module's id from which you want to create the material")
     ),
     coreapi.Field(
         "name",
@@ -107,14 +108,15 @@ create_material_schema = AutoSchema(manual_fields=[
     )
 ])
 
-# Get materials by module 
+# Get materials by module
 get_materials_by_module_schema = AutoSchema(manual_fields=[
     coreapi.Field(
         "module_id",
         required=True,
         location="path",
         type="integer",
-        schema=coreschema.String(description="Module's id from which you want to get the materials")
+        schema=coreschema.String(
+            description="Module's id from which you want to get the materials")
     ),
 ])
 
@@ -167,11 +169,12 @@ update_material_order_schema = AutoSchema(manual_fields=[
         required=True,
         location="path",
         type="integer",
-        schema=coreschema.String(description="Module's id from which you want to update material order")
+        schema=coreschema.String(
+            description="Module's id from which you want to update material order")
     ),
 ])
 
-# Delete material 
+# Delete material
 delete_material_schema = AutoSchema(manual_fields=[
     coreapi.Field(
         "material_id",
@@ -180,4 +183,85 @@ delete_material_schema = AutoSchema(manual_fields=[
         type="integer",
         schema=coreschema.String(description="Material id")
     ),
+])
+
+# Module
+# Create module
+create_module_schema = AutoSchema(manual_fields=[
+    coreapi.Field(
+        "course_id",
+        required=True,
+        location="form",
+        type="integer",
+        schema=coreschema.String(description="Course's id")
+    ),
+    coreapi.Field(
+        "name",
+        required=True,
+        location="form",
+        type="string",
+        schema=coreschema.String(description="Module's name")
+    ),
+    coreapi.Field(
+        "order",
+        required=False,
+        location="form",
+        type="integer",
+        schema=coreschema.String(description="Module's name")
+    )]
+)
+# Get module
+get_module_schema = AutoSchema(manual_fields=[
+    coreapi.Field(
+        "module_id",
+        required=True,
+        location="path",
+        type="integer",
+        schema=coreschema.String(description="Module's id")
+    )])
+# Delete module
+delete_module_schema = AutoSchema(manual_fields=[
+    coreapi.Field(
+        "module_id",
+        required=True,
+        location="path",
+        type="integer",
+        schema=coreschema.String(description="Module's id")
+    )])
+# Update module order
+update_module_order_schema = AutoSchema(manual_fields=[
+    coreapi.Field(
+        "course_id",
+        required=True,
+        location="path",
+        type="integer",
+        schema=coreschema.String(description="Course's id")
+    )
+])
+# Update module
+update_module_schema = AutoSchema(manual_fields=[
+    coreapi.Field(
+        "module_id",
+        required=True,
+        location="path",
+        type="integer",
+        schema=coreschema.String(description="Module's id")
+    ),
+    coreapi.Field(
+        "name",
+        required=True,
+        location="form",
+        type="string",
+        schema=coreschema.String(description="Module's name")
+    )
+])
+# List modules by course
+get_modules_by_course_schema = AutoSchema(manual_fields=[
+    coreapi.Field(
+        "alias",
+        required=True,
+        location="path",
+        type="string",
+        schema=coreschema.String(description="Course's alias")
+    )
 ])
