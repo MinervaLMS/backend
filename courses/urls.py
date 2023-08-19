@@ -16,7 +16,7 @@ module_urls = [
     path('module/create/', views.create_module, name='create_module'),
     path('module/<int:module_id>/',
          views.get_module_by_id, name='get_module_by_id'),
-    path('module/delete/<int:module_id>',
+    path('module/delete/<int:module_id>/',
          views.delete_module, name='delete_module'),
     path('module/update/<int:module_id>/',
          views.update_module, name='update_module'),
@@ -24,7 +24,7 @@ module_urls = [
          views.update_module_order, name='update_module_order'),
     path('module/<int:module_id>/materials/',
          views.get_materials_by_module, name="get_materials_by_module"),
-    path('module/<int:module_id>/materials/update_order',
+    path('module/<int:module_id>/materials/update_order/',
          views.update_material_order, name='update_material_order'),
 ]
 
