@@ -8,9 +8,9 @@ course_urls = [
     path('course/delete/<str:alias>/', views.delete_course, name='delete_course'),
     path('course/<str:alias>/modules/', views.get_modules_by_course,
          name="get_modules_by_course"),
-    path('course/<str:alias>/modules/<int:order>/',
+    path('course/<str:alias>/<int:order>/',
          views.get_module_by_course_order, name="get_module_by_course_order"),
-    path('course/<str:alias>/update_order/',
+    path('course/<str:alias>/modules/update_order/',
          views.update_module_order, name='update_module_order')
 ]
 
