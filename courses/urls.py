@@ -10,6 +10,8 @@ course_urls = [
          name="get_modules_by_course"),
     path('course/<str:alias>/modules/<int:order>/',
          views.get_module_by_course_order, name="get_module_by_course_order"),
+    path('course/<str:alias>/update_order/',
+         views.update_module_order, name='update_module_order')
 ]
 
 module_urls = [
@@ -20,8 +22,6 @@ module_urls = [
          views.delete_module, name='delete_module'),
     path('module/update/<int:module_id>/',
          views.update_module, name='update_module'),
-    path('module/<str:alias>/update_order/',
-         views.update_module_order, name='update_module_order'),
     path('module/<int:module_id>/materials/',
          views.get_materials_by_module, name="get_materials_by_module"),
     path('module/<int:module_id>/materials/update_order/',

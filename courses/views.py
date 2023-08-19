@@ -388,12 +388,12 @@ def delete_module(request, module_id: int) -> JsonResponse:
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
 @schema(schemas.update_module_order_schema)
-def update_module_order(request, course_id: int) -> JsonResponse:
+def update_module_order(request, alias: str) -> JsonResponse:
     """update modules order of a course
 
     Args:
         request : request http
-        course_id (int): course's id to update order of its modules
+        course_id (int): course's alias to update order of its modules
 
         {
             module1_id: order, module2_id: order, module3_id: order
@@ -404,7 +404,7 @@ def update_module_order(request, course_id: int) -> JsonResponse:
     """
 
     try:
-        Course.objects.get(id=course_id)
+        course = Course.objects.get(alias=alias)
     except Course.DoesNotExist:
         return JsonResponse({"message": "There is not a course with that id"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -415,7 +415,7 @@ def update_module_order(request, course_id: int) -> JsonResponse:
     if orders != correct_orders:
         return JsonResponse({"message": "This modules order is not valid"}, status=status.HTTP_400_BAD_REQUEST)
 
-    modules = Module.objects.filter(course_id=course_id)
+    modules = Module.objects.filter(course_id=course.id)
     for module in modules:
         module.order *= -1
         module.save()

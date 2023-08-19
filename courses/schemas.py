@@ -231,11 +231,11 @@ delete_module_schema = AutoSchema(manual_fields=[
 # Update module order
 update_module_order_schema = AutoSchema(manual_fields=[
     coreapi.Field(
-        "course_id",
+        "alias",
         required=True,
         location="path",
-        type="integer",
-        schema=coreschema.String(description="Course's id")
+        type="string",
+        schema=coreschema.String(description="Course's alias")
     )
 ])
 # Update module
