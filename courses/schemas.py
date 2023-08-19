@@ -265,3 +265,20 @@ get_modules_by_course_schema = AutoSchema(manual_fields=[
         schema=coreschema.String(description="Course's alias")
     )
 ])
+
+get_module_by_course_order_schema = AutoSchema(manual_fields=[
+    coreapi.Field(
+        "alias",
+        required=True,
+        location="path",
+        type="string",
+        schema=coreschema.String(description="Course's alias")
+    ),
+    coreapi.Field(
+        "order",
+        required=True,
+        location="path",
+        type="integer",
+        schema=coreschema.String(description="Module's order")
+    )
+])

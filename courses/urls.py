@@ -7,7 +7,9 @@ course_urls = [
     path('course/update/<str:alias>/', views.update_course, name='update_course'),
     path('course/delete/<str:alias>/', views.delete_course, name='delete_course'),
     path('course/<str:alias>/modules/', views.get_modules_by_course,
-         name="get_modules_by_course")
+         name="get_modules_by_course"),
+    path('course/<str:alias>/modules/<int:order>/',
+         views.get_module_by_course_order, name="get_module_by_course_order"),
 ]
 
 module_urls = [

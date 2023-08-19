@@ -483,3 +483,33 @@ def get_modules_by_course(request, alias: str) -> JsonResponse:
         return JsonResponse({"message": "There are not modules in this course"}, status=status.HTTP_404_NOT_FOUND)
     serializer = ModuleSerializer(modules_by_course, many=True)
     return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@schema(schemas.get_module_by_course_order_schema)
+def get_module_by_course_order(request, alias: str, order: int) -> JsonResponse:
+    """
+    Get a module from a course in the database
+
+    Args:
+        request: request http 
+        alias (str): Alias to get all modules from it
+        order (int): Order of the module
+
+    Returns:
+        Json response with the fields of the serialized materials if the user making
+        the request is Authenticated, else throws 401 Unauthorized status. If there is no course
+        or module order, then throws 404 status
+    """
+    try:
+        course = Course.objects.get(alias=alias)
+    except Course.DoesNotExist:
+        return JsonResponse({"message": "There is not a course with that id"}, status=status.HTTP_404_NOT_FOUND)
+    try:
+        module_by_course = Module.objects.get(
+            course_id=course.id, order=order)
+        module_by_course = ModuleSerializer(module_by_course)
+        return JsonResponse(module_by_course.data, safe=False, status=status.HTTP_200_OK)
+    except Module.DoesNotExist:
+        return JsonResponse({"message": "There are not modules by this order"}, status=status.HTTP_404_NOT_FOUND)
