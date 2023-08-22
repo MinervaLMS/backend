@@ -10,7 +10,7 @@ course_urls = [
 
 module_urls = [
     path('module/<int:module_id>/materials/', views.get_materials_by_module, name="get_materials_by_module"),
-    path('module/<int:module_id>/materials/update_order', views.update_material_order, name='update_material_order'),
+    path('module/<int:module_id>/materials/update_order/', views.update_material_order, name='update_material_order'),
 ]
 
 material_urls = [
