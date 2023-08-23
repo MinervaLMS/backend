@@ -37,5 +37,4 @@ material_urls = [
          views.delete_material, name='delete_material'),
 ]
 
-
 urlpatterns = course_urls + module_urls + material_urls
