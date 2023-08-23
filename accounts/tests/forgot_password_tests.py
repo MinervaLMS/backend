@@ -1,7 +1,6 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
 
-from ..models import User
 from courses.models import Course
 
 class PasswordResetTestCase(TestCase):
