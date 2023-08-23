@@ -75,7 +75,7 @@ def update_module(request, module_id: int) -> JsonResponse:
 
     try:
         module = Module.objects.get(id=module_id)
-    except Module.objects.get(id=module_id).DoesNotExist:
+    except Module.DoesNotExist:
         return JsonResponse({"message": "There is not a module with that id"}, status=status.HTTP_404_NOT_FOUND)
 
     if "name" in request.data:
