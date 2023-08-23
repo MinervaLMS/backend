@@ -219,3 +219,5 @@ RESEND_DOMAIN = os.environ.get("RESEND_DOMAIN")
 # CORS configuration (Change this in production)
 CORS_ALLOW_ALL_ORIGINS = True
 
+# Tests configuration
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
