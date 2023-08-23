@@ -1,4 +1,3 @@
-from django.apps import apps
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
@@ -6,12 +5,11 @@ from .managers import UserManager
 from courses.models import Course, Enrollment
 
 # TODO: Add many to many relationship with courses using instructor
-# TODO: Delete the temporary enrollment to ED20241 course
-
+# TODO: Delete the temporary enrollment to ED20241 course in production
 
 class User(AbstractUser):
     """
-    Edited user model to use email as username, timestamp as id and change required fields
+    Custom user model to use email as username and changed required fields
     """
 
     id = models.BigAutoField(auto_created=True, primary_key=True,
@@ -36,15 +34,13 @@ class User(AbstractUser):
     # Temporary enroll all registered users to ED20241 course
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        course = apps.get_model(
-            'courses', 'Course').objects.get(alias="ED20241")
+        course = Course.objects.get(alias="ED20241")
         already_enrolled = Enrollment.objects.filter(
             user_id=self, course_id=course).exists()
 
         if not already_enrolled:
             enrollment = Enrollment(user_id=self, course_id=course)
             enrollment.save()
-
 
     def __str__(self):
         return (self.get_full_name())
