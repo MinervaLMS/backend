@@ -113,7 +113,7 @@ def delete_material(request, material_id: int) -> JsonResponse:
         material = Material.objects.get(pk=material_id)
         materials_ahead = Material.objects.filter(
             module_id=material.module_id, order__gt=material.order).order_by('order')
-        material.order *= -1
+        material.order = -material.order if material.order > 0 else -1
         material.save()
 
         for material_ahead in materials_ahead:

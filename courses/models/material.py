@@ -20,7 +20,7 @@ class Material(models.Model):
         ]
 
     def save(self, *args, **kwargs):
-        if not self.order:
+        if self.order is None: 
             # In material creation, automatically assign the next possible order
             try:
                 self.order = Material.objects.filter(module_id=self.module_id).aggregate(

@@ -1,3 +1,4 @@
+from django.db import models
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes, schema
 from rest_framework import status
@@ -203,6 +204,8 @@ def update_module_order(request, alias: str) -> JsonResponse:
     orders: list = list(request.data.values())
     orders.sort()
     correct_orders: list = [n for n in range(len(orders))]
+    max_order = Module.objects.filter(course_id=course.id).aggregate(
+                    models.Max('order'))['order__max'] + 1
 
     if orders != correct_orders:
         return JsonResponse({"message": "This modules order is not valid"}, status=status.HTTP_400_BAD_REQUEST)
@@ -210,7 +213,7 @@ def update_module_order(request, alias: str) -> JsonResponse:
     modules = Module.objects.filter(course_id=course.id)
 
     for module in modules:
-        module.order *= -1
+        module.order += max_order
         module.save()
 
     for module in modules:
