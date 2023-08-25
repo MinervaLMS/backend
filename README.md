@@ -1,4 +1,4 @@
-<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
+<!-- Improved compatibility of Back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
 
 <a name="Judge - API"></a>
 
@@ -28,7 +28,7 @@
 <br />
 <div align="center">
 
-  <h3 align="center">Backend - Minerva</h3>
+  <h3 align="center">MinervaLMS - Backend</h3>
 
   <p align="center">
     Backend team repository of Minerva Learning Management System (LMS). Developed by a group of students of Universidad Nacional de Colombia using Django.
@@ -47,16 +47,16 @@
   <ol>
     <li>
       <a href="#about-the-project">About The Project</a>
-      <ul>
+      <ol>
         <li><a href="#built-with">Built With</a></li>
-      </ul>
+      </ol>
     </li>
     <li>
       <a href="#getting-started">Getting Started</a>
-      <ul>
+      <ol>
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#installation">Installation</a></li>
-      </ul>
+      </ol>
     </li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -70,16 +70,14 @@
 
 This project serves as the core system for the Minerva project. It's designed with scalability and maintainability in mind, ensuring it can handle increased usage. Anticipating around 5000 users annually.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 ### Built With
 
 Are you able to review our requirements outlined in the [pyproject](https://github.com/MinervaLMS/backend/blob/develop/pyproject.toml) file. This document provides a comprehensive overview of the specifications we are seeking.
 
--   ![Django](https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white)
--   ![DjangoREST](https://img.shields.io/badge/DJANGO-REST-ff1709?style=for-the-badge&logo=django&logoColor=white&color=ff1709&labelColor=gray)
+![Django](https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white)
+![DjangoREST](https://img.shields.io/badge/DJANGO-REST-ff1709?style=for-the-badge&logo=django&logoColor=white&color=ff1709&labelColor=gray)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">Back to top</a>)</p>
 
 <!-- GETTING STARTED -->
 
@@ -132,7 +130,7 @@ Nice to have:
       pre-commit install
     ```
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">Back to top</a>)</p>
 
 <!-- CONTRIBUTING -->
 
@@ -141,12 +139,21 @@ Nice to have:
 If you want to contribute in this project
 
 1. Clone the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
+2. Create your Feature Branch
+    ```sh
+    git checkout -b feature/AmazingFeature
+    ```
+3. Commit your Changes
+    ```sh
+    git commit -m 'Add some Amazing feature'
+    ```
+4. Push to the Branch
+    ```sh
+    git push origin feature/AmazingFeature
+    ```
 5. Open a Pull Request
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">Back to top</a>)</p>
 
 <!-- LICENSE -->
 
@@ -154,17 +161,17 @@ If you want to contribute in this project
 
 Distributed under the MIT License. See `LICENSE.txt` for more information.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">Back to top</a>)</p>
 
 <!-- CONTACT -->
 
 ## Contact
 
-Your Name - [@your_twitter](https://twitter.com/your_username) - email@example.com
+<!-- Your Name - [@your_twitter](https://twitter.com/your_username) - email@example.com -->
 
-Project Link: [https://github.com/your_username/repo_name](https://github.com/your_username/repo_name)
+- Project Link: [https://github.com/MinervaLMS/backend](https://github.com/MinervaLMS/backend)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">Back to top</a>)</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
