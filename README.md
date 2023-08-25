@@ -1,5 +1,7 @@
 <!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
+
 <a name="Judge - API"></a>
+
 <!--
 *** Thanks for checking out the Best-README-Template. If you have a suggestion
 *** that would make this better, please fork the repo and create a pull request
@@ -7,8 +9,6 @@
 *** Don't forget to give the project a star!
 *** Thanks again! Now go create something AMAZING! :D
 -->
-
-
 
 <!-- PROJECT SHIELDS -->
 <!--
@@ -18,11 +18,11 @@
 *** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
+
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
-
 
 <!-- PROJECT LOGO -->
 <br />
@@ -40,8 +40,6 @@
     <a href="https://github.com/MinervaLMS/backend/issues">Request Feature</a>
   </p>
 </div>
-
-
 
 <!-- TABLE OF CONTENTS -->
 <details>
@@ -66,27 +64,25 @@
   </ol>
 </details>
 
-
-
 <!-- ABOUT THE PROJECT -->
+
 ## About The Project
 
 This project serves as the core system for the Minerva project. It's designed with scalability and maintainability in mind, ensuring it can handle increased usage. Anticipating around 5000 users annually.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
 ### Built With
 
 Are you able to review our requirements outlined in the [pyproject](https://github.com/MinervaLMS/backend/blob/develop/pyproject.toml) file. This document provides a comprehensive overview of the specifications we are seeking.
 
-* ![Django](https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white)
-* ![DjangoREST](https://img.shields.io/badge/DJANGO-REST-ff1709?style=for-the-badge&logo=django&logoColor=white&color=ff1709&labelColor=gray)
-
+-   ![Django](https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white)
+-   ![DjangoREST](https://img.shields.io/badge/DJANGO-REST-ff1709?style=for-the-badge&logo=django&logoColor=white&color=ff1709&labelColor=gray)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
+
 ## Getting Started
 
 Here's a guide on how to set up our project locally. This step-by-step walkthrough will assist you in configuring the project on your local environment for seamless development and testing.
@@ -95,46 +91,51 @@ Here's a guide on how to set up our project locally. This step-by-step walkthrou
 
 In order to effectively work with this project, it's necessary to install certain software components. Follow these steps:
 
-* Ensure you have Python 3.X installed, with the appropriate version specified in [pyproject](https://github.com/MinervaLMS/backend/blob/develop/pyproject.toml)
+-   Ensure you have Python 3.X installed, with the appropriate version specified in [pyproject](https://github.com/MinervaLMS/backend/blob/develop/pyproject.toml)
 
-  ```sh
-  sudo apt install python3.8
-  ```
+    ```sh
+    sudo apt install python3.11.4
+    ```
 
 Nice to have:
-- Consider adding an SSH key for seamless connection with GitHub. This small step can greatly enhance your experience by simplifying authentication processes and streamlining your interactions with the platform. Look this [tutorial](https://www.youtube.com/watch?v=8X4u9sca3Io) if you want
+
+-   Consider adding an SSH key for seamless connection with GitHub. This small step can greatly enhance your experience by simplifying authentication processes and streamlining your interactions with the platform. Look this [tutorial](https://www.youtube.com/watch?v=8X4u9sca3Io) if you want
 
 ### Installation
 
 1. Clone the repo
-   ```sh
-   git clone https://github.com/MinervaLMS/backend.git
-   ```
+    ```sh
+    git clone https://github.com/MinervaLMS/backend.git
+    ```
 2. Install poetry
-   ```sh
-   curl -sSL https://install.python-poetry.org | python3 -
-   ```
+    ```sh
+    curl -sSL https://install.python-poetry.org | python3 -
+    ```
     For a proper installation on your operating system, we recommend following this [tutorial](https://python-poetry.org/docs/)
 3. Initialize the Poetry environment by navigating to the correct project path and executing the command below:
-   ```sh
-   poetry shell
-   ```
+    ```sh
+     poetry shell
+    ```
     - This installs the default Python version on your computer for the environment. If you prefer to use a different version, you can install that version on your computer and then proceed with the following steps:
         ```sh
-            poetry env use 3.8
+        poetry env use 3.11.4
         ```
 4. Install the required dependencies by running the following command:
     ```sh
-        poetry install
+    poetry install
     ```
 5. We recommend configuring the pre-commit functionality within the Poetry environment, especially if you won't be using it in other repositories. However, you also have the option to set it up globally on your PC by installing pre-commit system-wide.
-  ```sh
-    pre-commit install
-  ```
+    ```sh
+      poetry add -D pre-commit
+    ```
+    ```sh
+      pre-commit install
+    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- CONTRIBUTING -->
+
 ## Contributing
 
 If you want to contribute in this project
@@ -147,16 +148,16 @@ If you want to contribute in this project
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
 <!-- LICENSE -->
+
 ## License
 
 Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
 <!-- CONTACT -->
+
 ## Contact
 
 Your Name - [@your_twitter](https://twitter.com/your_username) - email@example.com
@@ -165,10 +166,9 @@ Project Link: [https://github.com/your_username/repo_name](https://github.com/yo
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+
 [contributors-shield]: https://img.shields.io/github/contributors/minervaLMS/backend
 [contributors-url]: https://github.com/MinervaLMS/backend/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/minervaLMS/backend
