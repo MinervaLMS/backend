@@ -1,3 +1,4 @@
+from django.db import models
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes, schema
 from rest_framework import status
@@ -108,7 +109,7 @@ def delete_module(request, module_id: int) -> JsonResponse:
         module = Module.objects.get(pk=module_id)
         modules_ahead = Module.objects.filter(
             course_id=module.course_id, order__gt=module.order).order_by('order')
-        module.order *= -1
+        module.order = -module.order if module.order > 0 else -1
         module.save()
 
         for module_ahead in modules_ahead:
@@ -193,7 +194,7 @@ def update_material_order(request, module_id: int) -> JsonResponse:
     """Update materials order of a module
 
     Args:
-        request : request http
+        request : request http with new material's order
         module_id (int): module's id to update order of its materials
 
         {
@@ -201,7 +202,7 @@ def update_material_order(request, module_id: int) -> JsonResponse:
         }
 
     Returns:
-        JsonResponse: _description_
+        JsonResponse: Json response with the fields of the serialized materials and their new order
     """
 
     try:
@@ -212,6 +213,8 @@ def update_material_order(request, module_id: int) -> JsonResponse:
     orders: list = list(request.data.values())
     orders.sort()
     correct_orders: list = [n for n in range(len(orders))]
+    max_order = Material.objects.filter(module_id=module_id).aggregate(
+                    models.Max('order'))['order__max'] + 1
 
     if orders != correct_orders:
         return JsonResponse({"message": "This materials order is not valid"}, status=status.HTTP_400_BAD_REQUEST)
@@ -219,10 +222,12 @@ def update_material_order(request, module_id: int) -> JsonResponse:
     materials = Material.objects.filter(module_id=module_id)
 
     for material in materials:
-        material.order *= -1
+        material.order += max_order  
         material.save()
 
     for material in materials:
+
+        print(request.data[str(material.id)])
         material.order = request.data[str(material.id)]
         material.save()
 

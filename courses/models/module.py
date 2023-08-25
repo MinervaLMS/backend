@@ -21,7 +21,7 @@ class Module(models.Model):
         ]
 
     def save(self, *args, **kwargs):
-        if not self.order:
+        if self.order is None: 
             # In module creation, automatically assign the next possible order
             try:
                 self.order = Module.objects.filter(course_id=self.course_id).aggregate(
