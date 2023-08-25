@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "minerva-backend"
+version = "0.0.1"
+description = "Backend team repository of Minerva Learning Management System (LMS). Developed by a group of students of Universidad Nacional de Colombia using Django."
+authors = ["Cristian Camilo Henao Rojas <cristian.henao@mercadolibre.com.co>"]
+
+[tool.poetry.dependencies]
+python = ">=3.8,<=3.12"
+django = "4.2.4"
+dj-database-url = "^2.1.0"
+django-environ = "^0.10.0"
+djangorestframework-simplejwt = "^5.3.0"
+django-cors-headers = "^4.2.0"
+coreapi = "^2.3.3"
+psycopg2-binary = "^2.9.7"
+resend = "^0.5.2"
+whitenoise = "^6.5.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[virtualenvs]
+create = true
+in-project = true
