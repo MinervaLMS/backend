@@ -129,46 +129,89 @@ class DeleteCourseTestCase(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
-# class GetModulesByCourseTestCase(TestCase):
-#     def setUp(self):
-#         self.client = APIClient()
-#         self.course = Course.objects.create(
-#             name="Test Course", alias="ED20241", description="This is a test course")
-#         self.user = User.objects.create(
-#             email='test@example.com', password='testpassword')
-#         self.client.force_authenticate(self.user)
-#         self.course_data = {
-#             'name': 'Test Course',
-#             'alias': 'test-course',
-#             'description': 'This is a test course.'
-#         }
+class GetModulesByCourseTestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.course = Course.objects.create(
+            name="Test Course", alias="ED20241", description="This is a test course")
+        self.user = User.objects.create(
+            email='test@example.com', password='testpassword')
+        self.client.force_authenticate(self.user)
+
+    def test_get_modules_by_course_not_exist(self):
+        response = self.client.get('/course/nonexistent-course/modules/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(loads(response.content), {"message": "There is not a course with that id"})
+
+    def test_get_modules_by_course_empty(self):
+        response = self.client.get(f'/course/{self.course.alias}/modules/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(loads(response.content), {"message": "There are not modules in this course"})
+
+    def test_get_modules_by_course_correct(self):
+        module = Module.objects.create(course_id=self.course, name="Test module")
+        response = self.client.get(f'/course/{self.course.alias}/modules/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(loads(response.content), [{"id": module.id, "course_id": self.course.id, "name": module.name, "order": module.order}])
 
 
-# class GetModuleByCourseOrderTestCase(TestCase):
-#     def setUp(self):
-#         self.client = APIClient()
-#         self.course = Course.objects.create(
-#             name="Test Course", alias="ED20241", description="This is a test course")
-#         self.user = User.objects.create(
-#             email='test@example.com', password='testpassword')
-#         self.client.force_authenticate(self.user)
-#         self.course_data = {
-#             'name': 'Test Course',
-#             'alias': 'test-course',
-#             'description': 'This is a test course.'
-#         }
+class GetModuleByCourseOrderTestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.course = Course.objects.create(
+            name="Test Course", alias="ED20241", description="This is a test course")
+        self.user = User.objects.create(
+            email='test@example.com', password='testpassword')
+        self.module = Module.objects.create(
+            course_id=self.course, name="Test module")
+        self.client.force_authenticate(self.user)
+
+    def test_get_module_by_course_order_not_exist(self):
+        response = self.client.get('/course/nonexistent-course/0/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(loads(response.content), {"message": "There is not a course with that id"})
+
+    def test_get_module_by_course_order_invalid(self):
+        response = self.client.get(f'/course/{self.course.alias}/10/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(loads(response.content), {"message": "There are not modules by this order"})
+    
+    def test_get_modules_by_course_order_correct(self):
+        response = self.client.get(f'/course/{self.course.alias}/{self.module.order}/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(loads(response.content), {"id": self.module.id, "course_id": self.course.id, "name": self.module.name, "order": self.module.order})
 
 
-# class UpdateModuleOrderTestCase(TestCase):
-#     def setUp(self):
-#         self.client = APIClient()
-#         self.course = Course.objects.create(
-#             name="Test Course", alias="ED20241", description="This is a test course")
-#         self.user = User.objects.create(
-#             email='test@example.com', password='testpassword')
-#         self.client.force_authenticate(self.user)
-#         self.course_data = {
-#             'name': 'Test Course',
-#             'alias': 'test-course',
-#             'description': 'This is a test course.'
-#         }
+class UpdateModuleOrderTestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.course = Course.objects.create(
+            name="Test Course", alias="ED20241", description="This is a test course")
+        self.user = User.objects.create(
+            email='test@example.com', password='testpassword')
+        self.client.force_authenticate(self.user)
+
+    def test_update_module_order_not_exist(self):
+        response = self.client.patch('/course/nonexistent-course/modules/update_order/', {}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(loads(response.content), {"message": "There is not a course with that id"})
+
+    def test_update_module_order_invalid(self):
+        invalid_order = {
+            "module1_id": 2,
+            "module2_id": 4,
+        }
+        response = self.client.patch(f'/course/{self.course.alias}/modules/update_order/', invalid_order, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(loads(response.content), {"message": "This modules order is not valid"})
+    
+    def test_update_module_order_correct(self):
+        module_1 = Module.objects.create(course_id=self.course, name="Test module 1")
+        module_2 = Module.objects.create(course_id=self.course, name="Test module 2")
+        new_order = {
+            str(module_1.id): 1,
+            str(module_2.id): 0,
+        }
+        response = self.client.patch(f'/course/{self.course.alias}/modules/update_order/', new_order, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(loads(response.content), [{"id": module_2.id, "name": module_2.name, "order": 0, "course_id": self.course.id}, {"id": module_1.id, "name": module_1.name, "order": 1, "course_id": self.course.id}])
