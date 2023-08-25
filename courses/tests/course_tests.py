@@ -138,7 +138,6 @@ class GetModulesByCourseTestCase(TestCase):
             email='test@example.com', password='testpassword')
         self.client.force_authenticate(self.user)
 
-
     def test_get_modules_by_course_not_exist(self):
         response = self.client.get('/course/nonexistent-course/modules/')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -154,6 +153,7 @@ class GetModulesByCourseTestCase(TestCase):
         response = self.client.get(f'/course/{self.course.alias}/modules/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(loads(response.content), [{"id": module.id, "course_id": self.course.id, "name": module.name, "order": module.order}])
+
 
 class GetModuleByCourseOrderTestCase(TestCase):
     def setUp(self):
@@ -213,11 +213,5 @@ class UpdateModuleOrderTestCase(TestCase):
             str(module_2.id): 0,
         }
         response = self.client.patch(f'/course/{self.course.alias}/modules/update_order/', new_order, format='json')
-        # print(loads(response.content))
-        # module_1.refresh_from_db()
-        # module_2.refresh_from_db()
-        # print(f'm1 : {module_1.order}')
-        # print(f'm2 : {module_2.order}')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
-        # self.assertEqual(loads(response.content), [{"id": module_2.id, "name": module_2.name, "order": 0, "course_id": self.course.id}, {"id": module_1.id, "course_id": self.course.id, "name": module_1.name, "order": 1, "course_id": self.course.id}])
+        self.assertEqual(loads(response.content), [{"id": module_2.id, "name": module_2.name, "order": 0, "course_id": self.course.id}, {"id": module_1.id, "name": module_1.name, "order": 1, "course_id": self.course.id}])
