@@ -1,6 +1,8 @@
 from rest_framework import serializers
 
-from ..models import Course, Module
+from ..models.course import Course
+from ..models.module import Module
+
 
 class ModuleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -9,24 +11,26 @@ class ModuleSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """
-        Verify if unique tuple course_id and order is duplicated, Verify course_id and name, verify if course exists.
+        Verify if unique tuple course_id and order is duplicated,
+        Verify course_id and name, verify if course exists.
         """
 
-        alias = data.get('course_id')
-        name = data.get('name')
-        order = data.get('order')
+        alias = data.get("course_id")
+        name = data.get("name")
+        order = data.get("order")
 
         if Module.objects.filter(course_id=alias, order=order).exists():
             raise serializers.ValidationError(
-                "This order in this course is already in use")
+                "This order in this course is already in use"
+            )
 
         if Module.objects.filter(course_id=alias, name=name).exists():
             raise serializers.ValidationError(
-                "This name in this course is already in use")
+                "This name in this course is already in use"
+            )
 
         if not Course.objects.filter(alias=alias).exists():
-            raise serializers.ValidationError(
-                "This course does not exist")
+            raise serializers.ValidationError("This course does not exist")
 
         return data
 

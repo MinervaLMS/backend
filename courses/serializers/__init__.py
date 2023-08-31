@@ -1,3 +1,0 @@
-from .course_serializer import CourseSerializer
-from .material_serializer import MaterialSerializer
-from .module_serializer import ModuleSerializer
