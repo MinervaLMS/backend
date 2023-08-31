@@ -3,37 +3,38 @@ from rest_framework.test import APIClient
 from rest_framework import status
 from json import loads
 
-from ..models import *
-from accounts.models import User
+from ..models.course import Course
+from ..models.module import Module
+from accounts.models.user import User
 
 
 class CreateCourseTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course")
+            name="Test Course", alias="ED20241", description="This is a test course"
+        )
         self.user = User.objects.create(
-            email='test@example.com', password='testpassword')
+            email="test@example.com", password="testpassword"
+        )
         self.client.force_authenticate(self.user)
         self.course_data = {
-            'name': 'Test Course1',
-            'alias': 'test',
-            'description': 'This is a test course.'
+            "name": "Test Course1",
+            "alias": "test",
+            "description": "This is a test course.",
         }
 
     def test_create_course_correct(self):
-        response = self.client.post(
-            '/course/create/', self.course_data, format='json')
+        response = self.client.post("/course/create/", self.course_data, format="json")
         self.assertEqual(response.status_code, 201)
 
     def test_create_course_invalid_data(self):
         invalid_data = {
-            'name': '',  # Invalid name
-            'alias': 'test',
-            'description': 'This is a test course.'
+            "name": "",  # Invalid name
+            "alias": "test",
+            "description": "This is a test course.",
         }
-        response = self.client.post(
-            '/course/create/', invalid_data, format='json')
+        response = self.client.post("/course/create/", invalid_data, format="json")
         self.assertEqual(response.status_code, 400)
 
 
@@ -41,24 +42,27 @@ class GetCourseTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course")
+            name="Test Course", alias="ED20241", description="This is a test course"
+        )
         self.user = User.objects.create(
-            email='test@example.com', password='testpassword')
+            email="test@example.com", password="testpassword"
+        )
         self.client.force_authenticate(self.user)
         self.course_data = {
-            'name': 'Test Course1',
-            'alias': 'test',
-            'description': 'This is a test course.'
+            "name": "Test Course1",
+            "alias": "test",
+            "description": "This is a test course.",
         }
 
     def test_get_course_correct(self):
         course = Course.objects.create(
-            name='Test Course2', alias='test2', description='This is a test course.')
-        response = self.client.get(f'/course/{course.alias}/')
+            name="Test Course2", alias="test2", description="This is a test course."
+        )
+        response = self.client.get(f"/course/{course.alias}/")
         self.assertEqual(response.status_code, 200)
 
     def test_get_course_not_found(self):
-        response = self.client.get('/course/nonexistent-course/')
+        response = self.client.get("/course/nonexistent-course/")
         self.assertEqual(response.status_code, 404)
 
 
@@ -66,39 +70,46 @@ class UpdateCourseTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course")
+            name="Test Course", alias="ED20241", description="This is a test course"
+        )
         self.user = User.objects.create(
-            email='test@example.com', password='testpassword')
+            email="test@example.com", password="testpassword"
+        )
         self.client.force_authenticate(self.user)
         self.course_data = {
-            'name': 'Test Course1',
-            'alias': 'test',
-            'description': 'This is a test course.'
+            "name": "Test Course1",
+            "alias": "test",
+            "description": "This is a test course.",
         }
 
     def test_update_course_correct(self):
         course = Course.objects.create(
-            name='Test Course2', alias='test2', description='This is a test course.')
-        updated_data = {'name': 'Updated Course'}
+            name="Test Course2", alias="test2", description="This is a test course."
+        )
+        updated_data = {"name": "Updated Course"}
         response = self.client.patch(
-            f'/course/update/{course.alias}/', updated_data, format='json')
+            f"/course/update/{course.alias}/", updated_data, format="json"
+        )
         self.assertEqual(response.status_code, 200)
         course.refresh_from_db()
-        self.assertEqual(course.name, 'Updated Course')
+        self.assertEqual(course.name, "Updated Course")
 
     def test_update_course_not_found(self):
         response = self.client.patch(
-            '/course/update/nonexistent-course/', {}, format='json')
+            "/course/update/nonexistent-course/", {}, format="json"
+        )
         self.assertEqual(response.status_code, 404)
 
     def test_update_course_invalid_data(self):
         course = Course.objects.create(
-            name='Test Course2', alias='test2', description='This is a test course.')
+            name="Test Course2", alias="test2", description="This is a test course."
+        )
         invalid_data = {
-            'name': '',  # Invalid name
+            "name": "",  # Invalid name
         }
         response = self.client.patch(
-            f'/course/update/{course.alias}/', invalid_data, format='json')
+            f"/course/update/{course.alias}/", invalid_data, format="json"
+        )
         self.assertEqual(response.status_code, 400)
 
 
@@ -106,26 +117,29 @@ class DeleteCourseTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course")
+            name="Test Course", alias="ED20241", description="This is a test course"
+        )
         self.user = User.objects.create(
-            email='test@example.com', password='testpassword')
+            email="test@example.com", password="testpassword"
+        )
         self.client.force_authenticate(self.user)
         self.course_data = {
-            'name': 'Test Course1',
-            'alias': 'test',
-            'description': 'This is a test course.'
+            "name": "Test Course1",
+            "alias": "test",
+            "description": "This is a test course.",
         }
 
     def test_delete_course_correct(self):
         course = Course.objects.create(
-            name='Test Course2', alias='test2', description='This is a test course.')
-        response = self.client.delete(f'/course/delete/{course.alias}/')
+            name="Test Course2", alias="test2", description="This is a test course."
+        )
+        response = self.client.delete(f"/course/delete/{course.alias}/")
         self.assertEqual(response.status_code, 200)
         with self.assertRaises(Course.DoesNotExist):
             course.refresh_from_db()
 
     def test_delete_course_not_found(self):
-        response = self.client.delete('/course/delete/nonexistent-course/')
+        response = self.client.delete("/course/delete/nonexistent-course/")
         self.assertEqual(response.status_code, 404)
 
 
@@ -133,78 +147,119 @@ class GetModulesByCourseTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course")
+            name="Test Course", alias="ED20241", description="This is a test course"
+        )
         self.user = User.objects.create(
-            email='test@example.com', password='testpassword')
+            email="test@example.com", password="testpassword"
+        )
         self.client.force_authenticate(self.user)
 
     def test_get_modules_by_course_not_exist(self):
-        response = self.client.get('/course/nonexistent-course/modules/')
+        response = self.client.get("/course/nonexistent-course/modules/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(loads(response.content), {"message": "There is not a course with that id"})
+        self.assertEqual(
+            loads(response.content), {"message": "There is not a course with that id"}
+        )
 
     def test_get_modules_by_course_empty(self):
-        response = self.client.get(f'/course/{self.course.alias}/modules/')
+        response = self.client.get(f"/course/{self.course.alias}/modules/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(loads(response.content), {"message": "There are not modules in this course"})
+        self.assertEqual(
+            loads(response.content), {"message": "There are not modules in this course"}
+        )
 
     def test_get_modules_by_course_correct(self):
         module = Module.objects.create(course_id=self.course, name="Test module")
-        response = self.client.get(f'/course/{self.course.alias}/modules/')
+        response = self.client.get(f"/course/{self.course.alias}/modules/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(loads(response.content), [{"id": module.id, "course_id": self.course.id, "name": module.name, "order": module.order}])
+        self.assertEqual(
+            loads(response.content),
+            [
+                {
+                    "id": module.id,
+                    "course_id": self.course.id,
+                    "name": module.name,
+                    "order": module.order,
+                }
+            ],
+        )
 
 
 class GetModuleByCourseOrderTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course")
+            name="Test Course", alias="ED20241", description="This is a test course"
+        )
         self.user = User.objects.create(
-            email='test@example.com', password='testpassword')
-        self.module = Module.objects.create(
-            course_id=self.course, name="Test module")
+            email="test@example.com", password="testpassword"
+        )
+        self.module = Module.objects.create(course_id=self.course, name="Test module")
         self.client.force_authenticate(self.user)
 
     def test_get_module_by_course_order_not_exist(self):
-        response = self.client.get('/course/nonexistent-course/0/')
+        response = self.client.get("/course/nonexistent-course/0/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(loads(response.content), {"message": "There is not a course with that id"})
+        self.assertEqual(
+            loads(response.content), {"message": "There is not a course with that id"}
+        )
 
     def test_get_module_by_course_order_invalid(self):
-        response = self.client.get(f'/course/{self.course.alias}/10/')
+        response = self.client.get(f"/course/{self.course.alias}/10/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(loads(response.content), {"message": "There are not modules by this order"})
-    
+        self.assertEqual(
+            loads(response.content), {"message": "There are not modules by this order"}
+        )
+
     def test_get_modules_by_course_order_correct(self):
-        response = self.client.get(f'/course/{self.course.alias}/{self.module.order}/')
+        response = self.client.get(f"/course/{self.course.alias}/{self.module.order}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(loads(response.content), {"id": self.module.id, "course_id": self.course.id, "name": self.module.name, "order": self.module.order})
+        self.assertEqual(
+            loads(response.content),
+            {
+                "id": self.module.id,
+                "course_id": self.course.id,
+                "name": self.module.name,
+                "order": self.module.order,
+            },
+        )
 
 
 class UpdateModuleOrderTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course")
+            name="Test Course", alias="ED20241", description="This is a test course"
+        )
         self.user = User.objects.create(
-            email='test@example.com', password='testpassword')
+            email="test@example.com", password="testpassword"
+        )
         self.client.force_authenticate(self.user)
 
     def test_update_module_order_not_exist(self):
-        response = self.client.patch('/course/nonexistent-course/modules/update_order/', {}, format='json')
+        response = self.client.patch(
+            "/course/nonexistent-course/modules/update_order/", {}, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(loads(response.content), {"message": "There is not a course with that id"})
+        self.assertEqual(
+            loads(response.content), {"message": "There is not a course with that id"}
+        )
 
     def test_update_module_order_invalid(self):
         invalid_order = {
             "module1_id": 2,
             "module2_id": 4,
         }
-        response = self.client.patch(f'/course/{self.course.alias}/modules/update_order/', invalid_order, format='json')
+        response = self.client.patch(
+            f"/course/{self.course.alias}/modules/update_order/",
+            invalid_order,
+            format="json",
+        )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(loads(response.content), {"message": "This modules order is not valid"})
-    
+        self.assertEqual(
+            loads(response.content), {"message": "This modules order is not valid"}
+        )
+
     def test_update_module_order_correct(self):
         module_1 = Module.objects.create(course_id=self.course, name="Test module 1")
         module_2 = Module.objects.create(course_id=self.course, name="Test module 2")
@@ -212,6 +267,26 @@ class UpdateModuleOrderTestCase(TestCase):
             str(module_1.id): 1,
             str(module_2.id): 0,
         }
-        response = self.client.patch(f'/course/{self.course.alias}/modules/update_order/', new_order, format='json')
+        response = self.client.patch(
+            f"/course/{self.course.alias}/modules/update_order/",
+            new_order,
+            format="json",
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(loads(response.content), [{"id": module_2.id, "name": module_2.name, "order": 0, "course_id": self.course.id}, {"id": module_1.id, "name": module_1.name, "order": 1, "course_id": self.course.id}])
+        self.assertEqual(
+            loads(response.content),
+            [
+                {
+                    "id": module_2.id,
+                    "name": module_2.name,
+                    "order": 0,
+                    "course_id": self.course.id,
+                },
+                {
+                    "id": module_1.id,
+                    "name": module_1.name,
+                    "order": 1,
+                    "course_id": self.course.id,
+                },
+            ],
+        )
