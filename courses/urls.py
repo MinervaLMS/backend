@@ -1,6 +1,12 @@
 from django.urls import path
 
-from .views import course_views, module_views, material_views, material_html_views
+from .views import (
+    course_views,
+    module_views,
+    material_views,
+    material_html_views,
+    material_video_views,
+)
 
 course_urls = [
     path("course/create/", course_views.create_course, name="create_course"),
@@ -102,4 +108,29 @@ material_html_urls = [
     ),
 ]
 
-urlpatterns = course_urls + module_urls + material_urls + material_html_urls
+material_video_urls = [
+    path(
+        "material/video/create/",
+        material_video_views.create_material_video,
+        name="create_material_video",
+    ),
+    path(
+        "material/video/<int:material_id>/",
+        material_video_views.get_material_video,
+        name="get_material_video",
+    ),
+    path(
+        "material/video/update/<int:material_id>/",
+        material_video_views.update_material_video,
+        name="update_material_video",
+    ),
+    path(
+        "material/video/delete/<int:material_video_id>/",
+        material_video_views.delete_material,
+        name="delete_material_video",
+    ),
+]
+
+urlpatterns = (
+    course_urls + module_urls + material_urls + material_html_urls + material_video_urls
+)
