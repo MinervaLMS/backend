@@ -89,6 +89,12 @@ def update_material_html(request, material_id: int) -> JsonResponse:
         response (JsonResponse): HTTP response in JSON format
     """
 
+    if "content" not in request.data:
+        return JsonResponse(
+            {"message": "You must provide the new content for the material"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
     if "material_id" in request.data:
         return JsonResponse(
             {"message": "You can not change the material id"},
