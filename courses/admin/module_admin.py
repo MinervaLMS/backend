@@ -1,13 +1,18 @@
 from django.contrib import admin
 
-from ..models import Module
 from .material_admin import MaterialInline
+
+from ..models.module import Module
 
 
 class ModuleAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'course_id',)
-    list_filter = ('course_id',)
-    search_fields = ('name', 'course__name')
+    list_display = (
+        "id",
+        "name",
+        "course_id",
+    )
+    list_filter = ("course_id",)
+    search_fields = ("name", "course__name")
     inlines = [MaterialInline]
 
 

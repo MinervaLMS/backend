@@ -1,4 +1,7 @@
-from .course_admin import *
-from .module_admin import *
-from .material_admin import *
-from .enrollment_admin import *
+from .course_admin import CourseAdmin
+from .module_admin import ModuleAdmin
+from .material_admin import MaterialAdmin
+from .material_html_admin import MaterialHTMLAdmin
+from .enrollment_admin import EnrollmentAdmin
+
+_ = [CourseAdmin, ModuleAdmin, MaterialAdmin, MaterialHTMLAdmin, EnrollmentAdmin]
