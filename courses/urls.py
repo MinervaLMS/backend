@@ -37,4 +37,12 @@ material_urls = [
          delete_material, name='delete_material'),
 ]
 
-urlpatterns = course_urls + module_urls + material_urls
+material_video_urls = [
+     path('material/video/create/', create_material_video, name="create_material_video"),
+     path('material/video/<int:material_id>/', get_material_video, name="get_material_video"),
+     path('material/video/update/<int:material_id>/',
+         update_material_video, name='update_material_video'),
+     path('material/video/delete/<int:material_video_id>/',
+         delete_material, name='delete_material_video'),
+]
+urlpatterns = course_urls + module_urls + material_urls + material_video_urls

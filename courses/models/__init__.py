@@ -4,3 +4,4 @@ from .course import Course
 from .module import Module
 from .material import Material
 from .enrollment import Enrollment
+from .material_video import MaterialVideo
