@@ -4,7 +4,6 @@ from rest_framework.decorators import api_view, permission_classes, schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-from ..models.course import Course
 from ..models.module import Module
 from ..models.material import Material
 from ..schemas import module_schemas as schemas
@@ -202,7 +201,7 @@ def get_material_by_module_order(request, module_id: str, order: int) -> JsonRes
     """
 
     try:
-        module = Course.objects.get(pk=module_id)
+        module = Module.objects.get(pk=module_id)
     except Module.DoesNotExist:
         return JsonResponse(
             {"message": "There is not a module with that id"},
@@ -275,7 +274,6 @@ def update_material_order(request, module_id: int) -> JsonResponse:
         material.save()
 
     for material in materials:
-        print(request.data[str(material.id)])
         material.order = request.data[str(material.id)]
         material.save()
 
