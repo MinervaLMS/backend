@@ -4,14 +4,16 @@ from rest_framework.decorators import api_view, permission_classes, schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-from ..models import *
-from ..schemas import *
-from ..serializers import *
+from ..models.course import Course
+from ..models.module import Module
+from ..schemas import course_schemas as schemas
+from ..serializers.course_serializer import CourseSerializer
+from ..serializers.module_serializer import ModuleSerializer
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 @permission_classes([IsAuthenticated])
-@schema(create_course_schema)
+@schema(schemas.create_course_schema)
 def create_course(request) -> JsonResponse:
     """
     View to create a course
@@ -27,14 +29,17 @@ def create_course(request) -> JsonResponse:
 
     if serializer.is_valid():
         serializer.save()
-        return JsonResponse({"message": "Course was created successfully"}, status=status.HTTP_201_CREATED)
+        return JsonResponse(
+            {"message": "Course was created successfully"},
+            status=status.HTTP_201_CREATED,
+        )
 
     return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 @permission_classes([IsAuthenticated])
-@schema(get_course_schema)
+@schema(schemas.get_course_schema)
 def get_course(request, alias: str) -> JsonResponse:
     """
     View to get a course
@@ -44,22 +49,25 @@ def get_course(request, alias: str) -> JsonResponse:
         alias (str): course alias
 
     Returns:
-        response (JsonResponse): HTTP response in JSON format with all course information
+        response (JsonResponse): HTTP response in JSON format
+        with all course information
     """
 
     try:
         course = Course.objects.get(alias=alias)
     except Course.DoesNotExist:
-        return JsonResponse({"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND)
+        return JsonResponse(
+            {"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND
+        )
 
     serializer = CourseSerializer(course)
 
     return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
 
-@api_view(['PATCH'])
+@api_view(["PATCH"])
 @permission_classes([IsAuthenticated])
-@schema(update_course_schema)
+@schema(schemas.update_course_schema)
 def update_course(request, alias: str) -> JsonResponse:
     """
     View to update a course
@@ -75,20 +83,24 @@ def update_course(request, alias: str) -> JsonResponse:
     try:
         course = Course.objects.get(alias=alias)
     except Course.DoesNotExist:
-        return JsonResponse({"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND)
+        return JsonResponse(
+            {"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND
+        )
 
     serializer = CourseSerializer(course, data=request.data, partial=True)
 
     if serializer.is_valid():
         serializer.save()
-        return JsonResponse({"message": "Course was changed successfully"}, status=status.HTTP_200_OK)
+        return JsonResponse(
+            {"message": "Course was changed successfully"}, status=status.HTTP_200_OK
+        )
 
     return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['DELETE'])
+@api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
-@schema(delete_course_schema)
+@schema(schemas.delete_course_schema)
 def delete_course(request, alias: str) -> JsonResponse:
     """
     View to delete a course
@@ -104,16 +116,20 @@ def delete_course(request, alias: str) -> JsonResponse:
     try:
         course = Course.objects.get(alias=alias)
     except Course.DoesNotExist:
-        return JsonResponse({"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND)
+        return JsonResponse(
+            {"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND
+        )
 
     course.delete()
 
-    return JsonResponse({"message": "Course was deleted successfully"}, status=status.HTTP_200_OK)
+    return JsonResponse(
+        {"message": "Course was deleted successfully"}, status=status.HTTP_200_OK
+    )
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 @permission_classes([IsAuthenticated])
-@schema(get_modules_by_course_schema)
+@schema(schemas.get_modules_by_course_schema)
 def get_modules_by_course(request, alias: str) -> JsonResponse:
     """
     Get all modules from a course in the database
@@ -130,22 +146,27 @@ def get_modules_by_course(request, alias: str) -> JsonResponse:
     try:
         course = Course.objects.get(alias=alias)
     except Course.DoesNotExist:
-        return JsonResponse({"message": "There is not a course with that id"}, status=status.HTTP_404_NOT_FOUND)
+        return JsonResponse(
+            {"message": "There is not a course with that id"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
 
-    modules_by_course = Module.objects.filter(
-        course_id=course.id).order_by('order')
+    modules_by_course = Module.objects.filter(course_id=course.id).order_by("order")
 
     if not modules_by_course:
-        return JsonResponse({"message": "There are not modules in this course"}, status=status.HTTP_404_NOT_FOUND)
+        return JsonResponse(
+            {"message": "There are not modules in this course"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
 
     serializer = ModuleSerializer(modules_by_course, many=True)
 
     return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 @permission_classes([IsAuthenticated])
-@schema(get_module_by_course_order_schema)
+@schema(schemas.get_module_by_course_order_schema)
 def get_module_by_course_order(request, alias: str, order: int) -> JsonResponse:
     """
     Get a module from a course in the database
@@ -156,28 +177,38 @@ def get_module_by_course_order(request, alias: str, order: int) -> JsonResponse:
         order (int): Order of the module
 
     Returns:
-        Json response with the fields of the serialized materials if the user making
-        the request is Authenticated, else throws 401 Unauthorized status. If there is no course
-        or module order, then throws 404 status
+        Json response with the fields of the serialized
+        materials if the user making the request is
+        Authenticated, else throws 401 Unauthorized
+        status. If there is no course or module order,
+        then throws 404 status
     """
 
     try:
         course = Course.objects.get(alias=alias)
     except Course.DoesNotExist:
-        return JsonResponse({"message": "There is not a course with that id"}, status=status.HTTP_404_NOT_FOUND)
+        return JsonResponse(
+            {"message": "There is not a course with that id"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
 
     try:
         module_by_course = Module.objects.get(course_id=course.id, order=order)
         module_by_course = ModuleSerializer(module_by_course)
 
-        return JsonResponse(module_by_course.data, safe=False, status=status.HTTP_200_OK)
+        return JsonResponse(
+            module_by_course.data, safe=False, status=status.HTTP_200_OK
+        )
     except Module.DoesNotExist:
-        return JsonResponse({"message": "There are not modules by this order"}, status=status.HTTP_404_NOT_FOUND)
+        return JsonResponse(
+            {"message": "There are not modules by this order"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
 
 
-@api_view(['PATCH'])
+@api_view(["PATCH"])
 @permission_classes([IsAuthenticated])
-@schema(update_module_order_schema)
+@schema(schemas.update_module_order_schema)
 def update_module_order(request, alias: str) -> JsonResponse:
     """update modules order of a course
 
@@ -199,16 +230,26 @@ def update_module_order(request, alias: str) -> JsonResponse:
     try:
         course = Course.objects.get(alias=alias)
     except Course.DoesNotExist:
-        return JsonResponse({"message": "There is not a course with that id"}, status=status.HTTP_404_NOT_FOUND)
+        return JsonResponse(
+            {"message": "There is not a course with that id"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
 
     orders: list = list(request.data.values())
     orders.sort()
     correct_orders: list = [n for n in range(len(orders))]
-    max_order = Module.objects.filter(course_id=course.id).aggregate(
-                    models.Max('order'))['order__max'] + 1
+    max_order = (
+        Module.objects.filter(course_id=course.id).aggregate(models.Max("order"))[
+            "order__max"
+        ]
+        + 1
+    )
 
     if orders != correct_orders:
-        return JsonResponse({"message": "This modules order is not valid"}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(
+            {"message": "This modules order is not valid"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     modules = Module.objects.filter(course_id=course.id)
 

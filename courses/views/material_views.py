@@ -3,13 +3,13 @@ from rest_framework.decorators import api_view, permission_classes, schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-from ..models import *
-from ..schemas import *
-from ..serializers import *
+from ..models.material import Material
+from ..schemas import material_schemas as schemas
+from ..serializers.material_serializer import MaterialSerializer
 
 
-@api_view(['POST'])
-@schema(create_material_schema)
+@api_view(["POST"])
+@schema(schemas.create_material_schema)
 @permission_classes([IsAuthenticated])
 def create_material(request) -> JsonResponse:
     """
@@ -26,14 +26,16 @@ def create_material(request) -> JsonResponse:
 
     if serializer.is_valid():
         serializer.save()
-        return JsonResponse({"message": "Material created successfully"}, status=status.HTTP_201_CREATED)
+        return JsonResponse(
+            {"message": "Material created successfully"}, status=status.HTTP_201_CREATED
+        )
 
     return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 @permission_classes([IsAuthenticated])
-@schema(get_material_schema)
+@schema(schemas.get_material_schema)
 def get_material(request, material_id: int) -> JsonResponse:
     """
     Get material by its id
@@ -52,18 +54,21 @@ def get_material(request, material_id: int) -> JsonResponse:
         material = MaterialSerializer(material)
         return JsonResponse(material.data, safe=False, status=status.HTTP_200_OK)
     except Material.DoesNotExist:
-        return JsonResponse({"message": "There is not a material with that id"}, status=status.HTTP_404_NOT_FOUND)
+        return JsonResponse(
+            {"message": "There is not a material with that id"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
 
 
-@api_view(['PATCH'])
+@api_view(["PATCH"])
 @permission_classes([IsAuthenticated])
-@schema(update_material_schema)
+@schema(schemas.update_material_schema)
 def update_material(request, material_id: int) -> JsonResponse:
     """
     View to change material data from a module in the database
 
     Args:
-        request: request http with material data 
+        request: request http with material data
         material_id (int): material's id to update it
 
         {
@@ -77,16 +82,25 @@ def update_material(request, material_id: int) -> JsonResponse:
     try:
         material = Material.objects.get(id=material_id)
     except Material.DoesNotExist:
-        return JsonResponse({"message": "There is not a material with that id"}, status=status.HTTP_404_NOT_FOUND)
+        return JsonResponse(
+            {"message": "There is not a material with that id"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
 
-    if 'order' in request.data:
-        return JsonResponse({"message": "You can not change the order of a material through this url"}, status=status.HTTP_400_BAD_REQUEST)
+    if "order" in request.data:
+        return JsonResponse(
+            {"message": "You can not change the order of a material through this url"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     for field_name, new_value in request.data.items():
         if hasattr(material, field_name):
             setattr(material, field_name, new_value)
         else:
-            return JsonResponse({"message": f"{field_name} attribute does not exist in material"}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse(
+                {"message": f"{field_name} attribute does not exist in material"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
     material.save()
     serializer = MaterialSerializer(material)
@@ -94,9 +108,9 @@ def update_material(request, material_id: int) -> JsonResponse:
     return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
 
-@api_view(['DELETE'])
+@api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
-@schema(delete_material_schema)
+@schema(schemas.delete_material_schema)
 def delete_material(request, material_id: int) -> JsonResponse:
     """
     Deletes material with passed id
@@ -112,7 +126,8 @@ def delete_material(request, material_id: int) -> JsonResponse:
     try:
         material = Material.objects.get(pk=material_id)
         materials_ahead = Material.objects.filter(
-            module_id=material.module_id, order__gt=material.order).order_by('order')
+            module_id=material.module_id, order__gt=material.order
+        ).order_by("order")
         material.order = -material.order if material.order > 0 else -1
         material.save()
 
@@ -122,6 +137,10 @@ def delete_material(request, material_id: int) -> JsonResponse:
 
         material.delete()
 
-        return JsonResponse({"message": "Material deleted successfully"}, status=status.HTTP_200_OK)
+        return JsonResponse(
+            {"message": "Material deleted successfully"}, status=status.HTTP_200_OK
+        )
     except Material.DoesNotExist:
-        return JsonResponse({"message": "Material does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        return JsonResponse(
+            {"message": "Material does not exist"}, status=status.HTTP_404_NOT_FOUND
+        )
