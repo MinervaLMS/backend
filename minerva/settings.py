@@ -51,7 +51,7 @@ DEPENDENCIES_APPS = [
     "corsheaders",
     "coreapi",
 ]
-MINERVA_APPS = ["accounts", "courses", "ioc"]
+MINERVA_APPS = ["accounts", "courses", "ioc", "social"]
 
 INSTALLED_APPS = DJANGO_APPS + DEPENDENCIES_APPS + MINERVA_APPS
 
@@ -87,7 +87,9 @@ SIMPLE_JWT = {
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
     "USER_ID_FIELD": "id",
     "USER_ID_CLAIM": "user_id",
-    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
+    "USER_AUTHENTICATION_RULE": (
+        "rest_framework_simplejwt.authentication.default_user_authentication_rule"
+    ),
     "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
     "TOKEN_TYPE_CLAIM": "token_type",
     "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
@@ -95,12 +97,24 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
     "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
-    "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
-    "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
-    "TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",
-    "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
-    "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
-    "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
+    "TOKEN_OBTAIN_SERIALIZER": (
+        "rest_framework_simplejwt.serializers.TokenObtainPairSerializer"
+    ),
+    "TOKEN_REFRESH_SERIALIZER": (
+        "rest_framework_simplejwt.serializers.TokenRefreshSerializer"
+    ),
+    "TOKEN_VERIFY_SERIALIZER": (
+        "rest_framework_simplejwt.serializers.TokenVerifySerializer"
+    ),
+    "TOKEN_BLACKLIST_SERIALIZER": (
+        "rest_framework_simplejwt.serializers.TokenBlacklistSerializer"
+    ),
+    "SLIDING_TOKEN_OBTAIN_SERIALIZER": (
+        "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer"
+    ),
+    "SLIDING_TOKEN_REFRESH_SERIALIZER": (
+        "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer"
+    ),
 }
 
 TEMPLATES = [
@@ -127,7 +141,7 @@ WSGI_APPLICATION = "minerva.wsgi.application"
 DATABASES = {
     "default": dj_database_url.config(
         # Feel free to alter this value to suit your needs.
-        default=env("DATABASE_URL", default="sqlite:///db.sqlite3")
+        default=env("DATABASE_URL", default=env("STR_CONNECTION"))
     )
 }
 
@@ -135,16 +149,18 @@ DATABASES = {
 # Password validation
 AUTH_PASSWORD_VALIDATORS: list[dict[str, str]] = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": (
+            "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+        ),
     },
     {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "NAME": ("django.contrib.auth.password_validation.MinimumLengthValidator"),
     },
     {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+        "NAME": ("django.contrib.auth.password_validation.CommonPasswordValidator"),
     },
     {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+        "NAME": ("django.contrib.auth.password_validation.NumericPasswordValidator"),
     },
 ]
 

@@ -1,7 +1,5 @@
 from django.db import models
 
-from .material import Material
-
 
 class Comment(models.Model):
     id = models.BigAutoField(
@@ -11,12 +9,12 @@ class Comment(models.Model):
         verbose_name="ID",
         editable=False,
     )
-    material_id = models.ForeignKey(Material, on_delete=models.CASCADE)
+    material_id = models.ForeignKey("courses.Material", on_delete=models.CASCADE)
     user_id = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
     parent_comment_id = models.ForeignKey(
         "self", null=True, blank=True, on_delete=models.CASCADE
     )
-    post_date = models.DateTimeField(auto_created=True)
+    post_date = models.DateTimeField(auto_now_add=True, blank=True)
     content = models.TextField()
     fixed = models.IntegerField(null=True, blank=True)
 
