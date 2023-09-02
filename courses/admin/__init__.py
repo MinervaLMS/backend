@@ -4,6 +4,7 @@ from .material_admin import MaterialAdmin
 from .material_html_admin import MaterialHTMLAdmin
 from .material_video_admin import MaterialVideoAdmin
 from .enrollment_admin import EnrollmentAdmin
+from .access_admin import AccessAdmin
 
 _ = [
     CourseAdmin,
@@ -12,4 +13,5 @@ _ = [
     MaterialHTMLAdmin,
     MaterialVideoAdmin,
     EnrollmentAdmin,
+    AccessAdmin,
 ]
