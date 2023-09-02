@@ -133,13 +133,23 @@ material_video_urls = [
 ]
 
 access_urls = [
-    path("material/access/create/", access_views.create_access, name="create_access"),
+    path("access/create/", access_views.create_access, name="create_access"),
     path(
-        "material/access/<int:material_id>/<int:user_id>/",
+        "access/<int:material_id>/<int:user_id>/",
         access_views.get_access,
         name="get_access",
     ),
-    path("material/assess/", access_views.assess_material, name="assess_material"),
+    path("access/update/like/", access_views.update_access_like, name="like_material"),
+    path(
+        "access/update/dislike/",
+        access_views.update_access_dislike,
+        name="dislike_material",
+    ),
+    path(
+        "access/delete/<int:material_id>/<int:user_id>/",
+        access_views.delete_access,
+        name="delete_access",
+    ),
 ]
 
 urlpatterns = (

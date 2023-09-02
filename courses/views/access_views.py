@@ -1,20 +1,25 @@
 from django.http import JsonResponse
+from django.utils import timezone
 
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from ..models.material import Material
 from ..models.access import Access
 from accounts.models.user import User
+from ..schemas import access_schemas as schemas
 from ..serializers.access_serializer import AccessSerializer
 from ..helpers.enrollment_validate import validate_enrollemet
 
 
 @api_view(["POST"])
+@schema(schemas.create_access_schema)
 @permission_classes([IsAuthenticated])
 def create_access(request) -> JsonResponse:
-    """Create a new access to a material by a user
+    """Create a new access to a material by a user, if the user has not accessed
+    the material before. But if the user has accessed the material before,
+    update the access data such as views and last_view
 
     Args:
         request: request http with access data
@@ -24,7 +29,7 @@ def create_access(request) -> JsonResponse:
         }
 
     Returns:
-        JsonResponse: HTTP response in JSON format
+        JsonResponse: HTTP response in JSON format with the access data
     """
     try:
         user: User = User.objects.get(id=request.data["user_id"])
@@ -36,11 +41,28 @@ def create_access(request) -> JsonResponse:
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
+        # Verify if the user has accessed the material before
+        access: Access = Access.objects.filter(
+            material_id=material.id, user_id=user.id
+        ).first()
+        if access:
+            access.views += 1
+            access.last_view = timezone.now()
+            access.save()
+            access = AccessSerializer(access)
+            return JsonResponse(
+                access.data,
+                safe=False,
+                status=status.HTTP_200_OK,
+            )
+
+        # If the user has not accessed the material before, create a new access
         access = AccessSerializer(data=request.data)
         if access.is_valid():
             access.save()
             return JsonResponse(
-                {"message": "Access created successfully"},
+                access.data,
+                safe=False,
                 status=status.HTTP_201_CREATED,
             )
 
@@ -59,6 +81,7 @@ def create_access(request) -> JsonResponse:
 
 
 @api_view(["GET"])
+@schema(schemas.get_access_schema)
 @permission_classes([IsAuthenticated])
 def get_access(request, material_id: int, user_id: int) -> JsonResponse:
     """Get access by its material and user
@@ -83,18 +106,16 @@ def get_access(request, material_id: int, user_id: int) -> JsonResponse:
         )
 
 
-# TODO: Se están sumando likes y restando dislikes cuando se actualiza el like
-# TODO: Crear función accerder a material y retorna el acceso
 @api_view(["PATCH"])
+@schema(schemas.update_access_like_schema)
 @permission_classes([IsAuthenticated])
-def assess_material(request) -> JsonResponse:
+def update_access_like(request) -> JsonResponse:
     """View to add a like to a material
     Args:
         request: request http with material data
         {
             "material_id": int,
-            "user_id": int,
-            "like": bool
+            "user_id": int
         }
 
     Returns:
@@ -103,28 +124,30 @@ def assess_material(request) -> JsonResponse:
     try:
         user: User = User.objects.get(id=request.data["user_id"])
         material: Material = Material.objects.get(id=request.data["material_id"])
-        # Verify if the user is enrolled in the course to which the material belongs
-        if not validate_enrollemet(user.id, material.id):
+        # Verify if user has access to the material before
+        access: Access = Access.objects.filter(
+            material_id=material.id, user_id=user.id
+        ).first()
+        if not access:
             return JsonResponse(
-                {"message": "You do not have permission to assess this material"},
+                {"message": "You should access to the material before"},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
-        # Update the like field
-        access = Access.objects.get(material_id=material.id, user_id=user.id)
-        access.like = request.data["like"]
-        # Then update the material's likes
-        if access.like is None:  # If the user has not assessed the material yet
-            if request.data["like"]:
-                material.likes += 1
-            else:
-                material.dislikes += 1
+        # Verify if the user has assessed the material or not
+        if access.like is None:
+            # If the user has not assessed the material, add a like
+            material.likes += 1
+            access.like = True
         else:
-            if request.data["like"]:
+            if access.like:
+                # If the user has liked the material before, remove the like
+                material.likes -= 1
+                access.like = None
+            else:
                 material.likes += 1
                 material.dislikes -= 1
-            else:
-                material.likes -= 1
-                material.dislikes += 1
+                access.like = True
+        # Update the like field
         access.save()
         material.save()
 
@@ -140,5 +163,95 @@ def assess_material(request) -> JsonResponse:
     except User.DoesNotExist:
         return JsonResponse(
             {"message": "There is not a user with this id"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+
+@api_view(["PATCH"])
+@schema(schemas.update_access_dislike_schema)
+@permission_classes([IsAuthenticated])
+def update_access_dislike(request) -> JsonResponse:
+    """View to add a dislike to a material
+    Args:
+        request: request http with material data
+        {
+            "material_id": int,
+            "user_id": int
+        }
+
+    Returns:
+        JsonResponse (JsonResponse): HTTP response in JSON format
+    """
+    try:
+        user: User = User.objects.get(id=request.data["user_id"])
+        material: Material = Material.objects.get(id=request.data["material_id"])
+        # Verify if user has access to the material before
+        access: Access = Access.objects.filter(
+            material_id=material.id, user_id=user.id
+        ).first()
+        if not access:
+            return JsonResponse(
+                {"message": "You should access to the material before"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        # Verify if the user has assessed the material or not
+        if access.like is None:
+            # If the user has not assessed the material, add a like
+            material.dislikes += 1
+            access.like = False
+        else:
+            if access.like:
+                # If the user has liked the material before, remove the like
+                material.likes -= 1
+                material.dislikes += 1
+                access.like = False
+            else:
+                material.dislikes -= 1
+                access.like = None
+        # Update the like field
+        access.save()
+        material.save()
+
+        return JsonResponse(
+            {"message": "Access assessed successfully"}, status=status.HTTP_201_CREATED
+        )
+
+    except Material.DoesNotExist:
+        return JsonResponse(
+            {"message": "There is not a material with this id"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+    except User.DoesNotExist:
+        return JsonResponse(
+            {"message": "There is not a user with this id"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+
+@api_view(["DELETE"])
+@schema(schemas.delete_access_schema)
+@permission_classes([IsAuthenticated])
+def delete_access(request, material_id: int, user_id: int) -> JsonResponse:
+    """View to delete an access to a material by a user
+
+    Args:
+        request : request http
+        material_id (int): material's id to which the access belongs
+        user_id (int): user's id to which the access belongs
+
+    Returns:
+        JsonResponse: HTTP response in JSON format
+    """
+
+    try:
+        access = Access.objects.get(material_id=material_id, user_id=user_id)
+        access.delete()
+        return JsonResponse(
+            {"message": "Access deleted successfully"}, status=status.HTTP_200_OK
+        )
+
+    except Access.DoesNotExist:
+        return JsonResponse(
+            {"message": "There is not an access with that material and user"},
             status=status.HTTP_404_NOT_FOUND,
         )

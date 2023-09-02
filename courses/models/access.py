@@ -7,7 +7,7 @@ class Access(models.Model):
     material_id = models.ForeignKey(Material, on_delete=models.CASCADE)
     user_id = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
     views = models.IntegerField(default=1)
-    last_view = models.DateTimeField(auto_now=True)
+    last_view = models.DateTimeField(auto_now_add=True, editable=True)
     completed = models.BooleanField(null=True, blank=True)
     like = models.BooleanField(null=True, blank=True)
 
