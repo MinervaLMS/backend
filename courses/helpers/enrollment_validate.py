@@ -4,7 +4,7 @@ from ..models.course import Course
 from ..models.enrollment import Enrollment
 
 
-def validate_enrollemet(user_id: int, material_id: int) -> bool:
+def validate_enrollment(user_id: int, material_id: int) -> bool:
     """Verify if a user is enrolled in a course to which a material belongs.
 
     Args:

@@ -4,11 +4,12 @@ from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view, schema
 
-from ..schemas import contact_support_email_schema
+from ..schemas import contact_support_schemas as schemas
 from ..helpers import emails
 
-@api_view(['POST'])
-@schema(contact_support_email_schema)
+
+@api_view(["POST"])
+@schema(schemas.contact_support_email_schema)
 def contact_support_email(request) -> JsonResponse:
     """
     Send an email to our support email with the user email and message
@@ -44,8 +45,12 @@ def contact_support_email(request) -> JsonResponse:
 
     try:
         emails.send_contact_support_email(
-            sender_email, sender_name, subject, email_body)
+            sender_email, sender_name, subject, email_body
+        )
     except Exception:
-        return JsonResponse({"message": "Email was not sent"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return JsonResponse(
+            {"message": "Email was not sent"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
     return JsonResponse({"message": "Email was sent"}, status=status.HTTP_200_OK)

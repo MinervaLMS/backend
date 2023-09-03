@@ -1,6 +1,7 @@
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from ..models import User
+from ..models.user import User
+
 
 def get_tokens_for_user(user: User | None) -> dict[str, str]:
     """
@@ -16,6 +17,6 @@ def get_tokens_for_user(user: User | None) -> dict[str, str]:
     refresh = RefreshToken.for_user(user)
 
     return {
-        'refresh': str(refresh),
-        'access': str(refresh.access_token),
+        "refresh": str(refresh),
+        "access": str(refresh.access_token),
     }

@@ -10,7 +10,7 @@ from ..models.access import Access
 from accounts.models.user import User
 from ..schemas import access_schemas as schemas
 from ..serializers.access_serializer import AccessSerializer
-from ..helpers.enrollment_validate import validate_enrollemet
+from ..helpers.enrollment_validate import validate_enrollment
 
 
 @api_view(["POST"])
@@ -35,7 +35,7 @@ def create_access(request) -> JsonResponse:
         user: User = User.objects.get(id=request.data["user_id"])
         material: Material = Material.objects.get(id=request.data["material_id"])
         # Verify if the user is enrolled in the course to which the material belongs
-        if not validate_enrollemet(user.id, material.id):
+        if not validate_enrollment(user.id, material.id):
             return JsonResponse(
                 {"message": "You do not have permission to access this material"},
                 status=status.HTTP_401_UNAUTHORIZED,

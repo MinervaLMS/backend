@@ -2,13 +2,14 @@ from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view, schema
 
-from ..schemas import user_login_schema
-from ..serializers import *
-from ..helpers import *
+from ..schemas import login_schemas as schemas
+from ..serializers.user_login_serializer import UserLoginSerializer
+from ..serializers.user_serializer import UserSerializer
+from ..helpers.user_tokens import get_tokens_for_user
 
 
-@api_view(['POST'])
-@schema(user_login_schema)
+@api_view(["POST"])
+@schema(schemas.user_login_schema)
 def user_login(request) -> JsonResponse:
     """
     View to user login using email and password
