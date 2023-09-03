@@ -28,6 +28,7 @@ class User(AbstractUser):
 
     # Many to many relationships
     courses = models.ManyToManyField("courses.Course", through="courses.Enrollment")
+    materials = models.ManyToManyField("courses.Material", through="courses.Access")
 
     # Remove username field and use email as unique identifier
     username = None

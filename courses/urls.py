@@ -6,6 +6,7 @@ from .views import (
     material_views,
     material_html_views,
     material_video_views,
+    access_views,
 )
 
 course_urls = [
@@ -131,6 +132,31 @@ material_video_urls = [
     ),
 ]
 
+access_urls = [
+    path("access/create/", access_views.create_access, name="create_access"),
+    path(
+        "access/<int:material_id>/<int:user_id>/",
+        access_views.get_access,
+        name="get_access",
+    ),
+    path("access/update/like/", access_views.update_access_like, name="like_material"),
+    path(
+        "access/update/dislike/",
+        access_views.update_access_dislike,
+        name="dislike_material",
+    ),
+    path(
+        "access/delete/<int:material_id>/<int:user_id>/",
+        access_views.delete_access,
+        name="delete_access",
+    ),
+]
+
 urlpatterns = (
-    course_urls + module_urls + material_urls + material_html_urls + material_video_urls
+    course_urls
+    + module_urls
+    + material_urls
+    + material_html_urls
+    + material_video_urls
+    + access_urls
 )
