@@ -11,17 +11,24 @@ from accounts.models.user import User
 class CreateCourseTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course"
-        )
         self.user = User.objects.create(
-            email="test@example.com", password="testpassword"
+            email="test@example.com",
+            password="testpassword",
+            first_name="Test",
+            last_name="User"
         )
         self.client.force_authenticate(self.user)
         self.course_data = {
             "name": "Test Course1",
             "alias": "test",
             "description": "This is a test course.",
+            "course_instructional_materials": 10,
+            "course_assessment_materials": 5,
+            "course_extra_materials": 3,
+            "min_assessment_progress": 80,
+            "average_stars": 4,
+            "appraisals": 20,
+            "comments": 15,
         }
 
     def test_create_course_correct(self):
@@ -33,6 +40,13 @@ class CreateCourseTestCase(TestCase):
             "name": "",  # Invalid name
             "alias": "test",
             "description": "This is a test course.",
+            "course_instructional_materials": 10,
+            "course_assessment_materials": 5,
+            "course_extra_materials": 3,
+            "min_assessment_progress": 80,
+            "average_stars": 4,
+            "appraisals": 20,
+            "comments": 15,
         }
         response = self.client.post("/course/create/", invalid_data, format="json")
         self.assertEqual(response.status_code, 400)
@@ -41,22 +55,38 @@ class CreateCourseTestCase(TestCase):
 class GetCourseTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course"
-        )
         self.user = User.objects.create(
-            email="test@example.com", password="testpassword"
+            email="test@example.com",
+            password="testpassword",
+            first_name="Test",
+            last_name="User"
         )
         self.client.force_authenticate(self.user)
         self.course_data = {
             "name": "Test Course1",
             "alias": "test",
             "description": "This is a test course.",
+            "course_instructional_materials": 10,
+            "course_assessment_materials": 5,
+            "course_extra_materials": 3,
+            "min_assessment_progress": 80,
+            "average_stars": 4,
+            "appraisals": 20,
+            "comments": 15,
         }
 
     def test_get_course_correct(self):
         course = Course.objects.create(
-            name="Test Course2", alias="test2", description="This is a test course."
+            name="Test Course2",
+            alias="test2",
+            description="This is a test course.",
+            course_instructional_materials=10,
+            course_assessment_materials=5,
+            course_extra_materials=3,
+            min_assessment_progress=80,
+            average_stars=4,
+            appraisals=20,
+            comments=15
         )
         response = self.client.get(f"/course/{course.alias}/")
         self.assertEqual(response.status_code, 200)
@@ -69,22 +99,38 @@ class GetCourseTestCase(TestCase):
 class UpdateCourseTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course"
-        )
         self.user = User.objects.create(
-            email="test@example.com", password="testpassword"
+            email="test@example.com",
+            password="testpassword",
+            first_name="Test",
+            last_name="User"
         )
         self.client.force_authenticate(self.user)
         self.course_data = {
             "name": "Test Course1",
             "alias": "test",
             "description": "This is a test course.",
+            "course_instructional_materials": 10,
+            "course_assessment_materials": 5,
+            "course_extra_materials": 3,
+            "min_assessment_progress": 80,
+            "average_stars": 4,
+            "appraisals": 20,
+            "comments": 15,
         }
 
     def test_update_course_correct(self):
         course = Course.objects.create(
-            name="Test Course2", alias="test2", description="This is a test course."
+            name="Test Course2",
+            alias="test2",
+            description="This is a test course.",
+            course_instructional_materials=10,
+            course_assessment_materials=5,
+            course_extra_materials=3,
+            min_assessment_progress=80,
+            average_stars=4,
+            appraisals=20,
+            comments=15
         )
         updated_data = {"name": "Updated Course"}
         response = self.client.patch(
@@ -102,10 +148,21 @@ class UpdateCourseTestCase(TestCase):
 
     def test_update_course_invalid_data(self):
         course = Course.objects.create(
-            name="Test Course2", alias="test2", description="This is a test course."
+            name="Test Course2",
+            alias="test2",
+            description="This is a test course.",
+            course_instructional_materials=10,
+            course_assessment_materials=5,
+            course_extra_materials=3,
+            min_assessment_progress=80,
+            average_stars=4,
+            appraisals=20,
+            comments=15
         )
         invalid_data = {
             "name": "",  # Invalid name
+            "alias": "test",
+            "description": "This is a test course.",
         }
         response = self.client.patch(
             f"/course/update/{course.alias}/", invalid_data, format="json"
@@ -116,22 +173,38 @@ class UpdateCourseTestCase(TestCase):
 class DeleteCourseTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course"
-        )
         self.user = User.objects.create(
-            email="test@example.com", password="testpassword"
+            email="test@example.com",
+            password="testpassword",
+            first_name="Test",
+            last_name="User"
         )
         self.client.force_authenticate(self.user)
         self.course_data = {
             "name": "Test Course1",
             "alias": "test",
             "description": "This is a test course.",
+            "course_instructional_materials": 10,
+            "course_assessment_materials": 5,
+            "course_extra_materials": 3,
+            "min_assessment_progress": 80,
+            "average_stars": 4,
+            "appraisals": 20,
+            "comments": 15,
         }
 
     def test_delete_course_correct(self):
         course = Course.objects.create(
-            name="Test Course2", alias="test2", description="This is a test course."
+            name="Test Course2",
+            alias="test2",
+            description="This is a test course.",
+            course_instructional_materials=10,
+            course_assessment_materials=5,
+            course_extra_materials=3,
+            min_assessment_progress=80,
+            average_stars=4,
+            appraisals=20,
+            comments=15
         )
         response = self.client.delete(f"/course/delete/{course.alias}/")
         self.assertEqual(response.status_code, 200)
