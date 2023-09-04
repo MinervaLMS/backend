@@ -45,6 +45,12 @@ password_reset_urls = [
 
 extra_urls = [
     path("users/", user_views.get_all_users, name="user_list"),
+    path("users/<int:user_id>/", user_views.get_user, name="get_user"),
+    path(
+        "users/<int:user_id>/courses/",
+        user_views.get_user_courses,
+        name="get_user_courses",
+    ),
     path(
         "contact/", contact_support_views.contact_support_email, name="support_contact"
     ),
