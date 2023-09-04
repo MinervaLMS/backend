@@ -11,6 +11,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+
         migrations.CreateModel(
             name='Institution',
             fields=[
@@ -21,4 +22,5 @@ class Migration(migrations.Migration):
                 ('url', models.CharField(max_length=100)),
             ],
         ),
+        migrations.RunSQL("ALTER SEQUENCE institutions_institution_id_seq RESTART WITH 1000;")
     ]

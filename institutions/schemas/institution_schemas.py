@@ -35,7 +35,7 @@ create_institution_schema = AutoSchema(manual_fields=[
 
 get_institution_schema = AutoSchema(manual_fields=[
     coreapi.Field(
-        "id",
+        "institution_id",
         required=True,
         location="path",
         type="integer",
@@ -45,7 +45,7 @@ get_institution_schema = AutoSchema(manual_fields=[
 
 update_institution_schema = AutoSchema(manual_fields=[
     coreapi.Field(
-        "id",
+        "institution_id",
         required=True,
         location="path",
         type="integer",
@@ -83,7 +83,7 @@ update_institution_schema = AutoSchema(manual_fields=[
 
 delete_institution_schema = AutoSchema(manual_fields=[
     coreapi.Field(
-        "id",
+        "institution_id",
         required=True,
         location="path",
         type="integer",

@@ -36,13 +36,13 @@ def create_institution(request) -> JsonResponse:
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 @schema(schemas.get_institution_schema)
-def get_institution(request, id: int) -> JsonResponse:
+def get_institution(request, institution_id: int) -> JsonResponse:
     """
     View to get an institution
 
     Args:
         request: http request
-        id (int): institution id
+        institution_id (int): institution id
 
     Returns:
         response (JsonResponse): HTTP response in JSON format
@@ -50,7 +50,7 @@ def get_institution(request, id: int) -> JsonResponse:
     """
 
     try:
-        institution = Institution.objects.get(id=id)
+        institution = Institution.objects.get(id=institution_id)
     except Institution.DoesNotExist:
         return JsonResponse(
             {"error": "Institution not found"}, status=status.HTTP_404_NOT_FOUND
@@ -63,13 +63,13 @@ def get_institution(request, id: int) -> JsonResponse:
 @api_view(["PATCH"])
 @permission_classes([IsAuthenticated])
 @schema(schemas.update_institution_schema)
-def update_institution(request, id: int) -> JsonResponse:
+def update_institution(request, institution_id: int) -> JsonResponse:
     """
     View to update an institution
 
     Args:
         request: http request
-        id (int): institution id
+        institution_id (int): institution id
 
     Returns:
         response (JsonResponse): HTTP response in JSON format
@@ -77,7 +77,7 @@ def update_institution(request, id: int) -> JsonResponse:
     """
 
     try:
-        institution = Institution.objects.get(id=id)
+        institution = Institution.objects.get(id=institution_id)
     except Institution.DoesNotExist:
         return JsonResponse(
             {"error": "Institution not found"}, status=status.HTTP_404_NOT_FOUND
@@ -98,20 +98,20 @@ def update_institution(request, id: int) -> JsonResponse:
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
 @schema(schemas.delete_institution_schema)
-def delete_institution(request, id: int) -> JsonResponse:
+def delete_institution(request, institution_id: int) -> JsonResponse:
     """
     View to delete an institution
 
     Args:
         request: http request
-        id (int): institution id
+        institution_id (int): institution id
 
     Returns:
         response (JsonResponse): HTTP response in JSON format
     """
 
     try:
-        institution = Institution.objects.get(id=id)
+        institution = Institution.objects.get(id=institution_id)
     except Institution.DoesNotExist:
         return JsonResponse(
             {"error": "Institution not found"}, status=status.HTTP_404_NOT_FOUND
