@@ -14,7 +14,8 @@ class Course(models.Model):
     appraisals = models.IntegerField(default=0)
     comments = models.IntegerField(default=0)
 
-    parent_course = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+    institution_id = models.ForeignKey("institutions.Institution", on_delete=models.CASCADE, blank=False)
+    parent_course_id = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
     enrollments = models.ManyToManyField("accounts.User", through='Enrollment')
 
     def __str__(self):

@@ -25,6 +25,13 @@ create_course_schema = AutoSchema(manual_fields=[
         schema=coreschema.String(description="Course description")
     ),
     coreapi.Field(
+        "institution_id",
+        required=True,
+        location="form",
+        type="integer",
+        schema=coreschema.Integer(description="ID of the institution")
+    ),
+    coreapi.Field(
         "parent_course_id",
         required=False,
         location="form",
@@ -113,6 +120,13 @@ update_course_schema = AutoSchema(manual_fields=[
         location="form",
         type="string",
         schema=coreschema.String(description="Course description")
+    ),
+    coreapi.Field(
+        "institution_id",
+        required=False,
+        location="form",
+        type="integer",
+        schema=coreschema.Integer(description="ID of the institution")
     ),
     coreapi.Field(
         "parent_course_id",

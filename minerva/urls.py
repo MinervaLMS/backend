@@ -8,5 +8,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include("accounts.urls")), # Include accounts urls
     path('', include("courses.urls")), # Include courses urls
+    path('', include("institutions.urls")), # Include institutions urls
     path('docs/', include_docs_urls(title='Minerva API')) # Route for API documentation
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # Serve an url for any media file
