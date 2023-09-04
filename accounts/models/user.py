@@ -28,6 +28,7 @@ class User(AbstractUser):
 
     # Many to many relationships
     courses = models.ManyToManyField("courses.Course", through="courses.Enrollment")
+    materials = models.ManyToManyField("courses.Material", through="courses.Access")
 
     # Remove username field and use email as unique identifier
     username = None
@@ -40,7 +41,16 @@ class User(AbstractUser):
     # Temporary enroll all registered users to ED20241 course
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        course = Course.objects.get(alias="ED20241")
+
+        try:
+            course = Course.objects.get(alias="ED20241")
+        except Course.DoesNotExist:
+            course = Course.objects.create(
+                name="Estructuras de Datos",
+                alias="ED20241",
+            )
+            course.save()
+
         already_enrolled = Enrollment.objects.filter(
             user_id=self, course_id=course
         ).exists()

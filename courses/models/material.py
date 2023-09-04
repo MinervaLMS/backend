@@ -2,11 +2,7 @@ from django.db import models
 
 from .module import Module
 
-# from social.models.comment import Comment
-# from accounts.models.user import User
 
-
-# TODO: update comments attribute to total_comments in the db model
 class Material(models.Model):
     id = models.BigAutoField(
         auto_created=True,
@@ -23,11 +19,6 @@ class Material(models.Model):
     likes = models.IntegerField(default=0)
     dislikes = models.IntegerField(default=0)
     total_comments = models.IntegerField(default=0)
-    comments = models.ManyToManyField(
-        "accounts.User",
-        through="social.Comment",
-        through_fields=("material_id", "user_id"),
-    )
 
     class Meta:
         constraints = [
