@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
@@ -8,12 +8,12 @@ from ..models.comment import Comment
 from accounts.models.user import User
 from courses.models.material import Material
 from ..serializers.comment_serializer import CommentSerializer
-
-# from ..schemas import comment_schemas as schemas
+from ..schemas import comment_schemas as schemas
 from courses.helpers.enrollment_validate import validate_enrollment
 
 
 @api_view(["POST"])
+@schema(schemas.create_comment_schema)
 @permission_classes([IsAuthenticated])
 def create_comment(request) -> JsonResponse:
     """Create a comment in a material by a user.
@@ -67,6 +67,7 @@ def create_comment(request) -> JsonResponse:
 
 
 @api_view(["GET"])
+@schema(schemas.get_comment_schema)
 @permission_classes([IsAuthenticated])
 def get_comment(request, comment_id: int) -> JsonResponse:
     """Get a comment by its id
@@ -91,6 +92,7 @@ def get_comment(request, comment_id: int) -> JsonResponse:
 
 
 @api_view(["GET"])
+@schema(schemas.get_comment_replies_schema)
 @permission_classes([IsAuthenticated])
 def get_comment_replies(request, comment_id: int) -> JsonResponse:
     """Get all replies of a comment
@@ -123,6 +125,7 @@ def get_comment_replies(request, comment_id: int) -> JsonResponse:
 
 
 @api_view(["DELETE"])
+@schema(schemas.delete_comment_schema)
 @permission_classes([IsAuthenticated])
 def delete_comment(request, comment_id: int) -> JsonResponse:
     """Delete a comment by its id
@@ -154,6 +157,7 @@ def delete_comment(request, comment_id: int) -> JsonResponse:
 
 
 @api_view(["GET"])
+@schema(schemas.get_user_comments_schema)
 @permission_classes([IsAuthenticated])
 def get_user_comments(request, user_id: int, material_id: int) -> JsonResponse:
     """Get all comments of a user in a material
@@ -189,6 +193,7 @@ def get_user_comments(request, user_id: int, material_id: int) -> JsonResponse:
 
 
 @api_view(["PATCH"])
+@schema(schemas.update_user_comment_schema)
 @permission_classes([IsAuthenticated])
 def update_user_comment(request, user_id: int, comment_id: int) -> JsonResponse:
     """Update a comment done by a user
@@ -231,6 +236,7 @@ def update_user_comment(request, user_id: int, comment_id: int) -> JsonResponse:
 
 
 @api_view(["DELETE"])
+@schema(schemas.delete_user_comment_schema)
 @permission_classes([IsAuthenticated])
 def delete_user_comment(request, user_id: int, comment_id: int) -> JsonResponse:
     """Delete a comment done by a user
