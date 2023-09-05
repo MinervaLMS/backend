@@ -18,7 +18,8 @@ def appraise_course(request, alias) -> JsonResponse:
     View to appraise a course. Only enrolled users can appraise a course.
 
     Args:
-        request: Json request with the following fields: stars, comment
+        request: Json request with the following
+        fields: stars and an optional comment
         alias (string): Course alias
 
     Returns:
@@ -26,14 +27,11 @@ def appraise_course(request, alias) -> JsonResponse:
     """
 
     # Check required fields
-    required_fields: list = ["stars", "comment"]
     error_messages: dict = {}
 
-    for field in required_fields:
-        if field not in request.data:
-            error_messages[field] = "This field is required"
-
-    if "stars" in request.data and request.data["stars"] not in range(0, 11):
+    if "stars" not in request.data:
+        error_messages["stars"] = "This field is required"
+    elif request.data["stars"] not in range(0, 11):
         error_messages["stars"] = "Stars must be between 0 and 10"
 
     if error_messages:
@@ -71,9 +69,11 @@ def appraise_course(request, alias) -> JsonResponse:
     # Detect if user has already appraised course
     # If so, update appraisal, date and comment
     if enrollment.appraisal_date:
+        if request.data["comment"]:
+            enrollment.appraisal_comment = request.data["comment"]
+
         old_appraisal_stars = enrollment.appraisal_stars
         enrollment.appraisal_stars = request.data["stars"]
-        enrollment.appraisal_comment = request.data["comment"]
         enrollment.appraisal_date = timezone.now()
         enrollment.save()
 
@@ -90,8 +90,10 @@ def appraise_course(request, alias) -> JsonResponse:
         )
 
     # Update Enrollment with appraisal, date and comment
+    if request.data["comment"]:
+        enrollment.appraisal_comment = request.data["comment"]
+
     enrollment.appraisal_stars = request.data["stars"]
-    enrollment.appraisal_comment = request.data["comment"]
     enrollment.appraisal_date = timezone.now()
     enrollment.save()
 
