@@ -20,6 +20,13 @@ class Material(models.Model):
     dislikes = models.IntegerField(default=0)
     total_comments = models.IntegerField(default=0)
 
+    # Many to many relationship
+    comments = models.ManyToManyField(
+        "accounts.User",
+        through="social.Comment",
+        through_fields=("material_id", "user_id"),
+    )
+
     class Meta:
         constraints = [
             models.UniqueConstraint(
