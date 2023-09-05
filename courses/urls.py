@@ -7,6 +7,7 @@ from .views import (
     material_html_views,
     material_video_views,
     access_views,
+    enrollment_views,
 )
 
 course_urls = [
@@ -32,6 +33,11 @@ course_urls = [
         "course/<str:alias>/modules/update_order/",
         course_views.update_module_order,
         name="update_module_order",
+    ),
+    path(
+        "course/<str:alias>/appraise/",
+        enrollment_views.appraise_course,
+        name="appraise_course",
     ),
 ]
 
