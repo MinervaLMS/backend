@@ -1,8 +1,9 @@
 from django.http import JsonResponse
+from django.db import models
 from rest_framework.decorators import api_view, permission_classes, schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from datetime import datetime
+from django.utils import timezone
 
 from ..schemas import enrollment_schemas as schemas
 from ..models.enrollment import Enrollment
@@ -38,6 +39,15 @@ def appraise_course(request, alias) -> JsonResponse:
     if error_messages:
         return JsonResponse(error_messages, status=status.HTTP_400_BAD_REQUEST)
 
+    # Check if course exists
+    try:
+        course = Course.objects.get(alias=alias)
+    except Course.DoesNotExist:
+        return JsonResponse(
+            {"message": "Course not found"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
     # Detect if user is enrolled in course
     user = request.user
 
@@ -48,8 +58,9 @@ def appraise_course(request, alias) -> JsonResponse:
         )
 
     # Detect if user has already finished course
-    course = Course.objects.get(alias=alias)
-    enrollment = Enrollment.objects.get(user_id=user, course_id=course)
+    enrollment = Enrollment.objects.annotate(
+        total_stars=models.Sum("appraisal_stars")
+    ).get(user_id=user, course_id=course)
 
     if not enrollment.completion_date:
         return JsonResponse(
@@ -60,10 +71,18 @@ def appraise_course(request, alias) -> JsonResponse:
     # Detect if user has already appraised course
     # If so, update appraisal, date and comment
     if enrollment.appraisal_date:
+        old_appraisal_stars = enrollment.appraisal_stars
         enrollment.appraisal_stars = request.data["stars"]
         enrollment.appraisal_comment = request.data["comment"]
-        enrollment.appraisal_date = datetime.now()
+        enrollment.appraisal_date = timezone.now()
         enrollment.save()
+
+        # Update course average stars
+        appraisal_difference = enrollment.appraisal_stars - old_appraisal_stars
+        course.average_stars = (
+            enrollment.total_stars + appraisal_difference
+        ) / course.appraisals
+        course.save()
 
         return JsonResponse(
             {"message": "Course appraised updated successfully"},
@@ -73,8 +92,19 @@ def appraise_course(request, alias) -> JsonResponse:
     # Update Enrollment with appraisal, date and comment
     enrollment.appraisal_stars = request.data["stars"]
     enrollment.appraisal_comment = request.data["comment"]
-    enrollment.appraisal_date = datetime.now()
+    enrollment.appraisal_date = timezone.now()
     enrollment.save()
+
+    # Update course average stars and number of appraisals
+    course.appraisals += 1
+
+    if not enrollment.total_stars:
+        enrollment.total_stars = 0
+
+    course.average_stars = (
+        enrollment.total_stars + enrollment.appraisal_stars
+    ) / course.appraisals
+    course.save()
 
     return JsonResponse(
         {"message": "Course appraised successfully"}, status=status.HTTP_200_OK

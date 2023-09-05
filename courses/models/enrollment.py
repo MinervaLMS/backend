@@ -15,7 +15,7 @@ class Enrollment(models.Model):
     last_module = models.IntegerField(default=0, blank=False)
 
     appraisal_stars = models.IntegerField(
-        blank=True, validators=[MaxValueValidator(10), MinValueValidator(0)]
+        null=True, blank=True, validators=[MaxValueValidator(10), MinValueValidator(0)]
     )
     appraisal_date = models.DateTimeField(null=True, blank=True)
     appraisal_comment = models.TextField(blank=True)
