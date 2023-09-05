@@ -41,7 +41,16 @@ class User(AbstractUser):
     # Temporary enroll all registered users to ED20241 course
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        course = Course.objects.get(alias="ED20241")
+
+        try:
+            course = Course.objects.get(alias="ED20241")
+        except Course.DoesNotExist:
+            course = Course.objects.create(
+                name="Estructuras de Datos",
+                alias="ED20241",
+            )
+            course.save()
+
         already_enrolled = Enrollment.objects.filter(
             user_id=self, course_id=course
         ).exists()
@@ -49,6 +58,15 @@ class User(AbstractUser):
         if not already_enrolled:
             enrollment = Enrollment(user_id=self, course_id=course)
             enrollment.save()
+
+    # Method to check if user is enrolled in a course with given alias
+    def is_enrolled(self, alias):
+        try:
+            course = Course.objects.get(alias=alias)
+        except Course.DoesNotExist:
+            return False
+
+        return Enrollment.objects.filter(user_id=self, course_id=course).exists()
 
     def __str__(self):
         return self.get_full_name()
