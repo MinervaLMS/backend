@@ -9,6 +9,7 @@ urlpatterns = [
     path("", include("accounts.urls")),  # Include accounts urls
     path("", include("courses.urls")),  # Include courses urls
     path("", include("social.urls")),  # Include social urls
+    path("", include("ioc.urls")), # Include ioc urls
     path(
         "docs/", include_docs_urls(title="Minerva API")
     ),  # Route for API documentation
