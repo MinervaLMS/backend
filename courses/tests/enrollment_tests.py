@@ -76,17 +76,14 @@ class AppraiseCourseTestCase(TestCase):
         self.client.force_authenticate(self.user1)
         response = self.client.post(
             f"/course/{self.course1.alias}/appraise/",
-            {
-                "stars": 10,
-                # missing comment
-            },
+            {},
             format="json",
         )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             response.json(),
             {
-                "comment": "This field is required",
+                "stars": "This field is required",
             },
         )
 
