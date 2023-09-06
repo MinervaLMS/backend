@@ -34,12 +34,14 @@ class CreateMaterialVideoTestCase(TestCase):
 
         self.material_video_data = {
             "material_id": self.material.id,
-            "external_id": "https://www.youtube.com/watch?v=gvYrBbX6obo&amp;ab_channel=DeiGamer",
+            "external_id": """
+            https://www.youtube.com/watch?v=gvYrBbX6obo&amp;ab_channel=DeiGamer
+            """,
         }
 
         self.material_video_invalid_types = {
             "material_id": self.material.id,
-            "external_id": "https://www.google.com"
+            "external_id": "https://www.google.com",
         }
 
         self.client.force_authenticate(self.user)
@@ -84,13 +86,17 @@ class GetMaterialVideoTestCase(TestCase):
 
         self.material_video_data = {
             "material_id": self.material.id,
-            "external_id": "https://www.youtube.com/watch?v=gvYrBbX6obo&amp;ab_channel=DeiGamer",
+            "external_id": """
+            https://www.youtube.com/watch?v=gvYrBbX6obo&amp;ab_channel=DeiGamer
+            """,
         }
 
         self.materialVideo = MaterialVideo.objects.create(
             material_id=self.material,
-            external_id="https://www.youtube.com/watch?v=gvYrBbX6obo&amp;ab_channel=DeiGamer",
-            length=954
+            external_id="""
+            https://www.youtube.com/watch?v=gvYrBbX6obo&amp;ab_channel=DeiGamer
+            """,
+            length=954,
         )
 
         self.client.force_authenticate(self.user)
@@ -126,34 +132,57 @@ class UpdateMaterialVideoTestCase(TestCase):
 
         self.materialVideo = MaterialVideo.objects.create(
             material_id=self.material,
-            external_id="https://www.youtube.com/watch?v=gvYrBbX6obo&amp;ab_channel=DeiGamer",
-            length=954
+            external_id="""
+            https://www.youtube.com/watch?v=gvYrBbX6obo&amp;ab_channel=DeiGamer
+            """,
+            length=954,
         )
 
         self.material_video_update_data = {
-            "external_id": "https://www.youtube.com/watch?v=Rm-jFWy7Jx0&ab_channel=JekavacTV"
+            "external_id": """
+            https://www.youtube.com/watch?v=Rm-jFWy7Jx0&ab_channel=JekavacTV
+            """
         }
 
-        self.material_video_source_fail_fields = {"external_id": "https://www.youtube.com/watch?v=Rm-jFWy7Jx0&ab_channel=JekavacTV", "source": "H"}
+        self.material_video_source_fail_fields = {
+            "external_id": """
+            https://www.youtube.com/watch?v=Rm-jFWy7Jx0&ab_channel=JekavacTV
+            """,
+            "source": "H",
+        }
 
-        self.material_video_length_fail_fields = {"external_id": "https://www.youtube.com/watch?v=Rm-jFWy7Jx0&ab_channel=JekavacTV", "length": 234}
+        self.material_video_length_fail_fields = {
+            "external_id": """
+            https://www.youtube.com/watch?v=Rm-jFWy7Jx0&ab_channel=JekavacTV
+            """,
+            "length": 234,
+        }
 
-        self.material_video_source_fail_fields = {"external_id": "https://www.google.com"}
+        self.material_video_source_fail_fields = {
+            "external_id": "https://www.google.com"
+        }
 
-        self.material_video_fail_fields = {"external_id": "https://www.youtube.com/watch?v=Rm-jFWy7Jx0&ab_channel=JekavacTV", "name": "imposible"}
+        self.material_video_fail_fields = {
+            "external_id": """
+            https://www.youtube.com/watch?v=Rm-jFWy7Jx0&ab_channel=JekavacTV
+            """,
+            "name": "imposible",
+        }
 
         self.client.force_authenticate(self.user)
 
     def test_update_material_video_not_exist(self):
         response = self.client.patch(
-            "/material/video/update/2344/", self.material_video_update_data, format="json"
+            "/material/video/update/2344/",
+            self.material_video_update_data,
+            format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(
             loads(response.content), {"message": "There is not a material with that id"}
         )
 
-    def test_update_material_video_source(self):
+    def test_update_material_video_source_edit(self):
         response = self.client.patch(
             f"/material/video/update/{self.material.id}/",
             self.material_video_source_fail_fields,
@@ -163,18 +192,6 @@ class UpdateMaterialVideoTestCase(TestCase):
         self.assertEqual(
             loads(response.content),
             {"message": "You can not change the source of a video manually"},
-        )
-
-    def test_update_material_video_length(self):
-        response = self.client.patch(
-            f"/material/video/update/{self.material.id}/",
-            self.material_video_length_fail_fields,
-            format="json",
-        )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(
-            loads(response.content),
-            {"message": "You can not change the length of a video manually"},
         )
 
     def test_update_material_video_source(self):
@@ -187,6 +204,18 @@ class UpdateMaterialVideoTestCase(TestCase):
         self.assertEqual(
             loads(response.content),
             {"message": "The external_id should be a valid YouTube link"},
+        )
+
+    def test_update_material_video_length(self):
+        response = self.client.patch(
+            f"/material/video/update/{self.material.id}/",
+            self.material_video_length_fail_fields,
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            loads(response.content),
+            {"message": "You can not change the length of a video manually"},
         )
 
     def test_update_material_video_fail_fields(self):
@@ -232,16 +261,21 @@ class DeleteMaterialVideoTestCase(TestCase):
 
         self.materialVideo = MaterialVideo.objects.create(
             material_id=self.material,
-            external_id="https://www.youtube.com/watch?v=gvYrBbX6obo&amp;ab_channel=DeiGamer",
-            length=954
+            external_id="""
+            https://www.youtube.com/watch?v=gvYrBbX6obo&amp;ab_channel=DeiGamer""",
+            length=954,
         )
 
         self.client.force_authenticate(self.user)
 
     def test_material_video_delete_not_exist(self):
-        response = self.client.delete(f"/material/video/delete/{self.materialVideo.id + 1}/")
+        response = self.client.delete(
+            f"/material/video/delete/{self.materialVideo.id + 1}/"
+        )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_material_delete_correct(self):
-        response = self.client.delete(f"/material/video/delete/{self.materialVideo.id}/")
+        response = self.client.delete(
+            f"/material/video/delete/{self.materialVideo.id}/"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)

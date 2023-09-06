@@ -7,6 +7,7 @@ from ..models.institution import Institution
 from ..schemas import institution_schemas as schemas
 from ..serializers.institution_serializer import InstitutionSerializer
 
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 @schema(schemas.create_institution_schema)

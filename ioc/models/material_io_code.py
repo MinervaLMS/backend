@@ -1,7 +1,8 @@
 from django.db import models
 
-#from ...courses.models.material import Material
+# from ...courses.models.material import Material
 from courses.models.material import Material
+
 
 class MaterialIoCode(models.Model):
     id = models.BigAutoField(
@@ -15,6 +16,6 @@ class MaterialIoCode(models.Model):
     max_time = models.IntegerField(blank=False)
     max_memory = models.IntegerField(blank=False)
     isActive = models.BooleanField(blank=False, default=True)
-    
+
     def __str__(self):
         return f"{self.id}"
