@@ -215,9 +215,9 @@ class DeleteMaterialIoCodeTestCase(TestCase):
         self.client.force_authenticate(self.user)
 
     def test_material_iocode_delete_not_exist(self):
-        response = self.client.delete(f"/material/iocode/delete/{self.material.id + 1}/")
+        response = self.client.delete(f"/material/iocode/delete/{self.material_iocode.id + 1}/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_material_delete_correct(self):
-        response = self.client.delete(f"/material/iocode/delete/{self.material.id}/")
+        response = self.client.delete(f"/material/iocode/delete/{self.material_iocode.id}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
