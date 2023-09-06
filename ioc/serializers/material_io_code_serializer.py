@@ -11,7 +11,6 @@ class MaterialIoCodeSerializer(serializers.ModelSerializer):
         """
         Verify if unique material_id is duplicated.
         """
-        print("IOCODE DATA: "+str(data))
 
         material_id = data.get("material_id")
         if MaterialIoCode.objects.filter(material_id=material_id).exists():

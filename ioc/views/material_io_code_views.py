@@ -28,7 +28,7 @@ def create_material_io_code(request) -> JsonResponse:
     if serializer.is_valid():
         serializer.save()
         return JsonResponse(
-            {"message": "Imput and output code was upload successfully"}, status=status.HTTP_201_CREATED
+            {"message": "Input and output code was upload successfully"}, status=status.HTTP_201_CREATED
         )
 
     return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -84,18 +84,41 @@ def update_material_io_code(request, material_id: int) -> JsonResponse:
             {"message": "There is not a material with that id"},
             status=status.HTTP_404_NOT_FOUND,
         )
-
+        
     if "max_time" in request.data:
+        if(not validNumber(request.data["max_time"])):
+            return JsonResponse(
+                {"message": "Value Error in max_time"},
+                status=status.HTTP_400_BAD_REQUEST)
         material.max_time = request.data["max_time"]
         
     if "max_memory" in request.data:
+        if(not validNumber(request.data["max_memory"])):
+            return JsonResponse(
+                {"message": "Value Error in max_memory"},
+                status=status.HTTP_400_BAD_REQUEST)
         material.max_memory = request.data["max_memory"]
+        
+        
+    if "isActive" in request.data:
+        if(not (eval(request.data["isActive"]))):
+            return JsonResponse(
+                {"message": "You can not inactive io-code material"},
+                status=status.HTTP_400_BAD_REQUEST)
+        material.isActive = eval(request.data["isActive"])
     
     material.save()
     serializer = MaterialIoCodeSerializer(material)
 
     return JsonResponse(serializer.data, status=status.HTTP_200_OK)
-        
+
+def validNumber(field):
+    try:
+        float(field)
+        return True
+    except:
+        return False
+
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
 # @schema(schemas.delete_material_io_code_schema)
@@ -113,8 +136,9 @@ def delete_material(request, material_io_code_id: int) -> JsonResponse:
 
     try:
         material = MaterialIoCode.objects.get(pk=material_io_code_id)
-
-        material.delete()
+        
+        material.isActive = False
+        material.save()
 
         return JsonResponse(
             {"message": "Material deleted successfully"}, status=status.HTTP_200_OK
