@@ -3,13 +3,22 @@ from rest_framework.test import APIClient
 
 from ..models.user import User
 from courses.models.course import Course
+from institutions.models.institution import Institution
 
 
 class GetUsersTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course"
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
         )
         self.user = User.objects.create_user(
             email="test@example.com", password="testpassword"
@@ -28,8 +37,16 @@ class GetUsersTestCase(TestCase):
 class GetUserTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course"
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
         )
         self.user = User.objects.create_user(
             email="test@example.com", password="testpassword"
@@ -53,8 +70,16 @@ class GetUserTestCase(TestCase):
 class GetUserCoursesTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course"
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
         )
         self.user = User.objects.create_user(
             email="test@example.com", password="testpassword"

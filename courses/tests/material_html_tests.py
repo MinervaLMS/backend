@@ -8,13 +8,22 @@ from ..models.material import Material
 from ..models.material_html import MaterialHTML
 
 from accounts.models.user import User
+from institutions.models.institution import Institution
 
 
 class CreateMaterialHTMLTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course"
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
         )
         self.module = Module.objects.create(course_id=self.course, name="Test module")
         self.material = Material.objects.create(
@@ -82,8 +91,16 @@ class CreateMaterialHTMLTestCase(TestCase):
 class GetMaterialHTMLTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course"
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
         )
         self.module = Module.objects.create(course_id=self.course, name="Test module")
         self.material = Material.objects.create(
@@ -117,8 +134,16 @@ class GetMaterialHTMLTestCase(TestCase):
 class UpdateMaterialHTMLTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course"
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
         )
         self.module = Module.objects.create(course_id=self.course, name="Test module")
         self.material = Material.objects.create(
@@ -182,8 +207,16 @@ class UpdateMaterialHTMLTestCase(TestCase):
 class DeleteMaterialHTMLTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course"
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
         )
         self.module = Module.objects.create(course_id=self.course, name="Test module")
         self.material = Material.objects.create(

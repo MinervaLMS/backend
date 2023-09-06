@@ -7,13 +7,22 @@ from ..models.material_io_code import MaterialIoCode
 from courses.models.course import Course
 from accounts.models.user import User
 from courses.models.module import Module
+from institutions.models.institution import Institution
 
 
 class CreateMaterialIoCodeTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course"
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
         )
         self.module = Module.objects.create(course_id=self.course, name="Test module")
         self.material = Material.objects.create(
@@ -88,8 +97,16 @@ class CreateMaterialIoCodeTestCase(TestCase):
 class GetMaterialIoCodeTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course"
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
         )
         self.module = Module.objects.create(course_id=self.course, name="Test module")
         self.material = Material.objects.create(
@@ -124,8 +141,16 @@ class GetMaterialIoCodeTestCase(TestCase):
 class UpdateMaterialIoCodeTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course"
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
         )
         self.module = Module.objects.create(course_id=self.course, name="Test module")
         self.material = Material.objects.create(
@@ -226,8 +251,16 @@ class UpdateMaterialIoCodeTestCase(TestCase):
 class DeleteMaterialIoCodeTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course"
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
         )
         self.module = Module.objects.create(course_id=self.course, name="Test module")
         self.material = Material.objects.create(

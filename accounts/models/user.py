@@ -57,6 +57,7 @@ class User(AbstractUser):
                 alias="ED",
                 institution=institution,
             )
+            institution.save()
             course.save()
 
         already_enrolled = Enrollment.objects.filter(

@@ -17,27 +17,20 @@ class CreateCourseTestCase(TestCase):
             email="test@example.com",
             password="testpassword",
             first_name="Test",
-            last_name="User"
+            last_name="User",
         )
         self.client.force_authenticate(self.user)
         self.institution = Institution.objects.create(
             name="Institucion de Test",
             alias="IT",
             description="Institucion de Test",
-            url="https://www.instituciontest.com"
+            url="https://www.instituciontest.com",
         )
         self.course_data = {
-            "institution_id": self.institution.id,
-            "name": "Test Course1",
+            "institution": self.institution.id,
+            "name": "Test Course 1",
             "alias": "test",
             "description": "This is a test course.",
-            "course_instructional_materials": 10,
-            "course_assessment_materials": 5,
-            "course_extra_materials": 3,
-            "min_assessment_progress": 80,
-            "average_stars": 4,
-            "appraisals": 20,
-            "comments": 15,
         }
 
     def test_create_course_correct(self):
@@ -46,17 +39,10 @@ class CreateCourseTestCase(TestCase):
 
     def test_create_course_invalid_data(self):
         invalid_data = {
-            "institution_id": self.institution.id,
+            "institution": self.institution.id,
             "name": "",  # Invalid name
             "alias": "test",
             "description": "This is a test course.",
-            "course_instructional_materials": 10,
-            "course_assessment_materials": 5,
-            "course_extra_materials": 3,
-            "min_assessment_progress": 80,
-            "average_stars": 4,
-            "appraisals": 20,
-            "comments": 15,
         }
         response = self.client.post("/course/create/", invalid_data, format="json")
         self.assertEqual(response.status_code, 400)
@@ -69,29 +55,22 @@ class GetCourseTestCase(TestCase):
             email="test@example.com",
             password="testpassword",
             first_name="Test",
-            last_name="User"
+            last_name="User",
         )
         self.client.force_authenticate(self.user)
         self.institution = Institution.objects.create(
             name="Institucion de Test",
             alias="IT",
             description="Institucion de Test",
-            url="https://www.instituciontest.com"
+            url="https://www.instituciontest.com",
         )
 
     def test_get_course_correct(self):
         course = Course.objects.create(
-            institution_id=self.institution,
+            institution=self.institution,
             name="Test Course2",
             alias="test2",
             description="This is a test course.",
-            course_instructional_materials=10,
-            course_assessment_materials=5,
-            course_extra_materials=3,
-            min_assessment_progress=80,
-            average_stars=4,
-            appraisals=20,
-            comments=15
         )
         response = self.client.get(f"/course/{course.alias}/")
         self.assertEqual(response.status_code, 200)
@@ -108,29 +87,22 @@ class UpdateCourseTestCase(TestCase):
             email="test@example.com",
             password="testpassword",
             first_name="Test",
-            last_name="User"
+            last_name="User",
         )
         self.client.force_authenticate(self.user)
         self.institution = Institution.objects.create(
             name="Institucion de Test",
             alias="IT",
             description="Institucion de Test",
-            url="https://www.instituciontest.com"
+            url="https://www.instituciontest.com",
         )
 
     def test_update_course_correct(self):
         course = Course.objects.create(
-            institution_id=self.institution,
             name="Test Course2",
             alias="test2",
             description="This is a test course.",
-            course_instructional_materials=10,
-            course_assessment_materials=5,
-            course_extra_materials=3,
-            min_assessment_progress=80,
-            average_stars=4,
-            appraisals=20,
-            comments=15
+            institution=self.institution,
         )
         updated_data = {"name": "Updated Course"}
         response = self.client.patch(
@@ -148,17 +120,10 @@ class UpdateCourseTestCase(TestCase):
 
     def test_update_course_invalid_data(self):
         course = Course.objects.create(
-            institution_id=self.institution,
             name="Test Course2",
             alias="test2",
             description="This is a test course.",
-            course_instructional_materials=10,
-            course_assessment_materials=5,
-            course_extra_materials=3,
-            min_assessment_progress=80,
-            average_stars=4,
-            appraisals=20,
-            comments=15
+            institution=self.institution,
         )
         invalid_data = {
             "name": "",  # Invalid name
@@ -178,29 +143,22 @@ class DeleteCourseTestCase(TestCase):
             email="test@example.com",
             password="testpassword",
             first_name="Test",
-            last_name="User"
+            last_name="User",
         )
         self.client.force_authenticate(self.user)
         self.institution = Institution.objects.create(
             name="Institucion de Test",
             alias="IT",
             description="Institucion de Test",
-            url="https://www.instituciontest.com"
+            url="https://www.instituciontest.com",
         )
 
     def test_delete_course_correct(self):
         course = Course.objects.create(
-            institution_id=self.institution,
-            name="Test Course2",
+            name="Test Course 2",
             alias="test2",
             description="This is a test course.",
-            course_instructional_materials=10,
-            course_assessment_materials=5,
-            course_extra_materials=3,
-            min_assessment_progress=80,
-            average_stars=4,
-            appraisals=20,
-            comments=15
+            institution=self.institution,
         )
         response = self.client.delete(f"/course/delete/{course.alias}/")
         self.assertEqual(response.status_code, 200)
@@ -215,8 +173,16 @@ class DeleteCourseTestCase(TestCase):
 class GetModulesByCourseTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course"
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
         )
         self.user = User.objects.create(
             email="test@example.com", password="testpassword"
@@ -257,8 +223,16 @@ class GetModulesByCourseTestCase(TestCase):
 class GetModuleByCourseOrderTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course"
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
         )
         self.user = User.objects.create(
             email="test@example.com", password="testpassword"
@@ -297,8 +271,16 @@ class GetModuleByCourseOrderTestCase(TestCase):
 class UpdateModuleOrderTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course"
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
         )
         self.user = User.objects.create(
             email="test@example.com", password="testpassword"
@@ -346,15 +328,15 @@ class UpdateModuleOrderTestCase(TestCase):
             loads(response.content),
             [
                 {
-                    "id": module_2.id,
-                    "name": module_2.name,
-                    "order": 0,
-                    "course_id": self.course.id,
-                },
-                {
                     "id": module_1.id,
                     "name": module_1.name,
                     "order": 1,
+                    "course_id": self.course.id,
+                },
+                {
+                    "id": module_2.id,
+                    "name": module_2.name,
+                    "order": 0,
                     "course_id": self.course.id,
                 },
             ],
