@@ -18,6 +18,7 @@ class CourseSerializer(serializers.ModelSerializer):
             "average_stars",
             "appraisals",
             "comments",
-            "parent_course",
+            "parent_course_id",
             "enrollments",
+            "institution_id"
         ]

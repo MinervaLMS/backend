@@ -5,6 +5,8 @@ from json import loads
 
 from ..models.course import Course
 from ..models.module import Module
+
+from institutions.models.institution import Institution
 from accounts.models.user import User
 
 
@@ -18,7 +20,14 @@ class CreateCourseTestCase(TestCase):
             last_name="User"
         )
         self.client.force_authenticate(self.user)
+        self.institution = Institution.objects.create(
+            name="Institucion de Test",
+            alias="IT",
+            description="Institucion de Test",
+            url="https://www.instituciontest.com"
+        )
         self.course_data = {
+            "institution_id": self.institution.id,
             "name": "Test Course1",
             "alias": "test",
             "description": "This is a test course.",
@@ -37,6 +46,7 @@ class CreateCourseTestCase(TestCase):
 
     def test_create_course_invalid_data(self):
         invalid_data = {
+            "institution_id": self.institution.id,
             "name": "",  # Invalid name
             "alias": "test",
             "description": "This is a test course.",
@@ -62,21 +72,16 @@ class GetCourseTestCase(TestCase):
             last_name="User"
         )
         self.client.force_authenticate(self.user)
-        self.course_data = {
-            "name": "Test Course1",
-            "alias": "test",
-            "description": "This is a test course.",
-            "course_instructional_materials": 10,
-            "course_assessment_materials": 5,
-            "course_extra_materials": 3,
-            "min_assessment_progress": 80,
-            "average_stars": 4,
-            "appraisals": 20,
-            "comments": 15,
-        }
+        self.institution = Institution.objects.create(
+            name="Institucion de Test",
+            alias="IT",
+            description="Institucion de Test",
+            url="https://www.instituciontest.com"
+        )
 
     def test_get_course_correct(self):
         course = Course.objects.create(
+            institution_id=self.institution,
             name="Test Course2",
             alias="test2",
             description="This is a test course.",
@@ -106,21 +111,16 @@ class UpdateCourseTestCase(TestCase):
             last_name="User"
         )
         self.client.force_authenticate(self.user)
-        self.course_data = {
-            "name": "Test Course1",
-            "alias": "test",
-            "description": "This is a test course.",
-            "course_instructional_materials": 10,
-            "course_assessment_materials": 5,
-            "course_extra_materials": 3,
-            "min_assessment_progress": 80,
-            "average_stars": 4,
-            "appraisals": 20,
-            "comments": 15,
-        }
+        self.institution = Institution.objects.create(
+            name="Institucion de Test",
+            alias="IT",
+            description="Institucion de Test",
+            url="https://www.instituciontest.com"
+        )
 
     def test_update_course_correct(self):
         course = Course.objects.create(
+            institution_id=self.institution,
             name="Test Course2",
             alias="test2",
             description="This is a test course.",
@@ -148,6 +148,7 @@ class UpdateCourseTestCase(TestCase):
 
     def test_update_course_invalid_data(self):
         course = Course.objects.create(
+            institution_id=self.institution,
             name="Test Course2",
             alias="test2",
             description="This is a test course.",
@@ -180,21 +181,16 @@ class DeleteCourseTestCase(TestCase):
             last_name="User"
         )
         self.client.force_authenticate(self.user)
-        self.course_data = {
-            "name": "Test Course1",
-            "alias": "test",
-            "description": "This is a test course.",
-            "course_instructional_materials": 10,
-            "course_assessment_materials": 5,
-            "course_extra_materials": 3,
-            "min_assessment_progress": 80,
-            "average_stars": 4,
-            "appraisals": 20,
-            "comments": 15,
-        }
+        self.institution = Institution.objects.create(
+            name="Institucion de Test",
+            alias="IT",
+            description="Institucion de Test",
+            url="https://www.instituciontest.com"
+        )
 
     def test_delete_course_correct(self):
         course = Course.objects.create(
+            institution_id=self.institution,
             name="Test Course2",
             alias="test2",
             description="This is a test course.",
