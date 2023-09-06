@@ -51,7 +51,8 @@ DEPENDENCIES_APPS = [
     "corsheaders",
     "coreapi",
 ]
-MINERVA_APPS = ["accounts", "courses", "ioc", "institutions"]
+
+MINERVA_APPS = ["accounts", "courses", "ioc", "social", "institutions"]
 
 INSTALLED_APPS = DJANGO_APPS + DEPENDENCIES_APPS + MINERVA_APPS
 

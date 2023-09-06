@@ -24,6 +24,13 @@ from .material_html_tests import (
     UpdateMaterialHTMLTestCase,
     DeleteMaterialHTMLTestCase,
 )
+from .material_video_tests import (
+    CreateMaterialVideoTestCase,
+    GetMaterialVideoTestCase,
+    UpdateMaterialVideoTestCase,
+    DeleteMaterialVideoTestCase,
+)
+from .enrollment_tests import AppraiseCourseTestCase
 
 _ = [
     CreateCourseTestCase,
@@ -51,3 +58,11 @@ _ = [
     UpdateMaterialHTMLTestCase,
     DeleteMaterialHTMLTestCase,
 ]
+_ = [
+    CreateMaterialVideoTestCase,
+    GetMaterialVideoTestCase,
+    UpdateMaterialVideoTestCase,
+    DeleteMaterialVideoTestCase,
+]
+
+_ = [AppraiseCourseTestCase]
