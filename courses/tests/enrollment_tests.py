@@ -5,36 +5,28 @@ from rest_framework.test import APIClient
 from ..models.course import Course
 from ..models.enrollment import Enrollment
 from accounts.models.user import User
+from institutions.models.institution import Institution
 
 
 class AppraiseCourseTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
-
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
         self.course1 = Course.objects.create(
-            name="Test Course 1",
-            alias="ED20241",
-            description="This is a test course.",
-            course_instructional_materials=0,
-            course_assessment_materials=0,
-            course_extra_materials=0,
-            min_assessment_progress=80,
-            average_stars=0,
-            appraisals=0,
-            comments=0,
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
         )
 
         self.course2 = Course.objects.create(
-            name="Test Course 2",
-            alias="test2",
-            description="This is a test course.",
-            course_instructional_materials=0,
-            course_assessment_materials=0,
-            course_extra_materials=0,
-            min_assessment_progress=80,
-            average_stars=0,
-            appraisals=0,
-            comments=0,
+            name="Estructuras de Datos 2",
+            alias="ED2",
+            institution=self.institution,
         )
 
         self.user1 = User.objects.create(

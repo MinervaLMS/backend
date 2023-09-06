@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from .managers import UserManager
 from courses.models.course import Course
 from courses.models.enrollment import Enrollment
+from institutions.models.institution import Institution
 
 # TODO: Add many to many relationship with courses using instructor
 # TODO: Delete the temporary enrollment to ED20241 course in production
@@ -43,12 +44,20 @@ class User(AbstractUser):
         super().save(*args, **kwargs)
 
         try:
-            course = Course.objects.get(alias="ED20241")
+            course = Course.objects.get(alias="ED")
         except Course.DoesNotExist:
+            institution = Institution.objects.create(
+                name="Universidad Nacional de Colombia",
+                alias="UNAL",
+                description="UNAL description",
+                url="https://unal.edu.co/",
+            )
             course = Course.objects.create(
                 name="Estructuras de Datos",
-                alias="ED20241",
+                alias="ED",
+                institution=institution,
             )
+            institution.save()
             course.save()
 
         already_enrolled = Enrollment.objects.filter(

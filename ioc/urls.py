@@ -25,6 +25,4 @@ material_io_code_urls = [
     ),
 ]
 
-urlpatterns = (
-    material_io_code_urls
-)
+urlpatterns = material_io_code_urls

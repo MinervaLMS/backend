@@ -20,6 +20,7 @@ class CourseSerializer(serializers.ModelSerializer):
             "comments",
             "parent_course",
             "enrollments",
+            "institution",
         ]
 
 
