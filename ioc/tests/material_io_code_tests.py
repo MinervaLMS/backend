@@ -33,7 +33,6 @@ class CreateMaterialIoCodeTestCase(TestCase):
             "material_id": self.material.id,
             "max_time": 18,
             "max_memory": 2,
-            "isActive": True
         }
 
         self.material_iocode_no_material_data = {
@@ -46,7 +45,6 @@ class CreateMaterialIoCodeTestCase(TestCase):
             "material_id": True,
             "max_time": "String in Integer Field",
             "max_memory": "String in Integer Field",
-            "isActive": -1
         }
 
         self.client.force_authenticate(self.user)
@@ -100,7 +98,6 @@ class GetMaterialIoCodeTestCase(TestCase):
             material_id=self.material,
             max_time=18,
             max_memory=2,
-            isActive=True
         )
         
         self.user = User.objects.create(
@@ -138,7 +135,6 @@ class UpdateMaterialIoCodeTestCase(TestCase):
             material_id=self.material,
             max_time=18,
             max_memory=2,
-            isActive=True
         )
         
         self.user = User.objects.create(
@@ -155,10 +151,6 @@ class UpdateMaterialIoCodeTestCase(TestCase):
 
         self.material_iocode_update_data_invalid = {
             "material_id": 999,
-        }
-        
-        self.material_iocode_update_data_invalid2 = {
-            "isActive": "False",
         }
         
         self.material_iocode_update_data_invalid3 = {
@@ -200,13 +192,6 @@ class UpdateMaterialIoCodeTestCase(TestCase):
             "/material/iocode/update/3822/", self.material_iocode_update_data, format="json"
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        
-    def test_update_material_iocode_not_active(self):
-        response = self.client.patch(
-            f"/material/iocode/update/{self.material.id}/", self.material_iocode_update_data_invalid2, format="json"
-        )
-        self.assertEqual(response.status_code, 400)
-
     def test_update_material_iocode_not_max_time(self):
         response = self.client.patch(
             f"/material/iocode/update/{self.material.id}/", self.material_iocode_update_data_invalid4, format="json"
@@ -237,7 +222,6 @@ class DeleteMaterialIoCodeTestCase(TestCase):
             material_id=self.material,
             max_time=18,
             max_memory=2,
-            isActive=True
         )
         
         self.user = User.objects.create(

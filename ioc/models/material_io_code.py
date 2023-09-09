@@ -14,7 +14,6 @@ class MaterialIoCode(models.Model):
     material_id = models.OneToOneField(Material, on_delete=models.CASCADE, blank=False)
     max_time = models.IntegerField(blank=False)
     max_memory = models.IntegerField(blank=False)
-    isActive = models.BooleanField(blank=False, default=True)
     
     def __str__(self):
         return f"{self.id}"

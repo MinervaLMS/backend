@@ -99,13 +99,6 @@ def update_material_io_code(request, material_id: int) -> JsonResponse:
                 status=status.HTTP_400_BAD_REQUEST)
         material.max_memory = request.data["max_memory"]
         
-        
-    if "isActive" in request.data:
-        if(not (eval(request.data["isActive"]))):
-            return JsonResponse(
-                {"message": "You can not inactive io-code material"},
-                status=status.HTTP_400_BAD_REQUEST)
-        material.isActive = eval(request.data["isActive"])
     
     material.save()
     serializer = MaterialIoCodeSerializer(material)
@@ -136,9 +129,7 @@ def delete_material(request, material_io_code_id: int) -> JsonResponse:
 
     try:
         material = MaterialIoCode.objects.get(pk=material_io_code_id)
-        
-        material.isActive = False
-        material.save()
+        material.delete()
 
         return JsonResponse(
             {"message": "Material deleted successfully"}, status=status.HTTP_200_OK
