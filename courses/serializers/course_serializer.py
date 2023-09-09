@@ -20,4 +20,15 @@ class CourseSerializer(serializers.ModelSerializer):
             "comments",
             "parent_course",
             "enrollments",
+            "institution",
+        ]
+
+
+class CourseEnrollmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Course
+        fields = [
+            "id",
+            "name",
+            "alias",
         ]

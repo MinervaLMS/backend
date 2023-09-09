@@ -238,12 +238,14 @@ def update_module_order(request, alias: str) -> JsonResponse:
     orders: list = list(request.data.values())
     orders.sort()
     correct_orders: list = [n for n in range(len(orders))]
-    max_order = (
-        Module.objects.filter(course_id=course.id).aggregate(models.Max("order"))[
-            "order__max"
-        ]
-        + 1
-    )
+    max_order = Module.objects.filter(course_id=course.id).aggregate(
+        models.Max("order")
+    )["order__max"]
+
+    if max_order is None:
+        max_order = 0
+    else:
+        max_order += 1
 
     if orders != correct_orders:
         return JsonResponse(

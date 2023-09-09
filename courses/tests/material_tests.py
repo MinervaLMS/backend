@@ -8,13 +8,22 @@ from ..models.module import Module
 from ..models.material import Material
 
 from accounts.models.user import User
+from institutions.models.institution import Institution
 
 
 class CreateMaterialTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course"
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
         )
         self.user = User.objects.create(
             email="test@example.com",
@@ -60,8 +69,16 @@ class CreateMaterialTestCase(TestCase):
 class GetMaterialTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course"
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
         )
         self.user = User.objects.create(
             email="test@example.com",
@@ -91,8 +108,16 @@ class GetMaterialTestCase(TestCase):
 class UpdateMaterialTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course"
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
         )
         self.user = User.objects.create(
             email="test@example.com",
@@ -165,8 +190,16 @@ class UpdateMaterialTestCase(TestCase):
 class DeleteMaterialTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course"
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
         )
         self.user = User.objects.create(
             email="test@example.com",
