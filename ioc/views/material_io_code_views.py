@@ -9,9 +9,8 @@ from ..models.material_io_code import MaterialIoCode
 
 from ..serializers.material_io_code_serializer import (
     MaterialGetIoCodeSerializer,
-    MaterialIoCodeSerializer,
+    MaterialIoCodeSerializer
 )
-
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -29,12 +28,10 @@ def create_material_io_code(request) -> JsonResponse:
     if serializer.is_valid():
         serializer.save()
         return JsonResponse(
-            {"message": "Input and output code was upload successfully"},
-            status=status.HTTP_201_CREATED,
+            {"message": "Input and output code was upload successfully"}, status=status.HTTP_201_CREATED
         )
 
     return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -62,7 +59,6 @@ def get_material_io_code(request, material_id: int) -> JsonResponse:
             status=status.HTTP_404_NOT_FOUND,
         )
 
-
 @api_view(["PATCH"])
 @permission_classes([IsAuthenticated])
 # @schema(schemas.update_material_io_code_schema)
@@ -88,44 +84,33 @@ def update_material_io_code(request, material_id: int) -> JsonResponse:
             {"message": "There is not a material with that id"},
             status=status.HTTP_404_NOT_FOUND,
         )
-
+        
     if "max_time" in request.data:
-        if not validNumber(request.data["max_time"]):
+        if(not validNumber(request.data["max_time"])):
             return JsonResponse(
                 {"message": "Value Error in max_time"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+                status=status.HTTP_400_BAD_REQUEST)
         material.max_time = request.data["max_time"]
-
+        
     if "max_memory" in request.data:
-        if not validNumber(request.data["max_memory"]):
+        if(not validNumber(request.data["max_memory"])):
             return JsonResponse(
                 {"message": "Value Error in max_memory"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+                status=status.HTTP_400_BAD_REQUEST)
         material.max_memory = request.data["max_memory"]
-
-    if "isActive" in request.data:
-        if not (eval(request.data["isActive"])):
-            return JsonResponse(
-                {"message": "You can not inactive io-code material"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        material.isActive = eval(request.data["isActive"])
-
+        
+    
     material.save()
     serializer = MaterialIoCodeSerializer(material)
 
     return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
-
 def validNumber(field):
     try:
         float(field)
         return True
-    except Exception:
+    except:
         return False
-
 
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
@@ -144,9 +129,7 @@ def delete_material(request, material_io_code_id: int) -> JsonResponse:
 
     try:
         material = MaterialIoCode.objects.get(pk=material_io_code_id)
-
-        material.isActive = False
-        material.save()
+        material.delete()
 
         return JsonResponse(
             {"message": "Material deleted successfully"}, status=status.HTTP_200_OK
