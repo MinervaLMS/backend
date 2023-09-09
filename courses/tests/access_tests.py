@@ -228,7 +228,7 @@ class UpdateAccessLikeTestCase(TestCase):
             "user_id": self.user.id,
         }
         response = self.client.patch("/access/update/like/", data, format="json")
-        # self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Access.objects.last().like, True)
         self.assertEqual(
             loads(response.content), {"message": "Access assessed successfully"}
@@ -311,7 +311,7 @@ class UpdateAccessDislikeTestCase(TestCase):
             "user_id": self.user.id,
         }
         response = self.client.patch("/access/update/dislike/", data, format="json")
-        # self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Access.objects.last().like, False)
         self.assertEqual(
             loads(response.content), {"message": "Access assessed successfully"}
