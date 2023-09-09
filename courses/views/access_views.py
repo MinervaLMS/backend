@@ -152,7 +152,7 @@ def update_access_like(request) -> JsonResponse:
         material.save()
 
         return JsonResponse(
-            {"message": "Access assessed successfully"}, status=status.HTTP_201_CREATED
+            {"message": "Access assessed successfully"}, status=status.HTTP_200_OK
         )
 
     except Material.DoesNotExist:
@@ -213,7 +213,7 @@ def update_access_dislike(request) -> JsonResponse:
         material.save()
 
         return JsonResponse(
-            {"message": "Access assessed successfully"}, status=status.HTTP_201_CREATED
+            {"message": "Access assessed successfully"}, status=status.HTTP_200_OK
         )
 
     except Material.DoesNotExist:
