@@ -43,6 +43,8 @@ def create_comment(request) -> JsonResponse:
         comment: Comment = CommentSerializer(data=request.data)
         if comment.is_valid():
             comment.save()
+            material.total_comments += 1
+            material.save()
             return JsonResponse(
                 data=comment.data,
                 safe=False,
@@ -139,6 +141,10 @@ def delete_comment(request, comment_id: int) -> JsonResponse:
     """
     try:
         comment: Comment = Comment.objects.get(id=comment_id)
+        # Decrease the total comments of the material
+        material: Material = comment.material_id
+        material.total_comments -= 1
+        material.save()
         comment.delete()
 
         return JsonResponse(
@@ -252,6 +258,10 @@ def delete_user_comment(request, user_id: int, comment_id: int) -> JsonResponse:
     try:
         user: User = User.objects.get(pk=user_id)
         comment_to_delete: Comment = user.comment_set.get(pk=comment_id)
+        # Decrease the total comments of the material
+        material: Material = comment_to_delete.material_id
+        material.total_comments -= 1
+        material.save()
         comment_to_delete.delete()
         return JsonResponse(
             data={"message": "Comment deleted successfully"},
