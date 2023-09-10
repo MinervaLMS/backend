@@ -64,7 +64,8 @@ def update_count_updated_material(
         # Guaranteed is_extra is either "True" or "False".
         # As it is a string, we need to convert it to a boolean
         new_is_extra = (
-            True if (new_is_extra == "True" or new_is_extra == "true") else False
+            True if (new_is_extra == "True" or new_is_extra ==
+                     "true") else False
         )
 
         if not old_is_extra and new_is_extra:

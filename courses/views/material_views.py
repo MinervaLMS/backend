@@ -31,10 +31,8 @@ def create_material(request) -> JsonResponse:
 
     if serializer.is_valid():
         serializer.save()
-
         # Update module's material counts
         update_count_created_material(serializer=serializer)
-
         return JsonResponse(
             {"message": "Material created successfully"}, status=status.HTTP_201_CREATED
         )
