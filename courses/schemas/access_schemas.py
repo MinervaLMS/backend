@@ -68,6 +68,18 @@ update_access_like_schema = AutoSchema(
                 description="User's id that wants to update the like"
             ),
         ),
+        coreapi.Field(
+            "like",
+            required=True,
+            location="form",
+            type="boolean",
+            schema=coreschema.String(
+                description=(
+                    "User's like to the material. True if the user likes "
+                    "the material, False if the user dislikes the material"
+                )
+            ),
+        ),
     ]
 )
 
