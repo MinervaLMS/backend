@@ -1,3 +1,4 @@
+'''Module for testing the IoCodeSubmission model and its endpoints.'''
 from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -11,7 +12,11 @@ from ..models.io_code_submission import IoCodeSubmission
 
 
 class CreateIoCodeSubmissionTestCase(TestCase):
-    def setUp(self):
+    '''Class that tests the creation of a IoCodeSubmission instance.'''
+
+    def setUp(self)->None:
+        '''Method that sets up the client and the data to be used in the tests.'''
+
         self.client = APIClient()
 
         self.institution = Institution.objects.create(
@@ -79,17 +84,23 @@ class CreateIoCodeSubmissionTestCase(TestCase):
 
         self.client.force_authenticate(self.user)
 
-    def test_create_correct(self):
+    def test_create_correct(self)->None:
+        '''Method that tests the creation of a IoCodeSubmission instance with correct data.'''
+
         response = self.client.post(
             "/iocode/submission/create/", self.io_code_submission_data, format="json"
         )
         self.assertEqual(response.status_code, 201)
 
-    def test_create_blank(self):
+    def test_create_blank(self)->None:
+        '''Method that tests the creation of a IoCodeSubmission instance with blank data.'''
+
         response = self.client.post("/iocode/submission/create/", {}, format="json")
         self.assertEqual(response.status_code, 400)
 
-    def test_create_no_material(self):
+    def test_create_no_material(self)->None:
+        '''Method that tests the creation of a IoCodeSubmission instance with no material.'''
+
         response = self.client.post(
             "/iocode/submission/create/",
             self.io_code_submission_data_no_material,
@@ -97,7 +108,9 @@ class CreateIoCodeSubmissionTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 400)
 
-    def test_create_no_user(self):
+    def test_create_no_user(self)->None:
+        '''Method that tests the creation of a IoCodeSubmission instance with no user.'''
+
         response = self.client.post(
             "/iocode/submission/create/",
             self.io_code_submission_data_no_user,
@@ -105,7 +118,9 @@ class CreateIoCodeSubmissionTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 400)
 
-    def test_create_invalid_types(self):
+    def test_create_invalid_types(self)->None:
+        '''Method that tests the creation of a IoCodeSubmission instance with invalid types.'''
+
         response = self.client.post(
             "/iocode/submission/create/",
             self.io_code_submission_data_invalid,
@@ -115,7 +130,10 @@ class CreateIoCodeSubmissionTestCase(TestCase):
 
 
 class GetIoCodeSubmissionTestCase(TestCase):
+    '''Class that tests the get method of the IoCodeSubmission model.'''
+
     def setUp(self):
+        '''Method that sets up the client and the data to be used in the tests.'''
         self.client = APIClient()
 
         self.institution = Institution.objects.create(
@@ -156,13 +174,16 @@ class GetIoCodeSubmissionTestCase(TestCase):
 
         self.client.force_authenticate(self.user)
 
-    def test_get_incorrect(self):
+    def test_get_incorrect(self)->None:
+        '''Method that tests the get method of the IoCodeSubmission model with an incorrect id.'''
+
         response = self.client.get(
             f"/iocode/submission/{(self.io_code_submission.submission_id)+1}/"
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_get_correct(self):
+    def test_get_correct(self)->None:
+        '''Method that tests the get method of the IoCodeSubmission model with a correct id.'''
         response = self.client.get(
             f"/iocode/submission/{self.io_code_submission.submission_id}/"
         )
@@ -170,8 +191,13 @@ class GetIoCodeSubmissionTestCase(TestCase):
 
 
 class DeleteIoCodeSubmissionTestCase(TestCase):
-    def setUp(self):
+    '''Class that tests the delete method of the IoCodeSubmission model.'''
+
+    def setUp(self)->None:
+        '''Method that sets up the client and the data to be used in the tests.'''
+
         self.client = APIClient()
+
         self.institution = Institution.objects.create(
             name="Test Institution",
             alias="TestInstitution",
@@ -210,13 +236,17 @@ class DeleteIoCodeSubmissionTestCase(TestCase):
 
         self.client.force_authenticate(self.user)
 
-    def test_delete_incorrect(self):
+    def test_delete_incorrect(self)->None:
+        '''Method that tests the delete method of the IoCodeSubmission model with an incorrect id.'''
+
         response = self.client.delete(
             f"/iocode/submission/delete/{(self.io_code_submission.submission_id)+1}/"
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_delete_correct(self):
+    def test_delete_correct(self)->None:
+        '''Method that tests the delete method of the IoCodeSubmission model with a correct id.'''
+
         response = self.client.delete(
             f"/iocode/submission/delete/{self.io_code_submission.submission_id}/"
         )
@@ -224,8 +254,13 @@ class DeleteIoCodeSubmissionTestCase(TestCase):
 
 
 class UpdateIoCodeSubmissionTestCase(TestCase):
-    def setUp(self):
+    '''Class that tests the update method of the IoCodeSubmission model.'''
+
+    def setUp(self)->None:
+        '''Method that sets up the client and the data to be used in the tests.'''
+
         self.client = APIClient()
+
         self.institution = Institution.objects.create(
             name="Test Institution",
             alias="TestInstitution",
@@ -278,7 +313,9 @@ class UpdateIoCodeSubmissionTestCase(TestCase):
             "execution_time": 2,
         }
 
-    def test_update_incorrect(self):
+    def test_update_incorrect(self)->None:
+        '''Method that tests the update method of the IoCodeSubmission model with an incorrect id.'''
+
         response = self.client.patch(
             f"/iocode/submission/update/{(self.io_code_submission.submission_id)+1}/",
             self.io_code_submission_data_update_response_char,
@@ -286,7 +323,9 @@ class UpdateIoCodeSubmissionTestCase(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_update_blank(self):
+    def test_update_blank(self)->None:
+        '''Method that tests the update method of the IoCodeSubmission model with blank data.'''
+
         response = self.client.patch(
             f"/iocode/submission/update/{self.io_code_submission.submission_id}/",
             {},
@@ -294,11 +333,15 @@ class UpdateIoCodeSubmissionTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-    def test_update_submission_id_blank(self):
+    def test_update_submission_id_blank(self)->None:
+        '''Method that tests the update method of the IoCodeSubmission model with blank submission_id.'''
+
         response = self.client.patch("/iocode/submission/update//", {}, format="json")
         self.assertEqual(response.status_code, 404)
 
-    def test_update_response_char(self):
+    def test_update_response_char(self)->None:
+        '''Method that tests the update method of the IoCodeSubmission model with response_char.'''
+
         response = self.client.patch(
             f"/iocode/submission/update/{self.io_code_submission.submission_id}/",
             self.io_code_submission_data_update_response_char,
@@ -306,7 +349,9 @@ class UpdateIoCodeSubmissionTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-    def test_update_execution_time(self):
+    def test_update_execution_time(self)->None:
+        '''Method that tests the update method of the IoCodeSubmission model with execution_time.'''
+
         response = self.client.patch(
             f"/iocode/submission/update/{self.io_code_submission.submission_id}/",
             self.io_code_submission_data_update_execution_time,
@@ -314,7 +359,9 @@ class UpdateIoCodeSubmissionTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-    def test_update_both(self):
+    def test_update_both(self)->None:
+        '''Method that tests the update method of the IoCodeSubmission model with both response_char and execution_time.'''
+        
         response = self.client.patch(
             f"/iocode/submission/update/{self.io_code_submission.submission_id}/",
             self.io_code_submission_data_update_both,
