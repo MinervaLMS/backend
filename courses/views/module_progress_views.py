@@ -32,19 +32,13 @@ def create_module_progress(request) -> JsonResponse:
             {"message": "Module_progress created successfully"},
             status=status.HTTP_201_CREATED,
         )
-    data = serializer.data.copy()
-    module = Module.objects.get(id=data["module_id"])
-    data["module_instructional_progress"] = round(
-        data["module_instructional_progress"]/module.module_instructional_materials, 2)
-    data["module_assessment_progress"] = round(
-        data["module_assessment_progress"]/module.module_assessment_materials, 2)
-    return JsonResponse(data, status=status.HTTP_400_BAD_REQUEST)
+    return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET"])
 @schema(schemas.get_module_progress_schema)
 @permission_classes([IsAuthenticated])
-def get_module_progress_by_id(request, user_id: int, module_id: int) -> JsonResponse:
+def get_module_progress(request, user_id: int, module_id: int) -> JsonResponse:
     """
     Get module_progress by its id
 
@@ -63,14 +57,17 @@ def get_module_progress_by_id(request, user_id: int, module_id: int) -> JsonResp
             user_id=user_id, module_id=module_id)
     except Module_progress.DoesNotExist:
         return JsonResponse({"message": "Module_progress not found"}, status=status.HTTP_404_NOT_FOUND)
-
+    module = Module.objects.get(id=module_id)
+    if module.module_instructional_materials < module_progress.module_instructional_progress:
+        module_progress.module_instructional_progress = module.module_instructional_materials
+    if module.module_assessment_materials < module_progress.module_assessment_progress:
+        module_progress.module_assessment_progress = module.module_assessment_materials
     serializer = Module_progressSerializer(module_progress)
     data = serializer.data.copy()
-    module = Module.objects.get(id=module_id)
     data["module_instructional_progress"] = round(
-        data["module_instructional_progress"]/module.module_instructional_materials, 2)
+        data["module_instructional_progress"]/module.module_instructional_materials, 2)*100 if module.module_instructional_materials != 0 else 0
     data["module_assessment_progress"] = round(
-        data["module_assessment_progress"]/module.module_assessment_materials, 2)
+        data["module_assessment_progress"]/module.module_assessment_materials, 2)*100 if module.module_assessment_materials != 0 else 0
     return JsonResponse(data, safe=False, status=status.HTTP_200_OK)
 
 
@@ -121,50 +118,4 @@ def update_module_progress(request, user_id: int, module_id: int) -> JsonRespons
     else:
         return JsonResponse({"message": "Material type incorrect"}, status=400)
     module_progress.save()
-    serializer = Module_progressSerializer(module_progress)
-    data = serializer.data.copy()
-    module = Module.objects.get(id=module_id)
-    data["module_instructional_progress"] = round(
-        data["module_instructional_progress"]/module.module_instructional_materials, 2)
-    data["module_assessment_progress"] = round(
-        data["module_assessment_progress"]/module.module_assessment_materials, 2)
-    return JsonResponse(data, safe=False, status=status.HTTP_200_OK)
-
-
-@api_view(["PATCH"])
-@schema(schemas.reload_module_progress_schema)
-@permission_classes([IsAuthenticated])
-def reload_module_progress(request, user_id: int, module_id: int) -> JsonResponse:
-    """
-    View to update a module_progress from a module and user in the database
-
-    Args:
-        request: request http with module_progress data
-            user_id
-            module_id
-    Returns:
-        response (JsonResponse): HTTP response in JSON format
-    """
-    try:
-        module_progress = Module_progress.objects.get(
-            user_id=user_id, module_id=module_id)
-    except Module_progress.DoesNotExist:
-        return JsonResponse({"message": "Module_progress not found"}, status=status.HTTP_404_NOT_FOUND)
-    module = Module.objects.get(id=module_id)
-    if module_progress.module_instructional_progress >= module.module_instructional_materials:
-        module_progress.module_instructional_progress = module.module_instructional_materials
-    elif module_progress.module_instructional_progress < 0:
-        module_progress.module_instructional_progress = 0
-    if module_progress.module_assessment_progress >= module.module_assessment_materials:
-        module_progress.module_assessment_progress = module.module_assessment_materials
-    elif module_progress.module_assessment_progress < 0:
-        module_progress.module_assessment_progress = 0
-    module_progress.save()
-    serializer = Module_progressSerializer(module_progress)
-    data = serializer.data.copy()
-    module = Module.objects.get(id=module_id)
-    data["module_instructional_progress"] = round(
-        data["module_instructional_progress"]/module.module_instructional_materials, 2)
-    data["module_assessment_progress"] = round(
-        data["module_assessment_progress"]/module.module_assessment_materials, 2)
-    return JsonResponse(data, safe=False, status=status.HTTP_200_OK)
+    return JsonResponse({"message": "Module_progress modified successfully"}, safe=False, status=status.HTTP_200_OK)

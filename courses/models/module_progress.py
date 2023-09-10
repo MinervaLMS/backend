@@ -4,10 +4,17 @@ from accounts.models.user import User
 
 
 class Module_progress(models.Model):
+    id = models.BigAutoField(
+        auto_created=True,
+        primary_key=True,
+        serialize=False,
+        verbose_name="ID",
+        editable=False,
+    )
     user_id = models.ForeignKey(
-        User, on_delete=models.CASCADE, primary_key=True)
+        User, on_delete=models.CASCADE)
     module_id = models.ForeignKey(
-        Module, on_delete=models.CASCADE, primary_key=True)
+        Module, on_delete=models.CASCADE)
     module_instructional_progress = models.IntegerField(default=0)
     module_assessment_progress = models.IntegerField(default=0)
 

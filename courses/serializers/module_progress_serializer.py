@@ -18,18 +18,10 @@ class Module_progressSerializer(serializers.ModelSerializer):
 
         user_id = data.get("user_id")
         module_id = data.get("module_id")
-
         if Module_progress.objects.filter(user_id=user_id, module_id=module_id).exists():
             raise serializers.ValidationError(
                 "This user in this module is already in use"
             )
-
-        if not User.objects.filter(id=user_id).exists():
-            raise serializers.ValidationError("This user does not exist")
-
-        if not Module.objects.filter(id=module_id).exists():
-            raise serializers.ValidationError("This module does not exist")
-
         return data
 
     def create(self, validated_data):

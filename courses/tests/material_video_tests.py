@@ -32,7 +32,8 @@ class CreateMaterialVideoTestCase(TestCase):
             last_name="test_last_name",
             first_name="test_first_name",
         )
-        self.module = Module.objects.create(course_id=self.course, name="Test module")
+        self.module = Module.objects.create(
+            course_id=self.course, name="Test module")
 
         self.material = Material.objects.create(
             module_id=self.module,
@@ -62,7 +63,8 @@ class CreateMaterialVideoTestCase(TestCase):
         self.assertEqual(response.status_code, 201)
 
     def test_create_blank(self):
-        response = self.client.post("/material/video/create/", {}, format="json")
+        response = self.client.post(
+            "/material/video/create/", {}, format="json")
         self.assertEqual(response.status_code, 400)
 
     def test_create_invalid_types(self):
@@ -92,7 +94,8 @@ class GetMaterialVideoTestCase(TestCase):
             last_name="test_last_name",
             first_name="test_first_name",
         )
-        self.module = Module.objects.create(course_id=self.course, name="Test module")
+        self.module = Module.objects.create(
+            course_id=self.course, name="Test module")
 
         self.material = Material.objects.create(
             module_id=self.module,
@@ -147,7 +150,8 @@ class UpdateMaterialVideoTestCase(TestCase):
             last_name="test_last_name",
             first_name="test_first_name",
         )
-        self.module = Module.objects.create(course_id=self.course, name="Test module")
+        self.module = Module.objects.create(
+            course_id=self.course, name="Test module")
         self.material = Material.objects.create(
             module_id=self.module,
             name="Test material name",
@@ -204,7 +208,8 @@ class UpdateMaterialVideoTestCase(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(
-            loads(response.content), {"message": "There is not a material with that id"}
+            loads(response.content), {
+                "message": "There is not a material with that id"}
         )
 
     def test_update_material_video_source_edit(self):
@@ -284,7 +289,8 @@ class DeleteMaterialVideoTestCase(TestCase):
             last_name="test_last_name",
             first_name="test_first_name",
         )
-        self.module = Module.objects.create(course_id=self.course, name="Test module")
+        self.module = Module.objects.create(
+            course_id=self.course, name="Test module")
         self.material = Material.objects.create(
             module_id=self.module,
             name="Test material_1",
