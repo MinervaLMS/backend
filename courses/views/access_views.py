@@ -48,7 +48,7 @@ def create_access(request) -> JsonResponse:
         if access:
             access.views += 1
             access.last_view = timezone.now()
-            access.save()
+            access.save(update_fields=["views", "last_view"])
             access = AccessSerializer(access)
             return JsonResponse(
                 access.data,
@@ -116,87 +116,44 @@ def update_access_like(request) -> JsonResponse:
         {
             "material_id": int,
             "user_id": int
+            "like": bool
         }
 
     Returns:
         JsonResponse (JsonResponse): HTTP response in JSON format
     """
     try:
-        user: User = User.objects.get(id=request.data["user_id"])
-        material: Material = Material.objects.get(id=request.data["material_id"])
         # Verify if user has access to the material before
-        access: Access = Access.objects.filter(
-            material_id=material.id, user_id=user.id
-        ).first()
-        if not access:
-            return JsonResponse(
-                {"message": "You should access to the material before"},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-        # Verify if the user has assessed the material or not
-        if access.like is None:
-            # If the user has not assessed the material, add a like
-            material.likes += 1
-            access.like = True
-        else:
-            if access.like:
-                # If the user has liked the material before, remove the like
-                material.likes -= 1
-                access.like = None
-            else:
+        access: Access = Access.objects.get(
+            material_id=request.data["material_id"], user_id=request.data["user_id"]
+        )
+        material: Material = access.material_id
+        # if user gives a like
+        if request.data["like"]:
+            # Verify if the user has assessed the material or not
+            if access.like is None:
+                # If the user has not assessed the material, add a like
                 material.likes += 1
-                material.dislikes -= 1
                 access.like = True
-        # Update the like field
-        access.save()
-        material.save()
-
-        return JsonResponse(
-            {"message": "Access assessed successfully"}, status=status.HTTP_200_OK
-        )
-
-    except Material.DoesNotExist:
-        return JsonResponse(
-            {"message": "There is not a material with this id"},
-            status=status.HTTP_404_NOT_FOUND,
-        )
-    except User.DoesNotExist:
-        return JsonResponse(
-            {"message": "There is not a user with this id"},
-            status=status.HTTP_404_NOT_FOUND,
-        )
-
-
-@api_view(["PATCH"])
-@schema(schemas.update_access_dislike_schema)
-@permission_classes([IsAuthenticated])
-def update_access_dislike(request) -> JsonResponse:
-    """View to add a dislike to a material
-    Args:
-        request: request http with material data
-        {
-            "material_id": int,
-            "user_id": int
-        }
-
-    Returns:
-        JsonResponse (JsonResponse): HTTP response in JSON format
-    """
-    try:
-        user: User = User.objects.get(id=request.data["user_id"])
-        material: Material = Material.objects.get(id=request.data["material_id"])
-        # Verify if user has access to the material before
-        access: Access = Access.objects.filter(
-            material_id=material.id, user_id=user.id
-        ).first()
-        if not access:
+            else:
+                if access.like:
+                    # If the user has liked the material before, remove the like
+                    material.likes -= 1
+                    access.like = None
+                else:
+                    material.likes += 1
+                    material.dislikes -= 1
+                    access.like = True
+            # Update the like field
+            material.save(update_fields=["likes", "dislikes"])
+            access.save(update_fields=["like"])
             return JsonResponse(
-                {"message": "You should access to the material before"},
-                status=status.HTTP_401_UNAUTHORIZED,
+                {"message": "Access assessed successfully"}, status=status.HTTP_200_OK
             )
-        # Verify if the user has assessed the material or not
+
+        # if user gives a dislike
         if access.like is None:
-            # If the user has not assessed the material, add a like
+            # If the user has not assessed the material, add a dislike
             material.dislikes += 1
             access.like = False
         else:
@@ -208,24 +165,83 @@ def update_access_dislike(request) -> JsonResponse:
             else:
                 material.dislikes -= 1
                 access.like = None
-        # Update the like field
-        access.save()
-        material.save()
-
+        material.save(update_fields=["likes", "dislikes"])
+        access.save(update_fields=["like"])
         return JsonResponse(
             {"message": "Access assessed successfully"}, status=status.HTTP_200_OK
         )
 
-    except Material.DoesNotExist:
+    except Access.DoesNotExist:
         return JsonResponse(
-            {"message": "There is not a material with this id"},
+            {"message": "There is not an access with that material and user"},
             status=status.HTTP_404_NOT_FOUND,
         )
-    except User.DoesNotExist:
+    except Exception as e:
         return JsonResponse(
-            {"message": "There is not a user with this id"},
-            status=status.HTTP_404_NOT_FOUND,
+            {"message": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
         )
+
+
+# @api_view(["PATCH"])
+# @schema(schemas.update_access_dislike_schema)
+# @permission_classes([IsAuthenticated])
+# def update_access_dislike(request) -> JsonResponse:
+#     """View to add a dislike to a material
+#     Args:
+#         request: request http with material data
+#         {
+#             "material_id": int,
+#             "user_id": int
+#         }
+#
+#     Returns:
+#         JsonResponse (JsonResponse): HTTP response in JSON format
+#     """
+#     try:
+#         user: User = User.objects.get(id=request.data["user_id"])
+#         material: Material = Material.objects.get(id=request.data["material_id"])
+#         # Verify if user has access to the material before
+#         access: Access = Access.objects.filter(
+#             material_id=material.id, user_id=user.id
+#         ).first()
+#         if not access:
+#             return JsonResponse(
+#                 {"message": "You should access to the material before"},
+#                 status=status.HTTP_401_UNAUTHORIZED,
+#             )
+#         # Verify if the user has assessed the material or not
+#         if access.like is None:
+#             # If the user has not assessed the material, add a dislike
+#             material.dislikes += 1
+#             access.like = False
+#         else:
+#             if access.like:
+#                 # If the user has liked the material before, remove the like
+#                 material.likes -= 1
+#                 material.dislikes += 1
+#                 access.like = False
+#             else:
+#                 material.dislikes -= 1
+#                 access.like = None
+#         # Update the like field
+#         access.save()
+#         material.save()
+#
+#         return JsonResponse(
+#             {"message": "Access assessed successfully"}, status=status.HTTP_200_OK
+#         )
+#
+#     except Material.DoesNotExist:
+#         return JsonResponse(
+#             {"message": "There is not a material with this id"},
+#             status=status.HTTP_404_NOT_FOUND,
+#         )
+#     except User.DoesNotExist:
+#         return JsonResponse(
+#             {"message": "There is not a user with this id"},
+#             status=status.HTTP_404_NOT_FOUND,
+#         )
 
 
 @api_view(["DELETE"])

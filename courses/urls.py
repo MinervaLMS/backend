@@ -146,11 +146,11 @@ access_urls = [
         name="get_access",
     ),
     path("access/update/like/", access_views.update_access_like, name="like_material"),
-    path(
-        "access/update/dislike/",
-        access_views.update_access_dislike,
-        name="dislike_material",
-    ),
+    # path(
+    #     "access/update/dislike/",
+    #     access_views.update_access_dislike,
+    #     name="dislike_material",
+    # ),
     path(
         "access/delete/<int:material_id>/<int:user_id>/",
         access_views.delete_access,
