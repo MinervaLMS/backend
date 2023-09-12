@@ -126,6 +126,38 @@ def get_comment_replies(request, comment_id: int) -> JsonResponse:
         )
 
 
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_material_comments(request, material_id: int) -> JsonResponse:
+    """Get all comments of a material in a
+    data structure with the replies of each comment
+
+    Args:
+        request: HTTP request
+        material_id (int): Material's id to get its comments
+
+    Returns:
+        JsonResponse: HTTP response in JSON format with the comments data
+    """
+
+    try:
+        comments: Comment = Comment.objects.filter(
+            material_id=material_id, parent_comment_id=None
+        )
+        ordered_comments = comments.order_by("fixed", "-post_date")
+
+        serialized_comments = CommentSerializer(ordered_comments, many=True)
+        return JsonResponse(
+            serialized_comments.data, safe=False, status=status.HTTP_200_OK
+        )
+
+    except Material.DoesNotExist:
+        return JsonResponse(
+            {"message": "There is not a material with this id"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+
 @api_view(["DELETE"])
 @schema(schemas.delete_comment_schema)
 @permission_classes([IsAuthenticated])
