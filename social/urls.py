@@ -18,7 +18,7 @@ comment_urls = [
 ]
 
 # TODO: These urls below should be in accounts app
-user_ursl = [
+user_urls = [
     path(
         "users/<int:user_id>/comments/<int:material_id>/",
         comment_views.get_user_comments,
@@ -36,4 +36,12 @@ user_ursl = [
     ),
 ]
 
-urlpatterns = comment_urls + user_ursl
+material_urls = [
+    path(
+        "material/<int:material_id>/comments/",
+        comment_views.get_material_comments,
+        name="get_material_comments",
+    ),
+]
+
+urlpatterns = comment_urls + user_urls + material_urls

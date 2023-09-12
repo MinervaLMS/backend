@@ -19,4 +19,6 @@ class Comment(models.Model):
     fixed = models.IntegerField(null=True, blank=True)
 
     def __str__(self) -> str:
-        return f"user {self.user_id} commented the material {self.material_id}"
+        return (
+            f"user {self.user_id} comment {self.id} in the material {self.material_id}"
+        )
