@@ -241,3 +241,83 @@ def delete_access(request, material_id: int, user_id: int) -> JsonResponse:
             {"message": "There is not an access with that material and user"},
             status=status.HTTP_404_NOT_FOUND,
         )
+
+
+# TODO: These views below only will be used to help the front-end
+@api_view(["POST"])
+# @schema(schemas.delete_access_schema)
+@permission_classes([IsAuthenticated])
+def create_all_access_to_user(request) -> JsonResponse:
+    """View to create all accesses to a user in materials of specific module
+
+    Args:
+        request : request http
+        user_id (int): user's id to which the access belongs
+        module_id (int): module's id to which materials belong
+        {
+            "user_id": int,
+            "module_id": int
+        }
+
+    Returns:
+        JsonResponse: HTTP response in JSON format
+    """
+    try:
+        user: User = User.objects.get(id=request.data["user_id"])
+        materials: list[Material] = Material.objects.filter(
+            module_id=request.data["module_id"]
+        )
+        accesses: list[Access] = []
+        for material in materials:
+            access = Access(user_id=user, material_id=material)
+            accesses.append(access)
+        Access.objects.bulk_create(accesses)
+
+        return JsonResponse(
+            {"message": "Accesses created successfully"}, status=status.HTTP_200_OK
+        )
+
+    except User.DoesNotExist:
+        return JsonResponse(
+            {"message": "There is not a user with that id"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {"message": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_accesses_by_user(request, user_id: int, module_id: int) -> JsonResponse:
+    """View to get all accesses by a user in materials of specific module
+
+    Args:
+        request : request http
+        user_id (int): user's id to which the access belongs
+        module_id (int): module's id to which materials belong
+
+    Returns:
+        JsonResponse: HTTP response in JSON format
+    """
+    try:
+        user: User = User.objects.get(id=user_id)
+        materials: list[Material] = Material.objects.filter(module_id=module_id)
+        accesses: list[Access] = Access.objects.filter(
+            material_id__in=materials, user_id=user
+        )
+        accesses = AccessSerializer(accesses, many=True)
+        return JsonResponse(accesses.data, safe=False, status=status.HTTP_200_OK)
+
+    except User.DoesNotExist:
+        return JsonResponse(
+            {"message": "There is not a user with that id"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {"message": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )

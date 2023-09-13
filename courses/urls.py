@@ -156,6 +156,16 @@ access_urls = [
         access_views.delete_access,
         name="delete_access",
     ),
+    path(
+        "users/<int:user_id>/<int:module_id>/access/",
+        access_views.get_accesses_by_user,
+        name="get_accesses_by_user",
+    ),
+    path(
+        "users/module/create/access/",
+        access_views.create_all_access_to_user,
+        name="create_all_access_to_user",
+    ),
 ]
 
 urlpatterns = (
