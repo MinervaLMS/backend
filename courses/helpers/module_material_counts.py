@@ -1,6 +1,9 @@
 from ..serializers.material_serializer import MaterialSerializer
 from ..models.material import Material
 from ..models.module import Module
+from ..models.access import Access
+from ..models.module_progress import Module_progress
+from accounts.models.user import User
 
 
 def update_count_created_material(*, serializer: MaterialSerializer) -> None:
@@ -27,20 +30,20 @@ def update_count_created_material(*, serializer: MaterialSerializer) -> None:
         module.module_instructional_materials += 1
 
     module.module_total_materials = (
-        module.module_extra_materials
-        + module.module_assessment_materials
-        + module.module_instructional_materials
+            module.module_extra_materials
+            + module.module_assessment_materials
+            + module.module_instructional_materials
     )
     module.save()
 
 
 def update_count_updated_material(
-    *,
-    material: Material,
-    old_material_type: str,
-    old_is_extra: bool,
-    new_material_type: str | None,
-    new_is_extra: str | None,
+        *,
+        material: Material,
+        old_material_type: str,
+        old_is_extra: bool,
+        new_material_type: str | None,
+        new_is_extra: str | None,
 ) -> None:
     """
     Updates the material count when a material is updated for the respective module
@@ -121,9 +124,9 @@ def update_count_updated_material(
                 module.module_instructional_materials -= 1
 
     module.module_total_materials = (
-        module.module_extra_materials
-        + module.module_assessment_materials
-        + module.module_instructional_materials
+            module.module_extra_materials
+            + module.module_assessment_materials
+            + module.module_instructional_materials
     )
 
     module.save()
@@ -140,7 +143,23 @@ def update_count_deleted_material(*, material: Material) -> None:
 
     """
     module: Module = material.module_id
+    access_list: list[Access] = Access.objects.filter(material_id=material.id, completed=True)
+    user_id: User | None = None
+    module_progress: Module_progress | None = None
+    for access in access_list:
+        if user_id != access.user_id:
+            user_id = access.user_id
+            module_progress: Module_progress = Module_progress.objects.get(
+                user_id=user_id, module_id=module.id
+            )
+        if material.material_type == "ioc" and material.is_extra is False:
+            # Is assessment material
+            module_progress.module_assessment_progress -= 1
+        elif material.is_extra is False:
+            # Is instructional material
+            module_progress.module_instructional_progress -= 1
 
+        module_progress.save()
     if material.is_extra and module.module_extra_materials > 0:
         # Is extra material
         module.module_extra_materials -= 1
@@ -154,8 +173,8 @@ def update_count_deleted_material(*, material: Material) -> None:
         module.module_instructional_materials -= 1
 
     module.module_total_materials = (
-        module.module_extra_materials
-        + module.module_assessment_materials
-        + module.module_instructional_materials
+            module.module_extra_materials
+            + module.module_assessment_materials
+            + module.module_instructional_materials
     )
     module.save()
