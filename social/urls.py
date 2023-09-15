@@ -11,6 +11,11 @@ comment_urls = [
         name="get_replies",
     ),
     path(
+        "comment/update/<int:comment_id>/",
+        comment_views.update_comment_fixed,
+        name="delete_comment",
+    ),
+    path(
         "comment/delete/<int:comment_id>/",
         comment_views.delete_comment,
         name="delete_comment",

@@ -41,12 +41,7 @@ create_comment_schema = AutoSchema(
             required=False,
             location="form",
             type="integer",
-            schema=coreschema.String(
-                description=(
-                    "No sé muy bien qué es esto, "
-                    "luego le pregunto al profe (es un entero)"
-                )
-            ),
+            schema=coreschema.String(description="Fixed's order of comment"),
         ),
     ]
 )
@@ -71,6 +66,27 @@ get_comment_replies_schema = AutoSchema(
             location="path",
             type="integer",
             schema=coreschema.String(description="Comment's id to get its replies"),
+        ),
+    ]
+)
+
+update_comment_fixed_schema = AutoSchema(
+    manual_fields=[
+        coreapi.Field(
+            "comment_id",
+            required=True,
+            location="path",
+            type="integer",
+            schema=coreschema.String(
+                description="Comment's id to update its fixed value"
+            ),
+        ),
+        coreapi.Field(
+            "fixed",
+            required=True,
+            location="form",
+            type="integer",
+            schema=coreschema.String(description="New fixed value"),
         ),
     ]
 )
@@ -150,6 +166,19 @@ delete_user_comment_schema = AutoSchema(
             location="path",
             type="integer",
             schema=coreschema.String(description="Comment's id to delete"),
+        ),
+    ]
+)
+
+# TODO: These schemas below should be in courses app (for material)
+get_material_comments_schema = AutoSchema(
+    manual_fields=[
+        coreapi.Field(
+            "material_id",
+            required=True,
+            location="path",
+            type="integer",
+            schema=coreschema.String("Material's id to get its comments"),
         ),
     ]
 )

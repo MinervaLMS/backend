@@ -192,7 +192,8 @@ class UpdateAccessLikeTestCase(TestCase):
         response = self.client.patch("/access/update/like/", data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(
-            loads(response.content), {"message": "There is not a user with this id"}
+            loads(response.content),
+            {"message": "There is not an access with that material and user"},
         )
 
     def test_update_access_materia_not_exist(self):
@@ -203,19 +204,8 @@ class UpdateAccessLikeTestCase(TestCase):
         response = self.client.patch("/access/update/like/", data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(
-            loads(response.content), {"message": "There is not a material with this id"}
-        )
-
-    def test_update_access_nonexistent(self):
-        data = {
-            "material_id": self.material.id,
-            "user_id": self.user.id,
-        }
-        response = self.client.patch("/access/update/like/", data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertEqual(
             loads(response.content),
-            {"message": "You should access to the material before"},
+            {"message": "There is not an access with that material and user"},
         )
 
     def test_upadate_access_correct(self):
@@ -275,7 +265,8 @@ class UpdateAccessDislikeTestCase(TestCase):
         response = self.client.patch("/access/update/dislike/", data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(
-            loads(response.content), {"message": "There is not a user with this id"}
+            loads(response.content),
+            {"message": "There is not an access with that material and user"},
         )
 
     def test_update_access_materia_not_exist(self):
@@ -286,19 +277,8 @@ class UpdateAccessDislikeTestCase(TestCase):
         response = self.client.patch("/access/update/dislike/", data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(
-            loads(response.content), {"message": "There is not a material with this id"}
-        )
-
-    def test_update_access_nonexistent(self):
-        data = {
-            "material_id": self.material.id,
-            "user_id": self.user.id,
-        }
-        response = self.client.patch("/access/update/dislike/", data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertEqual(
             loads(response.content),
-            {"message": "You should access to the material before"},
+            {"message": "There is not an access with that material and user"},
         )
 
     def test_upadate_access_correct(self):
