@@ -53,7 +53,6 @@ get_all_modules_progress_schema = AutoSchema(
         )
     ]
 )
-
 update_module_progress_schema = AutoSchema(
     manual_fields=[
         coreapi.Field(

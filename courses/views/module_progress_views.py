@@ -58,6 +58,10 @@ def get_module_progress(request, user_id: int, module_id: int) -> JsonResponse:
     except Module_progress.DoesNotExist:
         return JsonResponse({"message": "Module_progress not found"}, status=status.HTTP_404_NOT_FOUND)
     module = Module.objects.get(id=module_id)
+    if module.module_instructional_materials < module_progress.module_instructional_progress:
+        module_progress.module_instructional_progress = module.module_instructional_materials
+    if module.module_assessment_materials < module_progress.module_assessment_progress:
+        module_progress.module_assessment_progress = module.module_assessment_materials
     serializer = Module_progressSerializer(module_progress)
     data = serializer.data.copy()
     data["module_instructional_progress"] = round(
@@ -65,6 +69,7 @@ def get_module_progress(request, user_id: int, module_id: int) -> JsonResponse:
     data["module_assessment_progress"] = round(
         data["module_assessment_progress"]/module.module_assessment_materials, 2)*100 if module.module_assessment_materials != 0 else 0
     return JsonResponse(data, safe=False, status=status.HTTP_200_OK)
+
 
 @api_view(["GET"])
 @schema(schemas.get_all_modules_progress_schema)
@@ -99,6 +104,7 @@ def get_all_module_progress(request, user_id: int) -> JsonResponse:
         }
         list_progress.append(data)
     return JsonResponse(list_progress, safe=False, status=status.HTTP_200_OK)
+
 
 @api_view(["PATCH"])
 @schema(schemas.update_module_progress_schema)

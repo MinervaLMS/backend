@@ -40,11 +40,11 @@ def create_comment(request) -> JsonResponse:
             )
 
         # Create the comment
-        comment: Comment = CommentSerializer(data=request.data)
+        comment = CommentSerializer(data=request.data)
         if comment.is_valid():
             comment.save()
             material.total_comments += 1
-            material.save()
+            material.save(update_fields=["total_comments"])
             return JsonResponse(
                 data=comment.data,
                 safe=False,
@@ -88,7 +88,7 @@ def get_comment(request, comment_id: int) -> JsonResponse:
 
     except Comment.DoesNotExist:
         return JsonResponse(
-            {"message": "There is not an comment with this id"},
+            {"message": "There is not a comment with this id"},
             status=status.HTTP_404_NOT_FOUND,
         )
 
@@ -121,39 +121,35 @@ def get_comment_replies(request, comment_id: int) -> JsonResponse:
 
     except Comment.DoesNotExist:
         return JsonResponse(
-            {"message": "There is not an comment with this id"},
+            {"message": "There is not a comment with this id"},
             status=status.HTTP_404_NOT_FOUND,
         )
 
 
-@api_view(["GET"])
+@api_view(["PATCH"])
+@schema(schemas.update_comment_fixed_schema)
 @permission_classes([IsAuthenticated])
-def get_material_comments(request, material_id: int) -> JsonResponse:
-    """Get all comments of a material in a
-    data structure with the replies of each comment
+def update_comment_fixed(request, comment_id: int) -> JsonResponse:
+    """Change the fixed value of a comment
 
     Args:
-        request: HTTP request
-        material_id (int): Material's id to get its comments
+        request: request http with the new fixed value
+        comment_id: Comment's id to update
 
-    Returns:
-        JsonResponse: HTTP response in JSON format with the comments data
+    Returns: Json response with the confirmation of the update
     """
 
     try:
-        comments: Comment = Comment.objects.filter(
-            material_id=material_id, parent_comment_id=None
-        )
-        ordered_comments = comments.order_by("fixed", "-post_date")
+        comment: Comment = Comment.objects.get(pk=comment_id)
+        comment.fixed = request.data["fixed"]
+        comment.save(update_fields=["fixed"])
 
-        serialized_comments = CommentSerializer(ordered_comments, many=True)
         return JsonResponse(
-            serialized_comments.data, safe=False, status=status.HTTP_200_OK
+            data={"message": "Comment updated successfully"}, status=status.HTTP_200_OK
         )
-
-    except Material.DoesNotExist:
+    except Comment.DoesNotExist:
         return JsonResponse(
-            {"message": "There is not a material with this id"},
+            data={"message": "There is not a comment with this id"},
             status=status.HTTP_404_NOT_FOUND,
         )
 
@@ -176,7 +172,7 @@ def delete_comment(request, comment_id: int) -> JsonResponse:
         # Decrease the total comments of the material
         material: Material = comment.material_id
         material.total_comments -= 1
-        material.save()
+        material.save(update_fields=["total_comments"])
         comment.delete()
 
         return JsonResponse(
@@ -186,7 +182,39 @@ def delete_comment(request, comment_id: int) -> JsonResponse:
 
     except Comment.DoesNotExist:
         return JsonResponse(
-            data={"message": "There is not an comment with this id"},
+            data={"message": "There is not a comment with this id"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+
+@api_view(["GET"])
+@schema(schemas.get_material_comments_schema)
+@permission_classes([IsAuthenticated])
+def get_material_comments(request, material_id: int) -> JsonResponse:
+    """Get all comments of a material in a
+    data structure with the replies of each comment
+
+    Args:
+        request: HTTP request
+        material_id (int): Material's id to get its comments
+
+    Returns:
+        JsonResponse: HTTP response in JSON format with the comments data
+    """
+
+    try:
+        material: Material = Material.objects.get(id=material_id)
+        ordered_comments = material.comment_set.filter(parent_comment_id=None).order_by(
+            "fixed", "-post_date"
+        )
+        serialized_comments = CommentSerializer(ordered_comments, many=True)
+        return JsonResponse(
+            serialized_comments.data, safe=False, status=status.HTTP_200_OK
+        )
+
+    except Material.DoesNotExist:
+        return JsonResponse(
+            {"message": "There is not a material with this id"},
             status=status.HTTP_404_NOT_FOUND,
         )
 
@@ -255,7 +283,7 @@ def update_user_comment(request, user_id: int, comment_id: int) -> JsonResponse:
             )
 
         comment_by_user.content = request.data["content"]
-        comment_by_user.save()
+        comment_by_user.save(update_fields=["content"])
         return JsonResponse(
             data={"message": "Comment updated successfully"},
             status=status.HTTP_200_OK,
@@ -293,7 +321,7 @@ def delete_user_comment(request, user_id: int, comment_id: int) -> JsonResponse:
         # Decrease the total comments of the material
         material: Material = comment_to_delete.material_id
         material.total_comments -= 1
-        material.save()
+        material.save(update_fields=["total_comments"])
         comment_to_delete.delete()
         return JsonResponse(
             data={"message": "Comment deleted successfully"},
