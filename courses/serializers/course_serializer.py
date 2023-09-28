@@ -31,4 +31,5 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "alias",
+            "description",
         ]
