@@ -423,3 +423,67 @@ class DeleteMaterial(TestCase):
         content = loads(response.content)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(content["module_instructional_progress"], 0)
+
+class get_all_material_progress(TestCase):
+    def setUp(self) -> None:
+        self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
+        self.course = Course.objects.create(
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
+        )
+
+        self.user = User.objects.create(
+            email="test@example.com",
+            password="testpassword",
+            last_name="test_last_name",
+            first_name="test_first_name",
+        )
+        self.module_name = "Test Module #"
+        self.module1 = Module.objects.create(
+            course_id=self.course, name="Test Module 1",
+            module_instructional_materials=2,
+            module_assessment_materials=2
+        )
+        self.module2 = Module.objects.create(
+            course_id=self.course, name="Test Module 2",
+            module_instructional_materials=3,
+            module_assessment_materials=3
+        )
+        self.module1_progress = Module_progress.objects.create(
+            user_id=self.user, module_id=self.module1,
+            module_instructional_progress=1,
+            module_assessment_progress=1
+        )
+        self.module2_progress = Module_progress.objects.create(
+            user_id=self.user, module_id=self.module2,
+            module_instructional_progress=2,
+            module_assessment_progress=2
+        )
+        self.client.force_authenticate(self.user)
+    def get_all_progress(self):
+        response = self.client.get(
+            path = f"module/progress/{self.user.id}/"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        content = loads(response.content)
+        self.assertEqual(content, [
+            {
+                "module_id": self.module1.id,
+                "module_name": self.module1.name,
+                "module_instructional_progress": 50,
+                "module_assessment_progress": 50
+            },
+            {
+                "module_id": self.module2.id,
+                "module_name": self.module2.name,
+                "module_instructional_progress": 66.67,
+                "module_assessment_progress": 66.67
+            }
+        ])
