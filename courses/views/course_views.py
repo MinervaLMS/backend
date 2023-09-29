@@ -6,9 +6,11 @@ from rest_framework.permissions import IsAuthenticated
 
 from ..models.course import Course
 from ..models.module import Module
+from institutions.models.institution import Institution
 from ..schemas import course_schemas as schemas
 from ..serializers.course_serializer import CourseSerializer
 from ..serializers.module_serializer import ModuleSerializer
+from institutions.serializers.institution_serializer import InstitutionSerializer
 
 
 @api_view(["POST"])
@@ -50,7 +52,7 @@ def get_course(request, alias: str) -> JsonResponse:
 
     Returns:
         response (JsonResponse): HTTP response in JSON format
-        with all course information
+        with all course, institution, and instructors information
     """
 
     try:
@@ -60,9 +62,16 @@ def get_course(request, alias: str) -> JsonResponse:
             {"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND
         )
 
-    serializer = CourseSerializer(course)
+    institution_id = course.institution_id
+    institution = Institution.objects.get(id=institution_id)
 
-    return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+    course_serializer = CourseSerializer(course)
+    institution_serializer = InstitutionSerializer(institution)
+    
+    data = course_serializer.data
+    data["institution"] = institution_serializer.data
+
+    return JsonResponse(data, safe=False, status=status.HTTP_200_OK)
 
 
 @api_view(["PATCH"])
