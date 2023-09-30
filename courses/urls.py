@@ -171,21 +171,17 @@ access_urls = [
 ]
 
 module_progress_urls = [
-    path(
-        "module_progress/create/",
-        module_progress_views.create_module_progress,
-        name="create_module_progress",
-    ),
-    path(
-        "module_progress/<int:module_id>/<int:user_id>/",
-        module_progress_views.get_module_progress,
-        name="get_module_progress",
-    ),
-    path(
-        "module_progress/update/<int:module_id>/<int:user_id>/",
-        module_progress_views.update_module_progress,
-        name="update_module_progress",
-    ),
+    path("module_progress/create/", module_progress_views.create_module_progress,
+         name="create_module_progress"),
+    path("module_progress/<int:module_id>/<int:user_id>/", 
+         module_progress_views.get_module_progress,
+         name="get_module_progress"),
+    path("module/progress/<int:user_id>/", 
+         module_progress_views.get_all_module_progress,
+         name="get_all_module_progress"),
+    path("module_progress/update/<int:module_id>/<int:user_id>/", 
+         module_progress_views.update_module_progress,
+         name="update_module_progress"),
 ]
 
 instructor_urls = [
