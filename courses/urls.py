@@ -174,6 +174,8 @@ module_progress_urls = [
          name="create_module_progress"),
     path("module_progress/<int:module_id>/<int:user_id>/", module_progress_views.get_module_progress,
          name="get_module_progress"),
+    path("module/progress/<int:user_id>/", module_progress_views.get_all_module_progress,
+         name="get_all_module_progress"),
     path("module_progress/update/<int:module_id>/<int:user_id>/", module_progress_views.update_module_progress,
          name="update_module_progress"),
 ]

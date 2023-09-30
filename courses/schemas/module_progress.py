@@ -42,6 +42,17 @@ get_module_progress_schema = AutoSchema(
     ]
 )
 
+get_all_modules_progress_schema = AutoSchema(
+    manual_fields=[
+        coreapi.Field(
+            "user_id",
+            required=True,
+            location="path",
+            type="integer",
+            schema=coreschema.String(description="User's id to get it"),
+        )
+    ]
+)
 update_module_progress_schema = AutoSchema(
     manual_fields=[
         coreapi.Field(

@@ -71,6 +71,41 @@ def get_module_progress(request, user_id: int, module_id: int) -> JsonResponse:
     return JsonResponse(data, safe=False, status=status.HTTP_200_OK)
 
 
+@api_view(["GET"])
+@schema(schemas.get_all_modules_progress_schema)
+@permission_classes([IsAuthenticated])
+def get_all_module_progress(request, user_id: int) -> JsonResponse:
+    """
+    Get all module_progress by its id
+
+    Args:
+        request: request http
+        user_id (int): user's id to get it
+    Returns:
+        Json response with the fields of the serialized
+        module_progress if the user making the request is
+        Authenticated, else throws 401 Unauthorized
+        status or 404 if module_progress does not exist
+    """
+    try:
+        module_progress = Module_progress.objects.filter(user_id=user_id)
+    except Module_progress.DoesNotExist:
+        return JsonResponse({"message": "Module_progress not found"}, status=status.HTTP_404_NOT_FOUND)
+    list_progress: list = []
+    for progress in module_progress:
+        module: Module = Module.objects.get(id=progress.module_id)
+        data: dict = {
+            "module_id": progress.module_id,
+            "module_name": module.name,
+            "module_instructional_progress": round(
+                progress.module_instructional_progress/module.module_instructional_materials, 2)*100 if module.module_instructional_materials != 0 else 0,
+            "module_assessment_progress": round(
+                progress.module_assessment_progress/module.module_assessment_materials, 2)*100 if module.module_assessment_materials != 0 else 0
+        }
+        list_progress.append(data)
+    return JsonResponse(list_progress, safe=False, status=status.HTTP_200_OK)
+
+
 @api_view(["PATCH"])
 @schema(schemas.update_module_progress_schema)
 @permission_classes([IsAuthenticated])

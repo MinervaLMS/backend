@@ -143,7 +143,7 @@ def update_count_deleted_material(*, material: Material) -> None:
 
     """
     module: Module = material.module_id
-    access_list: list[Access] = Access.objects.filter(material_id=material.id, completed=True)
+    access_list: list[Access] = Access.objects.filter(material_id=material.id)
     user_id: User | None = None
     module_progress: Module_progress | None = None
     for access in access_list:
@@ -152,13 +152,23 @@ def update_count_deleted_material(*, material: Material) -> None:
             module_progress: Module_progress = Module_progress.objects.get(
                 user_id=user_id, module_id=module.id
             )
-        if material.material_type == "ioc" and material.is_extra is False:
-            # Is assessment material
-            module_progress.module_assessment_progress -= 1
-        elif material.is_extra is False:
-            # Is instructional material
-            module_progress.module_instructional_progress -= 1
-
+        if access.completed:
+            if material.material_type == "ioc" and material.is_extra is False:
+                # Is assessment material
+                module_progress.module_assessment_progress -= 1
+            elif material.is_extra is False:
+                # Is instructional material
+                module_progress.module_instructional_progress -= 1
+        # Less than 0 is not possible
+        if module_progress.module_assessment_progress < 0:
+            module_progress.module_assessment_progress = 0
+        if module_progress.module_instructional_progress < 0:
+            module_progress.module_instructional_progress = 0
+        # More than the total module
+        if module.module_instructional_materials < module_progress.module_instructional_progress:
+            module_progress.module_instructional_progress = module.module_instructional_materials
+        if module.module_assessment_materials < module_progress.module_assessment_progress:
+            module_progress.module_assessment_progress = module.module_assessment_materials
         module_progress.save()
     if material.is_extra and module.module_extra_materials > 0:
         # Is extra material
