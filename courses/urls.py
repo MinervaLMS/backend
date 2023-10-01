@@ -9,6 +9,7 @@ from .views import (
     access_views,
     enrollment_views,
     module_progress_views,
+    instructor_views,
 )
 
 course_urls = [
@@ -172,12 +173,38 @@ access_urls = [
 module_progress_urls = [
     path("module_progress/create/", module_progress_views.create_module_progress,
          name="create_module_progress"),
-    path("module_progress/<int:module_id>/<int:user_id>/", module_progress_views.get_module_progress,
+    path("module_progress/<int:module_id>/<int:user_id>/", 
+         module_progress_views.get_module_progress,
          name="get_module_progress"),
-    path("module/progress/<int:user_id>/", module_progress_views.get_all_module_progress,
+    path("module/progress/<int:user_id>/", 
+         module_progress_views.get_all_module_progress,
          name="get_all_module_progress"),
-    path("module_progress/update/<int:module_id>/<int:user_id>/", module_progress_views.update_module_progress,
+    path("module_progress/update/<int:module_id>/<int:user_id>/", 
+         module_progress_views.update_module_progress,
          name="update_module_progress"),
+]
+
+instructor_urls = [
+    path(
+        "instructor/create/",
+        instructor_views.create_instructor,
+        name="create_instructor",
+    ),
+    path(
+        "instructor/<int:user_id>/<int:course_id>/",
+        instructor_views.get_instructor,
+        name="get_instructor",
+    ),
+    path(
+        "instructor/update/<int:user_id>/<int:course_id>/",
+        instructor_views.update_instructor_type,
+        name="update_instructor_type",
+    ),
+    path(
+        "instructor/delete/<int:user_id>/<int:course_id>/",
+        instructor_views.delete_instructor,
+        name="delete_instructor",
+    ),
 ]
 
 urlpatterns = (
@@ -188,4 +215,5 @@ urlpatterns = (
     + material_video_urls
     + access_urls
     + module_progress_urls
+    + instructor_urls
 )
