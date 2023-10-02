@@ -456,6 +456,11 @@ class get_all_material_progress(TestCase):
             module_instructional_materials=3,
             module_assessment_materials=3
         )
+        self.module3 = Module.objects.create(
+            course_id=self.course, name="Test Module 3",
+            module_instructional_materials=0,
+            module_assessment_materials=0
+        )
         self.module1_progress = Module_progress.objects.create(
             user_id=self.user, module_id=self.module1,
             module_instructional_progress=1,
@@ -465,6 +470,11 @@ class get_all_material_progress(TestCase):
             user_id=self.user, module_id=self.module2,
             module_instructional_progress=2,
             module_assessment_progress=2
+        )
+        self.module3_progress = Module_progress.objects.create(
+            user_id=self.user, module_id=self.module3,
+            module_instructional_progress=0,
+            module_assessment_progress=0
         )
         self.client.force_authenticate(self.user)
     def get_all_progress(self):
@@ -485,5 +495,11 @@ class get_all_material_progress(TestCase):
                 "module_name": self.module2.name,
                 "module_instructional_progress": 66.67,
                 "module_assessment_progress": 66.67
+            },
+            {
+                "module_id": self.module3.id,
+                "module_name": self.module3.name,
+                "module_instructional_progress": 0,
+                "module_assessment_progress": 0
             }
         ])

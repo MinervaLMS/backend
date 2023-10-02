@@ -147,8 +147,8 @@ def update_count_deleted_material(*, material: Material) -> None:
     user_id: User | None = None
     module_progress: Module_progress | None = None
     for access in access_list:
-        if user_id != access.user_id:
-            user_id = access.user_id
+        if user_id != access.user_id.id:
+            user_id = access.user_id.id
             module_progress: Module_progress = Module_progress.objects.get(
                 user_id=user_id, module_id=module.id
             )

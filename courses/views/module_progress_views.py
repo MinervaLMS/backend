@@ -93,9 +93,9 @@ def get_all_module_progress(request, user_id: int) -> JsonResponse:
         return JsonResponse({"message": "Module_progress not found"}, status=status.HTTP_404_NOT_FOUND)
     list_progress: list = []
     for progress in module_progress:
-        module: Module = Module.objects.get(id=progress.module_id)
+        module: Module = progress.module_id
         data: dict = {
-            "module_id": progress.module_id,
+            "module_id": module.id,
             "module_name": module.name,
             "module_instructional_progress": round(
                 progress.module_instructional_progress/module.module_instructional_materials, 2)*100 if module.module_instructional_materials != 0 else 0,
