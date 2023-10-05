@@ -6,10 +6,12 @@ from rest_framework.permissions import IsAuthenticated
 
 from ..models.course import Course
 from ..models.module import Module
+from ..models.instructor import Instructor
 from institutions.models.institution import Institution
 from ..schemas import course_schemas as schemas
 from ..serializers.course_serializer import CourseSerializer
 from ..serializers.module_serializer import ModuleSerializer
+from ..serializers.instructor_serializer import InstructorSerializer
 from institutions.serializers.institution_serializer import InstitutionSerializer
 
 
@@ -64,12 +66,15 @@ def get_course(request, alias: str) -> JsonResponse:
 
     institution_id = course.institution_id
     institution = Institution.objects.get(id=institution_id)
+    instructors = Instructor.objects.filter(course_id=course.id)
 
     course_serializer = CourseSerializer(course)
     institution_serializer = InstitutionSerializer(institution)
+    instructor_serializer = InstructorSerializer(instructors, many=True)
     
     data = course_serializer.data
     data["institution"] = institution_serializer.data
+    data["instructors"] = instructor_serializer.data
 
     return JsonResponse(data, safe=False, status=status.HTTP_200_OK)
 
