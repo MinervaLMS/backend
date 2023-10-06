@@ -158,6 +158,54 @@ def update_access_like(request) -> JsonResponse:
             {"message": str(e)},
             status=status.HTTP_400_BAD_REQUEST,
         )
+    
+@api_view(["PATCH"])
+@schema(schemas.update_access_completed_schema)
+@permission_classes([IsAuthenticated])
+def update_access_completed(request) -> JsonResponse:
+    """view to make an access appear as completed
+    Args:
+        request: request http with material data
+        {
+            "material_id": int,
+            "user_id": int
+        }
+
+    Returns:
+        JsonResponse (JsonResponse): HTTP response in JSON format
+    """
+    try:
+        # Verify if user has access to the material before
+        access: Access = Access.objects.get(
+            material_id=request.data["material_id"], user_id=request.data["user_id"]
+        )
+        # Verify if the user has completed the material or not
+        if access.completed is None:
+            # If the user has not completed the material, turn completed field into "True"
+            access.completed = True
+        else:
+            # If the user has completed the material before, turn completed field into Null
+            access.completed = None
+            access.save(update_fields=["completed"])
+            return JsonResponse(
+                {"message": "Access completed eliminated"}, status=status.HTTP_200_OK
+            )
+        # Update the completed field
+        access.save(update_fields=["completed"])
+        return JsonResponse(
+            {"message": "Access completed successfully"}, status=status.HTTP_200_OK
+        )
+
+    except Access.DoesNotExist:
+        return JsonResponse(
+            {"message": "There is not an access with that material and user"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {"message": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
 @api_view(["PATCH"])

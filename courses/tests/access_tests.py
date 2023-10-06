@@ -152,6 +152,95 @@ class GetAccessTestCase(TestCase):
         self.assertEqual(Access.objects.last().views, 1)
 
 
+class UpdateAccessCompletedTestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
+        self.course = Course.objects.create(
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
+        )
+        self.user = User.objects.create(
+            email="test@example.com",
+            password="testpassword",
+            last_name="test_last_name",
+            first_name="test_first_name",
+        )
+        self.module = Module.objects.create(
+            course_id=self.course,
+            name="Test module",
+        )
+        self.material = Material.objects.create(
+            module_id=self.module,
+            name="Test material",
+            material_type="pdf",
+        )
+
+        self.client.force_authenticate(self.user)
+
+    def test_update_access_user_not_exist(self):
+        data = {
+            "material_id": self.material.id,
+            "user_id": -100,
+        }
+        response = self.client.patch("/access/update/completed/", data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(
+            loads(response.content),
+            {"message": "There is not an access with that material and user"},
+        )
+
+    def test_update_access_materia_not_exist(self):
+        data = {
+            "material_id": -100,
+            "user_id": self.user.id,
+        }
+        response = self.client.patch("/access/update/completed/", data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(
+            loads(response.content),
+            {"message": "There is not an access with that material and user"},
+        )
+
+    def test_update_access_correct(self):
+        Access.objects.create(
+            material_id=self.material,
+            user_id=self.user,
+        )
+        data = {
+            "material_id": self.material.id,
+            "user_id": self.user.id,
+        }
+        response = self.client.patch("/access/update/completed/", data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Access.objects.last().completed, True)
+        self.assertEqual(
+            loads(response.content), {"message": "Access completed successfully"}
+        )
+
+    def test_update_access_correct_eliminate(self):
+        Access.objects.create(
+            material_id=self.material,
+            user_id=self.user,
+            completed=True
+        )
+        data = {
+            "material_id": self.material.id,
+            "user_id": self.user.id,
+        }
+        response = self.client.patch("/access/update/completed/", data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Access.objects.last().completed, None)
+        self.assertEqual(
+            loads(response.content), {"message": "Access completed eliminated"}
+        )    
+
 class UpdateAccessLikeTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
@@ -223,7 +312,6 @@ class UpdateAccessLikeTestCase(TestCase):
         self.assertEqual(
             loads(response.content), {"message": "Access assessed successfully"}
         )
-
 
 class UpdateAccessDislikeTestCase(TestCase):
     def setUp(self):
