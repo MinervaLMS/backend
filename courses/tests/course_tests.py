@@ -5,6 +5,7 @@ from json import loads
 
 from ..models.course import Course
 from ..models.module import Module
+from ..models.instructor import Instructor
 
 from institutions.models.institution import Institution
 from accounts.models.user import User
@@ -66,14 +67,34 @@ class GetCourseTestCase(TestCase):
         )
 
     def test_get_course_correct(self):
+
+        user2 = User.objects.create(
+            email="test2@example.com",
+            password="testpassword2",
+            first_name="Test2",
+            last_name="User2",
+        )
         course = Course.objects.create(
             institution=self.institution,
             name="Test Course2",
             alias="test2",
             description="This is a test course.",
         )
+        instructor1 = Instructor.objects.create(
+            user_id=self.user,
+            course_id=course,
+            instructor_type="T"
+        )
+        instructor2 = Instructor.objects.create(
+            user_id=user2,
+            course_id=course,
+            instructor_type="A"
+        )
         response = self.client.get(f"/course/{course.alias}/")
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['institution']['id'], self.institution.id)
+        self.assertEqual(response.json()['instructors'][0]['user_id'], self.user.id)
+        self.assertEqual(response.json()['instructors'][1]['user_id'], user2.id)
 
     def test_get_course_not_found(self):
         response = self.client.get("/course/nonexistent-course/")
