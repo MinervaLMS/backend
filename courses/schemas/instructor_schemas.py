@@ -12,12 +12,12 @@ create_instructor_schema = AutoSchema(
             schema=coreschema.String(description="User's id who will be instructor"),
         ),
         coreapi.Field(
-            "course_id",
+            "course_alias",
             required=True,
             location="form",
-            type="integer",
+            type="string",
             schema=coreschema.String(
-                description="Course's id in which the user will be instructor"
+                description="Course's alias in which the user will be instructor"
             ),
         ),
         coreapi.Field(
