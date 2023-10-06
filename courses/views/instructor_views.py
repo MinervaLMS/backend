@@ -25,7 +25,7 @@ def create_instructor(request) -> JsonResponse:
     """
     try:
         User.objects.get(pk=request.data["user_id"])
-        Course.objects.get(pk=request.data["course_id"])
+        course: Course = Course.objects.get(alias=request.data["course_alias"])
 
         # verify if instructor_type is valid
         if request.data["instructor_type"] not in ["E", "T", "A"]:
@@ -33,10 +33,10 @@ def create_instructor(request) -> JsonResponse:
                 data={"message": "Invalid instructor type"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
+        request.data["course_id"] = course.id
         # verify if already exists an instructor with this user_id and course_id
         if Instructor.objects.filter(
-            user_id=request.data["user_id"], course_id=request.data["course_id"]
+            user_id=request.data["user_id"], course_id=course.id
         ).exists():
             return JsonResponse(
                 data={"message": "This user is already instructor in this course"},
@@ -58,7 +58,7 @@ def create_instructor(request) -> JsonResponse:
         )
     except Course.DoesNotExist:
         return JsonResponse(
-            data={"message": "There is not a course with this id"},
+            data={"message": "There is not a course with this alias"},
             status=status.HTTP_404_NOT_FOUND,
         )
 
