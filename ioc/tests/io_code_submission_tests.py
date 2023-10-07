@@ -1,5 +1,6 @@
 """Module for testing the IoCodeSubmission model and its endpoints."""
 from django.test import TestCase
+import requests
 from rest_framework.test import APIClient
 from rest_framework import status
 
@@ -10,8 +11,6 @@ from accounts.models.user import User
 from courses.models.module import Module
 from institutions.models.institution import Institution
 from ..models.io_code_submission import IoCodeSubmission
-
-import httpretty
 
 
 class CreateIoCodeSubmissionTestCase(TestCase):
@@ -52,11 +51,12 @@ class CreateIoCodeSubmissionTestCase(TestCase):
         self.io_code_submission_data = {
             "material_id": self.material.id,
             "user_id": self.user.id,
-            "response_char": "A",
+            "response_char": "T",
             "execution_time": 1,
             "execution_memory": 1,
             "completion_rate": 1.0,
         }
+
 
         self.io_code_submission_data_invalid = {
             "material_id": self.material.id,
@@ -136,13 +136,10 @@ class CreateIoCodeSubmissionTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 400)
 
-    @httpretty.activate
     def test_sent_submission_judge(self) -> None:
-        """Method that test checks if the IoCodeSubmission instance
-        is correctly sent to the judge's URL"""
-
-        httpretty.register_uri(httpretty.POST, URL_JUDGE, status=200)
-
+        """Method that checks if the IoCodeSubmission instance is successfully
+          submitted and judged at the judge's URL."""
+        
         response = self.client.post(
             "/iocode/submission/create/",
             self.io_code_submission_data,
@@ -150,10 +147,8 @@ class CreateIoCodeSubmissionTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 201)
 
-        requests = httpretty.latest_requests()
-        self.assertTrue(len(requests) == 1)
-        self.assertTrue(requests[0].method == "POST")
-        self.assertTrue(requests[0].url == URL_JUDGE)
+        submission = IoCodeSubmission.objects.get(pk=1)
+        self.assertEqual(submission.get_response_char(), "A")
 
 
 class GetIoCodeSubmissionTestCase(TestCase):

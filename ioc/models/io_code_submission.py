@@ -32,6 +32,13 @@ class IoCodeSubmission(models.Model):
             )
         ]
 
+    def set_response_char(self, new_value):
+        self.response_char = new_value
+        self.save()
+
+    def get_response_char(self):
+        return self.response_char 
+
     def __str__(self)->str:
         '''Method that returns a string representation of the model.'''
         return f"{self.submission_id}"
