@@ -1,10 +1,8 @@
 """Module for testing the IoCodeSubmission model and its endpoints."""
 from django.test import TestCase
-import requests
 from rest_framework.test import APIClient
 from rest_framework import status
 
-from constants.constants import URL_JUDGE
 from courses.models.material import Material
 from courses.models.course import Course
 from accounts.models.user import User
@@ -51,38 +49,56 @@ class CreateIoCodeSubmissionTestCase(TestCase):
         self.io_code_submission_data = {
             "material_id": self.material.id,
             "user_id": self.user.id,
+            "code": "print(int(input())**2)",
             "response_char": "T",
             "execution_time": 1,
             "execution_memory": 1,
             "completion_rate": 1.0,
+            "language": "py3",
         }
 
+        self.io_code_submission_data_wa = {
+            "material_id": self.material.id,
+            "user_id": self.user.id,
+            "code": "print(int(input()))",
+            "response_char": "T",
+            "execution_time": 1,
+            "execution_memory": 1,
+            "completion_rate": 1.0,
+            "language": "py3",
+        }
 
         self.io_code_submission_data_invalid = {
             "material_id": self.material.id,
             "user_id": self.user.id,
+            "code": "print(int(input())**2)",
             "response_char": "A",
             "execution_time": "uno",
             "execution_memory": "uno",
             "completion_rate": 1.0,
+            "language": "py3",
         }
 
         self.io_code_submission_data_no_material = {
             "material_id": self.material.id + 1,
             "user_id": self.user.id,
+            "code": "print(int(input())**2)",
             "response_char": "A",
             "execution_time": 1,
             "execution_memory": 1,
             "completion_rate": 1.0,
+            "language": "py3",
         }
 
         self.io_code_submission_data_no_user = {
             "material_id": self.material.id,
             "user_id": self.user.id + 1,
+            "code": "print(int(input())**2)",
             "response_char": "A",
             "execution_time": 1,
             "execution_memory": 1,
             "completion_rate": 1.0,
+            "language": "py3",
         }
 
         self.client.force_authenticate(self.user)
@@ -136,10 +152,10 @@ class CreateIoCodeSubmissionTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 400)
 
-    def test_sent_submission_judge(self) -> None:
-        """Method that checks if the IoCodeSubmission instance is successfully
-          submitted and judged at the judge's URL."""
-        
+    def test_submission_judge_correct_answer(self) -> None:
+        """Method that checks if the IoCodeSubmission instance, with a correct code
+        is successfully submitted and judged at the judge's URL."""
+
         response = self.client.post(
             "/iocode/submission/create/",
             self.io_code_submission_data,
@@ -147,8 +163,22 @@ class CreateIoCodeSubmissionTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 201)
 
-        submission = IoCodeSubmission.objects.get(pk=1)
-        self.assertEqual(submission.get_response_char(), "A")
+        submission = IoCodeSubmission.objects.latest("submission_date")
+        self.assertEqual(submission.response_char, "A")
+
+    def test_submission_judge_wrong_answer(self) -> None:
+        """Method that checks if the IoCodeSubmission instance, with a wrong code
+        is successfully submitted and judged at the judge's URL."""
+
+        response = self.client.post(
+            "/iocode/submission/create/",
+            self.io_code_submission_data_wa,
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201)
+
+        submission = IoCodeSubmission.objects.latest("submission_date")
+        self.assertEqual(submission.response_char, "W")
 
 
 class GetIoCodeSubmissionTestCase(TestCase):
@@ -188,10 +218,12 @@ class GetIoCodeSubmissionTestCase(TestCase):
         self.io_code_submission = IoCodeSubmission.objects.create(
             material_id=self.material,
             user_id=self.user,
+            code="print(input())",
             response_char="A",
             execution_time=1,
             execution_memory=1,
             completion_rate=1.0,
+            language="py3",
         )
 
         self.client.force_authenticate(self.user)
@@ -252,10 +284,12 @@ class DeleteIoCodeSubmissionTestCase(TestCase):
         self.io_code_submission = IoCodeSubmission.objects.create(
             material_id=self.material,
             user_id=self.user,
+            code="print(input())",
             response_char="A",
             execution_time=1,
             execution_memory=1,
             completion_rate=1.0,
+            language="py3",
         )
 
         self.client.force_authenticate(self.user)
@@ -318,10 +352,12 @@ class UpdateIoCodeSubmissionTestCase(TestCase):
         self.io_code_submission = IoCodeSubmission.objects.create(
             material_id=self.material,
             user_id=self.user,
+            code="print(input())",
             response_char="A",
             execution_time=1,
             execution_memory=1,
             completion_rate=1.0,
+            language="py3",
         )
 
         self.client.force_authenticate(self.user)
