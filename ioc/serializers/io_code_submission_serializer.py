@@ -36,7 +36,6 @@ class IoCodeSubmissionSerializer(serializers.ModelSerializer):
         }
         headers = {"Content-Type": "application/json"}
         response = requests.post(URL_JUDGE, data=json.dumps(data), headers=headers)
-        print(data, response)
 
         if response.status_code == 201:
             response_json = response.json()
