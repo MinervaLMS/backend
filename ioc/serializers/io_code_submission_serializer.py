@@ -1,5 +1,6 @@
 """Module for serializing IoCodeSubmission model"""
 
+import json
 import requests
 from rest_framework import serializers
 
@@ -23,24 +24,26 @@ class IoCodeSubmissionSerializer(serializers.ModelSerializer):
 
         codesubmission = IoCodeSubmission(**validated_data)
         serializer = IoCodeSubmissionSerializer(codesubmission)
+        codesubmission.save()
 
         data = {
             "problem_id": serializer.data["material_id"],
             "submission_id": codesubmission.submission_id,
+            "code": codesubmission.code,
             "time_limit": codesubmission.execution_time,
             "memory_limit": codesubmission.execution_memory,
             "language": codesubmission.language,
-            "code": codesubmission.code,
         }
         headers = {"Content-Type": "application/json"}
-        response = requests.post(URL_JUDGE, data=data, headers=headers)
+        response = requests.post(URL_JUDGE, data=json.dumps(data), headers=headers)
+        print(data, response)
 
         if response.status_code == 201:
             response_json = response.json()
-            verdict = response_json.get("verdict")
-            if verdict:
-                verdict = verdict[0]
-            codesubmission.response_char = verdict
-
-        codesubmission.save()
+            verdict_dict = response_json.get("verdict")
+            print(verdict_dict)
+            if verdict_dict:
+                verdict = verdict_dict.get("verdict")
+                codesubmission.response_char = verdict[0]
+                codesubmission.save()
         return codesubmission

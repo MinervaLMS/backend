@@ -52,7 +52,7 @@ class CreateIoCodeSubmissionTestCase(TestCase):
             "code": "print(int(input())**2)",
             "response_char": "T",
             "execution_time": 1,
-            "execution_memory": 1,
+            "execution_memory": 10000,
             "completion_rate": 1.0,
             "language": "py3",
         }
@@ -63,7 +63,7 @@ class CreateIoCodeSubmissionTestCase(TestCase):
             "code": "print(int(input()))",
             "response_char": "T",
             "execution_time": 1,
-            "execution_memory": 1,
+            "execution_memory": 1000,
             "completion_rate": 1.0,
             "language": "py3",
         }
@@ -111,6 +111,8 @@ class CreateIoCodeSubmissionTestCase(TestCase):
             "/iocode/submission/create/", self.io_code_submission_data, format="json"
         )
         self.assertEqual(response.status_code, 201)
+        submission = IoCodeSubmission.objects.latest("submission_date")
+        self.assertEqual(submission.language, "py3")
 
     def test_create_blank(self) -> None:
         """Method that tests the creation of a IoCodeSubmission instance
