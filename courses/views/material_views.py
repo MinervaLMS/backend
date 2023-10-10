@@ -33,9 +33,9 @@ def create_material(request) -> JsonResponse:
         serializer.save()
         # Update module's material counts
         update_count_created_material(serializer=serializer)
-        return JsonResponse(
-            {"message": "Material created successfully"}, status=status.HTTP_201_CREATED
-        )
+        response = serializer.data
+        response["message"] = "Material created successfully"
+        return JsonResponse(response, status=status.HTTP_201_CREATED)
 
     return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
