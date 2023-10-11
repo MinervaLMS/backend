@@ -153,7 +153,11 @@ access_urls = [
         access_views.update_access_dislike,
         name="dislike_material",
     ),
-    path("access/update/completed/", access_views.update_access_completed, name="complete_material"),
+    path(
+        "access/update/completed/",
+        access_views.update_access_completed,
+        name="complete_material",
+    ),
     path(
         "access/delete/<int:material_id>/<int:user_id>/",
         access_views.delete_access,
@@ -172,17 +176,26 @@ access_urls = [
 ]
 
 module_progress_urls = [
-    path("module_progress/create/", module_progress_views.create_module_progress,
-         name="create_module_progress"),
-    path("module_progress/<int:module_id>/<int:user_id>/", 
-         module_progress_views.get_module_progress,
-         name="get_module_progress"),
-    path("module/progress/<int:user_id>/", 
-         module_progress_views.get_all_module_progress,
-         name="get_all_module_progress"),
-    path("module_progress/update/<int:module_id>/<int:user_id>/", 
-         module_progress_views.update_module_progress,
-         name="update_module_progress"),
+    path(
+        "module_progress/create/",
+        module_progress_views.create_module_progress,
+        name="create_module_progress",
+    ),
+    path(
+        "module_progress/<int:module_id>/<int:user_id>/",
+        module_progress_views.get_module_progress,
+        name="get_module_progress",
+    ),
+    path(
+        "module/progress/<int:user_id>/<str:alias>/",
+        module_progress_views.get_course_module_progress,
+        name="get_course_module_progress",
+    ),
+    path(
+        "module_progress/update/<int:module_id>/<int:user_id>/",
+        module_progress_views.update_module_progress,
+        name="update_module_progress",
+    ),
 ]
 
 instructor_urls = [
