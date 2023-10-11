@@ -1,4 +1,4 @@
-'''Module for views of IoCodeSubmission model.'''
+"""Module for views of IoCodeSubmission model."""
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
@@ -24,7 +24,7 @@ def create_io_code_submission(request) -> JsonResponse:
     if serializer.is_valid():
         serializer.save()
         return JsonResponse(
-            {"message": "CodeSubmission was created successfully"},
+            serializer.data,
             status=status.HTTP_201_CREATED,
         )
 
