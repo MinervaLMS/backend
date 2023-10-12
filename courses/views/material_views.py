@@ -38,6 +38,7 @@ def create_material(request) -> JsonResponse:
             # Update module's material counts
             update_count_created_material(serializer=serializer)
             # Create all access objects for the new material
+            # TODO: Doing the same thing when a enrollment is created
             create_accesses_for_material(
                 course_id=module.course_id.id, material=material
             )
