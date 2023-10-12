@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, permission_classes, schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
+from ..models.module import Module
 from ..models.material import Material
 from ..schemas import material_schemas as schemas
 from ..serializers.material_serializer import MaterialSerializer
@@ -11,6 +12,7 @@ from ..helpers.module_material_counts import (
     update_count_deleted_material,
     update_count_updated_material,
 )
+from ..helpers.create_all_accesses import create_accesses_for_material
 
 
 @api_view(["POST"])
@@ -26,18 +28,30 @@ def create_material(request) -> JsonResponse:
     Returns:
         response (JsonResponse): HTTP response in JSON format
     """
+    try:
+        module: Module = Module.objects.get(id=request.data.get("module_id"))
 
-    serializer = MaterialSerializer(data=request.data)
+        serializer = MaterialSerializer(data=request.data)
 
-    if serializer.is_valid():
-        serializer.save()
-        # Update module's material counts
-        update_count_created_material(serializer=serializer)
-        response = serializer.data
-        response["message"] = "Material created successfully"
-        return JsonResponse(response, status=status.HTTP_201_CREATED)
+        if serializer.is_valid():
+            material: Material = serializer.save()
+            # Update module's material counts
+            update_count_created_material(serializer=serializer)
+            # Create all access objects for the new material
+            create_accesses_for_material(
+                course_id=module.course_id.id, material=material
+            )
+            response = serializer.data
+            response["message"] = "Material created successfully"
+            return JsonResponse(response, status=status.HTTP_201_CREATED)
 
-    return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    except Module.DoesNotExist:
+        return JsonResponse(
+            data={"message": "There is not a module with that id"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
 
 
 @api_view(["GET"])

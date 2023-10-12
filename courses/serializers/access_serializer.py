@@ -25,7 +25,6 @@ class AccessSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        validated_data["views"] = 0
         access = Access(**validated_data)
         access.save()
         return access

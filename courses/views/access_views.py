@@ -17,7 +17,7 @@ from ..helpers.enrollment_validate import validate_enrollment
 @schema(schemas.create_access_schema)
 @permission_classes([IsAuthenticated])
 def create_access(request) -> JsonResponse:
-    """Create a new access to a material by a user, if the user has not accessed
+    """Create new access to a material by a user, if the user has not accessed
     the material before. But if the user has accessed the material before,
     update the access data such as views and last_view
 
@@ -158,7 +158,8 @@ def update_access_like(request) -> JsonResponse:
             {"message": str(e)},
             status=status.HTTP_400_BAD_REQUEST,
         )
-    
+
+
 @api_view(["PATCH"])
 @schema(schemas.update_access_completed_schema)
 @permission_classes([IsAuthenticated])
@@ -181,10 +182,12 @@ def update_access_completed(request) -> JsonResponse:
         )
         # Verify if the user has completed the material or not
         if access.completed is None:
-            # If the user has not completed the material, turn completed field into "True"
+            # If the user has not completed the material,
+            # turn completed field into "True"
             access.completed = True
         else:
-            # If the user has completed the material before, turn completed field into Null
+            # If the user has completed the material before,
+            # turn completed field into Null
             access.completed = None
             access.save(update_fields=["completed"])
             return JsonResponse(
@@ -266,7 +269,7 @@ def update_access_dislike(request) -> JsonResponse:
 @schema(schemas.delete_access_schema)
 @permission_classes([IsAuthenticated])
 def delete_access(request, material_id: int, user_id: int) -> JsonResponse:
-    """View to delete an access to a material by a user
+    """View to delete access to a material by a user
 
     Args:
         request : request http
