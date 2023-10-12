@@ -25,3 +25,26 @@ get_user_courses_schema = AutoSchema(
         ),
     ]
 )
+
+get_user_materials_schema = AutoSchema(
+    manual_fields=[
+        coreapi.Field(
+            "user_id",
+            required=True,
+            location="path",
+            type="integer",
+            schema=coreschema.String(
+                description="User's id who has accessed to the materials"
+            ),
+        ),
+        coreapi.Field(
+            "module_id",
+            required=True,
+            location="path",
+            type="integer",
+            schema=coreschema.String(
+                description="Module's id which materials belongs to"
+            ),
+        ),
+    ]
+)
