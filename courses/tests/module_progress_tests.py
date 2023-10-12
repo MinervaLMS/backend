@@ -3,6 +3,7 @@ from rest_framework.test import APIClient
 from rest_framework import status
 from json import loads
 
+from ..models.enrollment import Enrollment
 from ..models.course import Course
 from ..models.module import Module
 from ..models.module_progress import Module_progress
@@ -123,12 +124,8 @@ class GetModuleProgressTestCase(TestCase):
     # Normal add
 
     def test_1get_add_count_progress_instructional(self):
-        self.client.post(
-            path="/material/create/", data=self.material_1, format="json"
-        )
-        self.client.post(
-            path="/material/create/", data=self.material_2, format="json"
-        )
+        self.client.post(path="/material/create/", data=self.material_1, format="json")
+        self.client.post(path="/material/create/", data=self.material_2, format="json")
         self.client.patch(
             path=f"/module_progress/update/{self.user.id}/{self.module.id}/",
             data={"material_type": "instructional", "type": True},
@@ -143,12 +140,8 @@ class GetModuleProgressTestCase(TestCase):
         self.assertEqual(content["module_assessment_progress"], 0)
 
     def test_2get_add_count_progress_assessment(self):
-        self.client.post(
-            path="/material/create/", data=self.material_3, format="json"
-        )
-        self.client.post(
-            path="/material/create/", data=self.material_4, format="json"
-        )
+        self.client.post(path="/material/create/", data=self.material_3, format="json")
+        self.client.post(path="/material/create/", data=self.material_4, format="json")
         self.client.patch(
             path=f"/module_progress/update/{self.user.id}/{self.module.id}/",
             data={"material_type": "assessment", "type": True},
@@ -165,12 +158,8 @@ class GetModuleProgressTestCase(TestCase):
     # Add if it gets above the max
 
     def test_3get_addMax_count_progress_instructional(self):
-        self.client.post(
-            path="/material/create/", data=self.material_1, format="json"
-        )
-        self.client.post(
-            path="/material/create/", data=self.material_2, format="json"
-        )
+        self.client.post(path="/material/create/", data=self.material_1, format="json")
+        self.client.post(path="/material/create/", data=self.material_2, format="json")
         self.client.patch(
             path=f"/module_progress/update/{self.user.id}/{self.module.id}/",
             data={"material_type": "instructional", "type": True},
@@ -195,12 +184,8 @@ class GetModuleProgressTestCase(TestCase):
         self.assertEqual(content["module_assessment_progress"], 0)
 
     def test_4get_addMax_count_progress_assessment(self):
-        self.client.post(
-            path="/material/create/", data=self.material_3, format="json"
-        )
-        self.client.post(
-            path="/material/create/", data=self.material_4, format="json"
-        )
+        self.client.post(path="/material/create/", data=self.material_3, format="json")
+        self.client.post(path="/material/create/", data=self.material_4, format="json")
         self.client.patch(
             path=f"/module_progress/update/{self.user.id}/{self.module.id}/",
             data={"material_type": "assessment", "type": True},
@@ -227,12 +212,8 @@ class GetModuleProgressTestCase(TestCase):
     # Incorrect format
 
     def test_5get_add_incorrect_count_progress_instructional_assessment(self):
-        self.client.post(
-            path="/material/create/", data=self.material_1, format="json"
-        )
-        self.client.post(
-            path="/material/create/", data=self.material_2, format="json"
-        )
+        self.client.post(path="/material/create/", data=self.material_1, format="json")
+        self.client.post(path="/material/create/", data=self.material_2, format="json")
         response = self.client.patch(
             path=f"/module_progress/update/{self.user.id}/{self.module.id}/",
             data={"material_type": "Peje", "type": True},
@@ -243,12 +224,8 @@ class GetModuleProgressTestCase(TestCase):
     # Normal subtract
 
     def test_6get_subtract_count_progress_instructional(self):
-        self.client.post(
-            path="/material/create/", data=self.material_1, format="json"
-        )
-        self.client.post(
-            path="/material/create/", data=self.material_2, format="json"
-        )
+        self.client.post(path="/material/create/", data=self.material_1, format="json")
+        self.client.post(path="/material/create/", data=self.material_2, format="json")
         self.client.patch(
             path=f"/module_progress/update/{self.user.id}/{self.module.id}/",
             data={"material_type": "instructional", "type": True},
@@ -273,12 +250,8 @@ class GetModuleProgressTestCase(TestCase):
         self.assertEqual(content["module_assessment_progress"], 0)
 
     def test_7get_subtract_count_progress_assessment(self):
-        self.client.post(
-            path="/material/create/", data=self.material_3, format="json"
-        )
-        self.client.post(
-            path="/material/create/", data=self.material_4, format="json"
-        )
+        self.client.post(path="/material/create/", data=self.material_3, format="json")
+        self.client.post(path="/material/create/", data=self.material_4, format="json")
         self.client.patch(
             path=f"/module_progress/update/{self.user.id}/{self.module.id}/",
             data={"material_type": "assessment", "type": True},
@@ -304,12 +277,8 @@ class GetModuleProgressTestCase(TestCase):
 
     # Delete material
     def test_8get_delete_count_progress_instructional(self):
-        self.client.post(
-            path="/material/create/", data=self.material_1, format="json"
-        )
-        self.client.post(
-            path="/material/create/", data=self.material_2, format="json"
-        )
+        self.client.post(path="/material/create/", data=self.material_1, format="json")
+        self.client.post(path="/material/create/", data=self.material_2, format="json")
         self.client.patch(
             path=f"/module_progress/update/{self.user.id}/{self.module.id}/",
             data={"material_type": "instructional", "type": True},
@@ -320,9 +289,7 @@ class GetModuleProgressTestCase(TestCase):
             data={"material_type": "instructional", "type": True},
             format="json",
         )
-        self.client.delete(
-            path="/material/delete/16/"
-        )
+        self.client.delete(path="/material/delete/16/")
         response = self.client.get(
             path=f"/module_progress/{self.user.id}/{self.module.id}/"
         )
@@ -332,12 +299,8 @@ class GetModuleProgressTestCase(TestCase):
         self.assertEqual(content["module_assessment_progress"], 0)
 
     def test_9get_delete_count_progress_assessment(self):
-        self.client.post(
-            path="/material/create/", data=self.material_3, format="json"
-        )
-        self.client.post(
-            path="/material/create/", data=self.material_4, format="json"
-        )
+        self.client.post(path="/material/create/", data=self.material_3, format="json")
+        self.client.post(path="/material/create/", data=self.material_4, format="json")
         self.client.patch(
             path=f"/module_progress/update/{self.user.id}/{self.module.id}/",
             data={"material_type": "assessment", "type": True},
@@ -348,9 +311,7 @@ class GetModuleProgressTestCase(TestCase):
             data={"material_type": "assessment", "type": True},
             format="json",
         )
-        self.client.delete(
-            path="/material/delete/18/"
-        )
+        self.client.delete(path="/material/delete/18/")
         response = self.client.get(
             path=f"/module_progress/{self.user.id}/{self.module.id}/"
         )
@@ -383,12 +344,12 @@ class DeleteMaterial(TestCase):
         )
         self.module_name = "Test Module #"
         self.module = Module.objects.create(
-            course_id=self.course, name=self.module_name,
-            module_instructional_materials=2
+            course_id=self.course,
+            name=self.module_name,
+            module_instructional_materials=2,
         )
         self.module_progress = Module_progress.objects.create(
-            user_id=self.user, module_id=self.module,
-            module_instructional_progress=1
+            user_id=self.user, module_id=self.module, module_instructional_progress=1
         )
         self.material1 = Material.objects.create(
             module_id=self.module,
@@ -413,10 +374,9 @@ class DeleteMaterial(TestCase):
             completed=False,
         )
         self.client.force_authenticate(self.user)
+
     def test_delete_material_progress_correct(self):
-        self.client.delete(
-            path=f"/material/delete/{self.material1.id}/"
-        )
+        self.client.delete(path=f"/material/delete/{self.material1.id}/")
         response = self.client.get(
             path=f"/module_progress/{self.user.id}/{self.module.id}/"
         )
@@ -424,7 +384,8 @@ class DeleteMaterial(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(content["module_instructional_progress"], 0)
 
-class get_all_material_progress(TestCase):
+
+class test_get_course_material_progress(TestCase):
     def setUp(self) -> None:
         self.client = APIClient()
         self.institution = Institution.objects.create(
@@ -433,9 +394,14 @@ class get_all_material_progress(TestCase):
             description="UNAL description",
             url="https://unal.edu.co/",
         )
-        self.course = Course.objects.create(
+        self.course1 = Course.objects.create(
             name="Estructuras de Datos",
             alias="ED",
+            institution=self.institution,
+        )
+        self.course2 = Course.objects.create(
+            name="Fundamentos de Programación",
+            alias="FDP",
             institution=self.institution,
         )
 
@@ -445,61 +411,86 @@ class get_all_material_progress(TestCase):
             last_name="test_last_name",
             first_name="test_first_name",
         )
+
+        Enrollment.objects.create(user_id=self.user, course_id=self.course2)
+
         self.module_name = "Test Module #"
         self.module1 = Module.objects.create(
-            course_id=self.course, name="Test Module 1",
+            course_id=self.course2,
+            name="Test Module 1",
             module_instructional_materials=2,
-            module_assessment_materials=2
+            module_assessment_materials=2,
         )
         self.module2 = Module.objects.create(
-            course_id=self.course, name="Test Module 2",
+            course_id=self.course1,
+            name="Test Module 2",
             module_instructional_materials=3,
-            module_assessment_materials=3
+            module_assessment_materials=3,
         )
         self.module3 = Module.objects.create(
-            course_id=self.course, name="Test Module 3",
+            course_id=self.course1,
+            name="Test Module 3",
             module_instructional_materials=0,
-            module_assessment_materials=0
+            module_assessment_materials=0,
         )
         self.module1_progress = Module_progress.objects.create(
-            user_id=self.user, module_id=self.module1,
+            user_id=self.user,
+            module_id=self.module1,
             module_instructional_progress=1,
-            module_assessment_progress=1
+            module_assessment_progress=1,
         )
         self.module2_progress = Module_progress.objects.create(
-            user_id=self.user, module_id=self.module2,
+            user_id=self.user,
+            module_id=self.module2,
             module_instructional_progress=2,
-            module_assessment_progress=2
+            module_assessment_progress=2,
         )
         self.module3_progress = Module_progress.objects.create(
-            user_id=self.user, module_id=self.module3,
+            user_id=self.user,
+            module_id=self.module3,
             module_instructional_progress=0,
-            module_assessment_progress=0
+            module_assessment_progress=0,
         )
         self.client.force_authenticate(self.user)
-    def get_all_progress(self):
-        response = self.client.get(
-            path = f"module/progress/{self.user.id}/"
+
+    def test_get_course_progress(self):
+        response1 = self.client.get(
+            path=f"/module/progress/{self.user.id}/{self.course1.alias}/"
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        content = loads(response.content)
-        self.assertEqual(content, [
-            {
-                "module_id": self.module1.id,
-                "module_name": self.module1.name,
-                "module_instructional_progress": 50,
-                "module_assessment_progress": 50
-            },
-            {
-                "module_id": self.module2.id,
-                "module_name": self.module2.name,
-                "module_instructional_progress": 66.67,
-                "module_assessment_progress": 66.67
-            },
-            {
-                "module_id": self.module3.id,
-                "module_name": self.module3.name,
-                "module_instructional_progress": 0,
-                "module_assessment_progress": 0
-            }
-        ])
+        response2 = self.client.get(
+            path=f"/module/progress/{self.user.id}/{self.course2.alias}/"
+        )
+        self.assertEqual(response1.status_code, status.HTTP_200_OK)
+        self.assertEqual(response2.status_code, status.HTTP_200_OK)
+        content1 = loads(response1.content)
+        content2 = loads(response2.content)
+
+        self.assertEqual(
+            content1,
+            [
+                {
+                    "module_id": self.module2.id,
+                    "module_name": self.module2.name,
+                    "module_instructional_progress": 66.67,
+                    "module_assessment_progress": 66.67,
+                },
+                {
+                    "module_id": self.module3.id,
+                    "module_name": self.module3.name,
+                    "module_instructional_progress": 0,
+                    "module_assessment_progress": 0,
+                },
+            ],
+        )
+        self.assertEqual(
+            content2,
+            [
+                {
+                    "module_id": self.module1.id,
+                    "module_name": self.module1.name,
+                    "module_instructional_progress": 50,
+                    "module_assessment_progress": 50,
+                }
+            ],
+        )
+        # TODO: Fail tests

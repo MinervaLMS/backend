@@ -9,9 +9,7 @@ create_module_progress_schema = AutoSchema(
             required=True,
             location="form",
             type="integer",
-            schema=coreschema.String(
-                description="User id"
-            ),
+            schema=coreschema.String(description="User id"),
         ),
         coreapi.Field(
             "module_id",
@@ -42,7 +40,7 @@ get_module_progress_schema = AutoSchema(
     ]
 )
 
-get_all_modules_progress_schema = AutoSchema(
+get_course_modules_progress_schema = AutoSchema(
     manual_fields=[
         coreapi.Field(
             "user_id",
@@ -50,7 +48,14 @@ get_all_modules_progress_schema = AutoSchema(
             location="path",
             type="integer",
             schema=coreschema.String(description="User's id to get it"),
-        )
+        ),
+        coreapi.Field(
+            "alias",
+            required=True,
+            location="path",
+            type="string",
+            schema=coreschema.String(description="Course alias to filter."),
+        ),
     ]
 )
 update_module_progress_schema = AutoSchema(
@@ -74,8 +79,7 @@ update_module_progress_schema = AutoSchema(
             required=True,
             location="form",
             type="string",
-            schema=coreschema.String(
-                description="Material's type to update it"),
+            schema=coreschema.String(description="Material's type to update it"),
         ),
         coreapi.Field(
             "type",
@@ -84,7 +88,6 @@ update_module_progress_schema = AutoSchema(
             type="boolean",
             schema=coreschema.String(description="Type of update"),
         ),
-
     ]
 )
 
