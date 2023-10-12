@@ -2,6 +2,8 @@ from rest_framework import serializers
 
 from ..models.material import Material
 
+from ioc.serializers.material_io_code_serializer import MaterialIoCodeSerializer
+
 
 class MaterialSerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,5 +28,12 @@ class MaterialSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         material = Material(**validated_data)
         material.save()
-
+        data_ioc = self.initial_data
+        material_id = material.id
+        if validated_data.get("material_type") == "ioc":
+            data_ioc["material_id"] = material_id
+            serializer = MaterialIoCodeSerializer(data=data_ioc)
+            if serializer.is_valid():
+                serializer.save()
+            
         return material
