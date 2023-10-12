@@ -26,14 +26,19 @@ class MaterialSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
+        """When a material is created, if it is an ioc,
+        it is also created in the ioc table."""
+
         material = Material(**validated_data)
         material.save()
+
         data_ioc = self.initial_data
         material_id = material.id
+
         if validated_data.get("material_type") == "ioc":
             data_ioc["material_id"] = material_id
             serializer = MaterialIoCodeSerializer(data=data_ioc)
             if serializer.is_valid():
                 serializer.save()
-            
+
         return material
