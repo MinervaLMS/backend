@@ -3,13 +3,22 @@ from rest_framework.test import APIClient
 
 from ..models.user import User
 from courses.models import Course
+from institutions.models import Institution
 
 
 class RegisterTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
         self.course = Course.objects.create(
-            name="Test Course", alias="ED20241", description="This is a test course"
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
         )
         self.user_data = {
             "email": "test@example.com",

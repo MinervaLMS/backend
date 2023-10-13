@@ -54,6 +54,11 @@ extra_urls = [
     path(
         "contact/", contact_support_views.contact_support_email, name="support_contact"
     ),
+    path(
+        "users/<int:user_id>/module/<int:module_id>/materials/",
+        user_views.get_user_materials,
+        name="get_user_materials",
+    ),
 ]
 
 urlpatterns = register_urls + login_urls + password_reset_urls + extra_urls

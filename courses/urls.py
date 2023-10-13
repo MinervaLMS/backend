@@ -7,6 +7,9 @@ from .views import (
     material_html_views,
     material_video_views,
     access_views,
+    enrollment_views,
+    module_progress_views,
+    instructor_views,
 )
 
 course_urls = [
@@ -32,6 +35,11 @@ course_urls = [
         "course/<str:alias>/modules/update_order/",
         course_views.update_module_order,
         name="update_module_order",
+    ),
+    path(
+        "course/<str:alias>/appraise/",
+        enrollment_views.appraise_course,
+        name="appraise_course",
     ),
 ]
 
@@ -146,9 +154,70 @@ access_urls = [
         name="dislike_material",
     ),
     path(
+        "access/update/completed/",
+        access_views.update_access_completed,
+        name="complete_material",
+    ),
+    path(
         "access/delete/<int:material_id>/<int:user_id>/",
         access_views.delete_access,
         name="delete_access",
+    ),
+    path(
+        "users/<int:user_id>/<int:module_id>/access/",
+        access_views.get_accesses_by_user,
+        name="get_accesses_by_user",
+    ),
+    path(
+        "users/module/create/access/",
+        access_views.create_all_access_to_user,
+        name="create_all_access_to_user",
+    ),
+]
+
+module_progress_urls = [
+    path(
+        "module_progress/create/",
+        module_progress_views.create_module_progress,
+        name="create_module_progress",
+    ),
+    path(
+        "module_progress/<int:module_id>/<int:user_id>/",
+        module_progress_views.get_module_progress,
+        name="get_module_progress",
+    ),
+    path(
+        "module/progress/<int:user_id>/<str:alias>/",
+        module_progress_views.get_course_module_progress,
+        name="get_course_module_progress",
+    ),
+    path(
+        "module_progress/update/<int:module_id>/<int:user_id>/",
+        module_progress_views.update_module_progress,
+        name="update_module_progress",
+    ),
+]
+
+instructor_urls = [
+    path(
+        "instructor/create/",
+        instructor_views.create_instructor,
+        name="create_instructor",
+    ),
+    path(
+        "instructor/<int:user_id>/<int:course_id>/",
+        instructor_views.get_instructor,
+        name="get_instructor",
+    ),
+    path(
+        "instructor/update/<int:user_id>/<int:course_id>/",
+        instructor_views.update_instructor_type,
+        name="update_instructor_type",
+    ),
+    path(
+        "instructor/delete/<int:user_id>/<int:course_id>/",
+        instructor_views.delete_instructor,
+        name="delete_instructor",
     ),
 ]
 
@@ -159,4 +228,6 @@ urlpatterns = (
     + material_html_urls
     + material_video_urls
     + access_urls
+    + module_progress_urls
+    + instructor_urls
 )

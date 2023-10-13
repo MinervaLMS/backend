@@ -1,9 +1,9 @@
 from django.http import JsonResponse
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from pytube import YouTube
-
+from ..schemas import material_video_schemas as schemas
 from ..models.material_video import MaterialVideo
 
 # from ..schemas import material_video_schemas as schemas
@@ -15,7 +15,7 @@ from ..serializers.material_video_serializer import (
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-# @schema(schemas.create_material_video_schema)
+@schema(schemas.create_material_video_schema)
 def create_material_video(request) -> JsonResponse:
     """
     View to upload a video for a material
@@ -39,7 +39,7 @@ def create_material_video(request) -> JsonResponse:
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-# @schema(schemas.get_material_video_schema)
+@schema(schemas.get_material_video_schema)
 def get_material_video(request, material_id: int) -> JsonResponse:
     """
     Get material by its id
@@ -66,7 +66,7 @@ def get_material_video(request, material_id: int) -> JsonResponse:
 
 @api_view(["PATCH"])
 @permission_classes([IsAuthenticated])
-# @schema(schemas.update_material_video_schema)
+@schema(schemas.update_material_video_schema)
 def update_material_video(request, material_id: int) -> JsonResponse:
     """
     View to change material video url from a module in the database
@@ -127,7 +127,7 @@ def update_material_video(request, material_id: int) -> JsonResponse:
 
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
-# @schema(schemas.delete_material_video_schema)
+@schema(schemas.delete_material_video_schema)
 def delete_material(request, material_video_id: int) -> JsonResponse:
     """
     Deletes video material video with passed id

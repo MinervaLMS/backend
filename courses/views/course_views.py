@@ -6,9 +6,13 @@ from rest_framework.permissions import IsAuthenticated
 
 from ..models.course import Course
 from ..models.module import Module
+from ..models.instructor import Instructor
+from institutions.models.institution import Institution
 from ..schemas import course_schemas as schemas
 from ..serializers.course_serializer import CourseSerializer
 from ..serializers.module_serializer import ModuleSerializer
+from ..serializers.instructor_serializer import InstructorSerializer
+from institutions.serializers.institution_serializer import InstitutionSerializer
 
 
 @api_view(["POST"])
@@ -50,7 +54,7 @@ def get_course(request, alias: str) -> JsonResponse:
 
     Returns:
         response (JsonResponse): HTTP response in JSON format
-        with all course information
+        with all course, institution, and instructors information
     """
 
     try:
@@ -60,9 +64,19 @@ def get_course(request, alias: str) -> JsonResponse:
             {"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND
         )
 
-    serializer = CourseSerializer(course)
+    institution_id = course.institution_id
+    institution = Institution.objects.get(id=institution_id)
+    instructors = Instructor.objects.filter(course_id=course.id)
 
-    return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+    course_serializer = CourseSerializer(course)
+    institution_serializer = InstitutionSerializer(institution)
+    instructor_serializer = InstructorSerializer(instructors, many=True)
+    
+    data = course_serializer.data
+    data["institution"] = institution_serializer.data
+    data["instructors"] = instructor_serializer.data
+
+    return JsonResponse(data, safe=False, status=status.HTTP_200_OK)
 
 
 @api_view(["PATCH"])
@@ -238,12 +252,14 @@ def update_module_order(request, alias: str) -> JsonResponse:
     orders: list = list(request.data.values())
     orders.sort()
     correct_orders: list = [n for n in range(len(orders))]
-    max_order = (
-        Module.objects.filter(course_id=course.id).aggregate(models.Max("order"))[
-            "order__max"
-        ]
-        + 1
-    )
+    max_order = Module.objects.filter(course_id=course.id).aggregate(
+        models.Max("order")
+    )["order__max"]
+
+    if max_order is None:
+        max_order = 0
+    else:
+        max_order += 1
 
     if orders != correct_orders:
         return JsonResponse(

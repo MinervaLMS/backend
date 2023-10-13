@@ -71,6 +71,29 @@ update_access_like_schema = AutoSchema(
     ]
 )
 
+update_access_completed_schema = AutoSchema(
+    manual_fields=[
+        coreapi.Field(
+            "material_id",
+            required=True,
+            location="form",
+            type="integer",
+            schema=coreschema.String(
+                description="Material's id to which the user wants to complete"
+            ),
+        ),
+        coreapi.Field(
+            "user_id",
+            required=True,
+            location="form",
+            type="integer",
+            schema=coreschema.String(
+                description="User's id that wants to complete a material"
+            ),
+        ),
+    ]
+)
+
 update_access_dislike_schema = AutoSchema(
     manual_fields=[
         coreapi.Field(
