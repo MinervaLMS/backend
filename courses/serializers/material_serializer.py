@@ -4,6 +4,18 @@ from ..models.material import Material
 
 from ioc.serializers.material_io_code_serializer import MaterialIoCodeSerializer
 
+from constants.ioc import URL_PROBLEM
+import json
+import requests
+
+
+def judge(data):
+    """Method that creates the problem on the judge files."""
+
+    headers = {"Content-Type": "application/json"}
+    response = requests.post(URL_PROBLEM, data=json.dumps(data), headers=headers)
+    return response.json(), response.status_code
+
 
 class MaterialSerializer(serializers.ModelSerializer):
     class Meta:
@@ -32,13 +44,15 @@ class MaterialSerializer(serializers.ModelSerializer):
         material = Material(**validated_data)
         material.save()
 
-        data_ioc = self.initial_data
-        material_id = material.id
-
         if validated_data.get("material_type") == "ioc":
+            data_ioc = self.initial_data
+            material_id = material.id
             data_ioc["material_id"] = material_id
             serializer = MaterialIoCodeSerializer(data=data_ioc)
+
             if serializer.is_valid():
+                data_ioc["problem_id"] = data_ioc["name"]
+                judge(data_ioc)
                 serializer.save()
 
         return material
