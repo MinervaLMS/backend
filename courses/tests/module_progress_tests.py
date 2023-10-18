@@ -420,18 +420,21 @@ class test_get_course_material_progress(TestCase):
             name="Test Module 1",
             module_instructional_materials=2,
             module_assessment_materials=2,
+            order=1,
         )
         self.module2 = Module.objects.create(
             course_id=self.course1,
             name="Test Module 2",
             module_instructional_materials=3,
             module_assessment_materials=3,
+            order=1
         )
         self.module3 = Module.objects.create(
             course_id=self.course1,
             name="Test Module 3",
             module_instructional_materials=0,
             module_assessment_materials=0,
+            order=2
         )
         self.module1_progress = Module_progress.objects.create(
             user_id=self.user,
@@ -473,12 +476,14 @@ class test_get_course_material_progress(TestCase):
                     "module_name": self.module2.name,
                     "module_instructional_progress": 66.67,
                     "module_assessment_progress": 66.67,
+                    "order": 1
                 },
                 {
                     "module_id": self.module3.id,
                     "module_name": self.module3.name,
                     "module_instructional_progress": 0,
                     "module_assessment_progress": 0,
+                    "order": 2
                 },
             ],
         )
@@ -490,6 +495,7 @@ class test_get_course_material_progress(TestCase):
                     "module_name": self.module1.name,
                     "module_instructional_progress": 50,
                     "module_assessment_progress": 50,
+                    "order": 1
                 }
             ],
         )
