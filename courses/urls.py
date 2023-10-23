@@ -221,6 +221,19 @@ instructor_urls = [
     ),
 ]
 
+enrollment_urls = [
+    path(
+        "enrollment/create/",
+        enrollment_views.create_enrollment,
+        name="create_enrollment",
+    ),
+    path(
+        "enrollment/<int:user_id>/<str:course_alias>/",
+        enrollment_views.get_enrollment,
+        name="get_enrollment",
+    ),
+]
+
 urlpatterns = (
     course_urls
     + module_urls
@@ -230,4 +243,5 @@ urlpatterns = (
     + access_urls
     + module_progress_urls
     + instructor_urls
+    + enrollment_urls
 )

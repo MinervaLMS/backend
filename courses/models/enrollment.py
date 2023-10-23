@@ -19,6 +19,7 @@ class Enrollment(models.Model):
     )
     appraisal_date = models.DateTimeField(null=True, blank=True)
     appraisal_comment = models.TextField(blank=True)
+    points = models.IntegerField(default=0)
 
     class Meta:
         constraints = [
