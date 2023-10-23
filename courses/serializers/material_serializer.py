@@ -4,6 +4,8 @@ from ..models.material import Material
 
 from ioc.serializers.material_io_code_serializer import MaterialIoCodeSerializer
 
+from ioc.serializers.case_serializer import CaseSerializer
+
 from constants.ioc import URL_PROBLEM
 import json
 import requests
@@ -54,5 +56,14 @@ class MaterialSerializer(serializers.ModelSerializer):
                 data_ioc["problem_id"] = data_ioc["name"]
                 judge(data_ioc)
                 serializer.save()
+                case_data = {}
+                for case in range(len(data_ioc["input"])):
+                    case_data["id_case"] = case
+                    case_data["input"] = data_ioc["input"][case]
+                    case_data["output"] = data_ioc["output"][case]
+                    case_data["material_io_code_id"] = serializer.data["id"]
+                    serializer_case = CaseSerializer(data=case_data)
+                    if serializer_case.is_valid():
+                        serializer_case.save()
 
         return material
