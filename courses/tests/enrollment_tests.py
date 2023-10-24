@@ -1,6 +1,8 @@
 from django.utils import timezone
 from django.test import TestCase
+from rest_framework import status
 from rest_framework.test import APIClient
+from json import loads
 
 from ..models.course import Course
 from ..models.enrollment import Enrollment
@@ -182,3 +184,136 @@ class AppraiseCourseTestCase(TestCase):
                 "message": "Course appraised successfully",
             },
         )
+
+
+class CreateEnrollmentTestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
+        self.course1 = Course.objects.create(
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
+        )
+
+        self.course2 = Course.objects.create(
+            name="Estructuras de Datos 2",
+            alias="ED2",
+            institution=self.institution,
+        )
+
+        self.user = User.objects.create(
+            email="test1@example.com",
+            password="testpassword",
+            first_name="Test",
+            last_name="User1",
+        )
+
+        self.enrollment_data = {
+            "user_id": self.user.id,
+            "course_alias": self.course2.alias,
+        }
+
+        self.client.force_authenticate(self.user)
+
+    def test_create_enrollment_user_not_exist(self):
+        data = {
+            "user_id": -5,
+            "course_alias": self.course1.alias,
+        }
+        response = self.client.post("/enrollment/create/", data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(
+            loads(response.content), {"message": "There is not a user with this id"}
+        )
+
+    def test_create_enrollment_course_not_exist(self):
+        data = {
+            "user_id": self.user.id,
+            "course_alias": "NonExistentCourse",
+        }
+        response = self.client.post("/enrollment/create/", data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(
+            loads(response.content),
+            {"message": "There is not a course with this alias"},
+        )
+
+    def test_create_enrollment_already_exist(self):
+        data = {"user_id": self.user.id, "course_alias": self.course1.alias}
+        response = self.client.post("/enrollment/create/", data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            loads(response.content),
+            {"message": "This user is already enrolled in this course"},
+        )
+
+    def test_create_enrollment_correct(self):
+        response = self.client.post(
+            "/enrollment/create/", self.enrollment_data, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(
+            loads(response.content), {"message": "Enrollment created successfully"}
+        )
+
+
+class GetEnrollmentTestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
+        self.course1 = Course.objects.create(
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
+        )
+
+        self.course2 = Course.objects.create(
+            name="Estructuras de Datos 2",
+            alias="ED2",
+            institution=self.institution,
+        )
+
+        self.user = User.objects.create(
+            email="test1@example.com",
+            password="testpassword",
+            first_name="Test",
+            last_name="User1",
+        )
+
+        self.enrollment_data = {
+            "user_id": self.user.id,
+            "course_alias": self.course2.alias,
+        }
+
+        self.client.force_authenticate(self.user)
+
+    def test_get_enrollment_course_not_exist(self):
+        response = self.client.get(f"/enrollment/{self.user.id}/NonExistentCourse/")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(
+            loads(response.content),
+            {"message": "There is not a course with this alias"},
+        )
+
+    def test_get_enrollment_not_exist(self):
+        response = self.client.get(f"/enrollment/101/{self.course1.alias}/")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(
+            loads(response.content),
+            {"message": "This user is not enrolled in this course"},
+        )
+
+    def test_get_enrollment_correct(self):
+        response = self.client.get(f"/enrollment/{self.user.id}/{self.course1.alias}/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

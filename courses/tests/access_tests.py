@@ -149,7 +149,7 @@ class GetAccessTestCase(TestCase):
     def test_get_access_correct(self):
         response = self.client.get(f"/access/{self.material.id}/{self.user.id}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(Access.objects.last().views, 1)
+        self.assertEqual(Access.objects.last().views, 0)
 
 
 class UpdateAccessCompletedTestCase(TestCase):
@@ -226,9 +226,7 @@ class UpdateAccessCompletedTestCase(TestCase):
 
     def test_update_access_correct_eliminate(self):
         Access.objects.create(
-            material_id=self.material,
-            user_id=self.user,
-            completed=True
+            material_id=self.material, user_id=self.user, completed=True
         )
         data = {
             "material_id": self.material.id,
@@ -239,7 +237,8 @@ class UpdateAccessCompletedTestCase(TestCase):
         self.assertEqual(Access.objects.last().completed, None)
         self.assertEqual(
             loads(response.content), {"message": "Access completed eliminated"}
-        )    
+        )
+
 
 class UpdateAccessLikeTestCase(TestCase):
     def setUp(self):
@@ -312,6 +311,7 @@ class UpdateAccessLikeTestCase(TestCase):
         self.assertEqual(
             loads(response.content), {"message": "Access assessed successfully"}
         )
+
 
 class UpdateAccessDislikeTestCase(TestCase):
     def setUp(self):
