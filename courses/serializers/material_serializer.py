@@ -30,9 +30,9 @@ class MaterialSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     f"The value {result_ioc[0]} is missing."
                 )
-            if self.initial_data["max_time"] < 300:
+            if self.initial_data["max_memory"] < 300:
                 raise serializers.ValidationError(
-                    "The value max_time must be greater than 300."
+                    "The value max_memory must be greater than 300."
                 )
 
         return data
