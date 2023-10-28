@@ -11,6 +11,62 @@ from accounts.models.user import User
 from institutions.models.institution import Institution
 
 
+class CreateMaterialIOCTestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.institution = Institution.objects.create(
+            name="Universidad Nacional de Colombia",
+            alias="UNAL",
+            description="UNAL description",
+            url="https://unal.edu.co/",
+        )
+        self.course = Course.objects.create(
+            name="Estructuras de Datos",
+            alias="ED",
+            institution=self.institution,
+        )
+        self.user = User.objects.create(
+            email="test@example.com",
+            password="testpassword",
+            last_name="test_last_name",
+            first_name="test_first_name",
+        )
+        self.module = Module.objects.create(course_id=self.course, name="Test module")
+
+        self.incomplete_data = {
+            "module_id": self.module.id,
+            "name": "Image to reply",
+            "material_type": "ioc",
+            "is_extra": True,
+        }
+
+        self.correct_data = {
+            "module_id": self.module.id,
+            "name": "JEAN_TRY",
+            "material_type": "ioc",
+            "input": ["4\n1\n2\n3\n4", "8\n1\n5\n2\n3\n2\n3\n4\n5"],
+            "output": ["La suma es 10", "La suma es 25"],
+            "is_extra": "False",
+            "points": [45, 75],
+            "max_memory": 300,
+            "max_time": 1,
+        }
+
+        self.client.force_authenticate(self.user)
+
+    def test_create_wrong(self):
+        response = self.client.post(
+            "/material/create/", self.incomplete_data, format="json"
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_create_correct(self):
+        response = self.client.post(
+            "/material/create/", self.correct_data, format="json"
+        )
+        self.assertEqual(response.status_code, 201)
+
+
 class CreateMaterialTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
