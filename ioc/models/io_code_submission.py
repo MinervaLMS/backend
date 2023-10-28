@@ -32,7 +32,7 @@ class IoCodeSubmission(models.Model):
         constraints = [
             models.CheckConstraint(
                 check=models.Q(
-                    response_char__in={"A", "W", "C", "E", "T", "M", "P", "I", "J"}
+                    response_char__in={"A", "W", "I", "R", "O", "M", "T", "E", "C"}
                 )
                 | models.Q(response_char__isnull=True),
                 name="char_check",
