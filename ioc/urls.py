@@ -1,8 +1,11 @@
 from django.urls import path
 
-from .views import material_io_code_views
+from .views import (
+    material_io_code_views,
+    io_code_submission_views,
+    io_code_submission_summary_views,
+)
 
-from .views import io_code_submission_views
 
 material_io_code_urls = [
     path(
@@ -49,4 +52,12 @@ io_code_submission_urls = [
         name="delete_io_code_submission",
     ),
 ]
-urlpatterns = material_io_code_urls + io_code_submission_urls
+
+io_code_submission_summary_urls = [
+    path(
+        "iocode/submission/summary/<int:user_id>/<int:material_id>/",
+        io_code_submission_summary_views.get_summary_by_user,
+        name="get_summary_by_user",
+    )
+]
+urlpatterns = material_io_code_urls + io_code_submission_urls + io_code_submission_summary_urls

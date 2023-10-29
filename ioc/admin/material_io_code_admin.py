@@ -4,7 +4,15 @@ from ..models.material_io_code import MaterialIoCode
 
 
 class MaterialIoCodeAdmin(admin.ModelAdmin):
-    list_display = ("id", "material_id", "max_time", "max_memory")
+    list_display = (
+        "id",
+        "material_id",
+        "max_time",
+        "max_memory",
+        "max_points",
+        "min_points",
+        "points_penalty",
+    )
     list_filter = ("material_id", "id")
     search_fields = ("material_id", "id")
 
