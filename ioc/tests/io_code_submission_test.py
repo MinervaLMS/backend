@@ -9,6 +9,7 @@ from courses.models.course import Course
 from accounts.models.user import User
 from courses.models.module import Module
 from institutions.models.institution import Institution
+from ioc.models.material_io_code import MaterialIoCode
 from ..models.io_code_submission import IoCodeSubmission
 
 
@@ -40,6 +41,12 @@ class CreateIoCodeSubmissionTestCase(TestCase):
             material_type="I",
             is_extra=False,
         )
+        self.material_ioc = MaterialIoCode.objects.create(
+            material_id=self.material,
+            max_time=1000,
+            max_memory=1000,
+        )
+
         self.user = User.objects.create(
             email="test@example.com",
             password="JHuyfub434eknjbv",
@@ -50,16 +57,56 @@ class CreateIoCodeSubmissionTestCase(TestCase):
         self.io_code_submission_data = {
             "material_id": self.material.id,
             "user_id": self.user.id,
-            "response_char": "A",
-            "execution_time": 1,
-            "execution_memory": 1,
+            "code": "print('Hello World')",
+            "execution_time": 1000,
+            "execution_memory": 1000,
             "completion_rate": 1.0,
+            "language": "py",
+        }
+
+        self.io_code_submission_data_wrong_answer = {
+            "material_id": self.material.id,
+            "user_id": self.user.id,
+            "code": "print()",
+            "execution_time": 1000,
+            "execution_memory": 1000,
+            "completion_rate": 1.0,
+            "language": "py",
+        }
+
+        self.io_code_submission_data_copilation_error = {
+            "material_id": self.material.id,
+            "user_id": self.user.id,
+            "code": "while",
+            "execution_time": 1000,
+            "execution_memory": 1000,
+            "completion_rate": 1.0,
+            "language": "py",
+        }
+
+        self.io_code_submission_data_memeory_exceed = {
+            "material_id": self.material.id,
+            "user_id": self.user.id,
+            "code": "while(True):\n    pass",
+            "execution_time": 1000,
+            "execution_memory": 1000,
+            "completion_rate": 1.0,
+            "language": "py",
+        }
+
+        self.io_code_submission_data_time_exceed = {
+            "material_id": self.material.id,
+            "user_id": self.user.id,
+            "code": "while(True):\n    pass",
+            "execution_time": 10,
+            "execution_memory": 10000,
+            "completion_rate": 1.0,
+            "language": "py",
         }
 
         self.io_code_submission_data_invalid = {
             "material_id": self.material.id,
             "user_id": self.user.id,
-            "response_char": "A",
             "execution_time": "uno",
             "execution_memory": "uno",
             "completion_rate": 1.0,
@@ -68,7 +115,6 @@ class CreateIoCodeSubmissionTestCase(TestCase):
         self.io_code_submission_data_no_material = {
             "material_id": self.material.id + 1,
             "user_id": self.user.id,
-            "response_char": "A",
             "execution_time": 1,
             "execution_memory": 1,
             "completion_rate": 1.0,
@@ -77,7 +123,6 @@ class CreateIoCodeSubmissionTestCase(TestCase):
         self.io_code_submission_data_no_user = {
             "material_id": self.material.id,
             "user_id": self.user.id + 1,
-            "response_char": "A",
             "execution_time": 1,
             "execution_memory": 1,
             "completion_rate": 1.0,
@@ -138,9 +183,9 @@ class CreateIoCodeSubmissionTestCase(TestCase):
         "ioc.serializers.io_code_submission_serializer.judge",
         return_value=(
             {
-                "max_memory": 9088,
+                "max_memory": 8960,
                 "max_time": 0.03,
-                "submission_id": "1",
+                "submission_id": 72,
                 "verdict": {"message": "Accepted", "verdict": "AC"},
             },
             201,
@@ -165,11 +210,11 @@ class CreateIoCodeSubmissionTestCase(TestCase):
         "ioc.serializers.io_code_submission_serializer.judge",
         return_value=(
             {
-                "max_memory": 9088,
+                "max_memory": 8960,
                 "max_time": 0.03,
-                "submission_id": "1",
+                "submission_id": 72,
                 "verdict": {"message": "Wrong Answer", "verdict": "WA"},
-                "wrong_case": 2,
+                "wrong_case": 1,
             },
             201,
         ),
@@ -181,13 +226,94 @@ class CreateIoCodeSubmissionTestCase(TestCase):
 
         response = self.client.post(
             "/iocode/submission/create/",
-            self.io_code_submission_data,
+            self.io_code_submission_data_wrong_answer,
             format="json",
         )
         self.assertEqual(response.status_code, 201)
 
         submission = IoCodeSubmission.objects.latest("submission_date")
         self.assertEqual(submission.response_char, "W")
+
+    @patch(
+        "ioc.serializers.io_code_submission_serializer.judge",
+        return_value=(
+            {
+                "max_memory": 8832,
+                "max_time": 11.99,
+                "submission_id": 72,
+                "verdict": {"message": "Time Limit Exceeded", "verdict": "TLE"},
+                "wrong_case": 1,
+            },
+            201,
+        ),
+    )
+    def test_submission_judge_time_exceed(self, mock_judge) -> None:
+        """Method that checks if the IoCodeSubmission instance,
+        with a code that exceed the time limit is successfully submitted and judged
+        at the judge's URL."""
+
+        response = self.client.post(
+            "/iocode/submission/create/",
+            self.io_code_submission_data_time_exceed,
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201)
+
+        submission = IoCodeSubmission.objects.latest("submission_date")
+        self.assertEqual(submission.response_char, "T")
+
+    @patch(
+        "ioc.serializers.io_code_submission_serializer.judge",
+        return_value=(
+            {
+                "max_memory": 7680,
+                "max_time": 0.09,
+                "submission_id": 72,
+                "verdict": {"message": "Memory Limit Exceeded", "verdict": "MLE"},
+                "wrong_case": 1,
+            },
+            201,
+        ),
+    )
+    def test_submission_judge_memory_exceed(self, mock_judge) -> None:
+        """Method that checks if the IoCodeSubmission instance,
+        with a code that exceed the memory limit is successfully submitted and judged
+        at the judge's URL."""
+
+        response = self.client.post(
+            "/iocode/submission/create/",
+            self.io_code_submission_data_memeory_exceed,
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201)
+
+        submission = IoCodeSubmission.objects.latest("submission_date")
+        self.assertEqual(submission.response_char, "M")
+
+    @patch(
+        "ioc.serializers.io_code_submission_serializer.judge",
+        return_value=(
+            {
+                "submission_id": 72,
+                "verdict": "Judge execution: code compilation or problem_id don't exist.",
+            },
+            201,
+        ),
+    )
+    def test_submission_judge_copilation_error(self, mock_judge) -> None:
+        """Method that checks if the IoCodeSubmission instance,
+        with a code that does not compile is successfully submitted and judged
+        at the judge's URL."""
+
+        response = self.client.post(
+            "/iocode/submission/create/",
+            self.io_code_submission_data_copilation_error,
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201)
+
+        submission = IoCodeSubmission.objects.latest("submission_date")
+        self.assertEqual(submission.response_char, "C")
 
 
 class GetIoCodeSubmissionTestCase(TestCase):
