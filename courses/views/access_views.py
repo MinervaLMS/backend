@@ -5,6 +5,8 @@ from rest_framework.decorators import api_view, permission_classes, schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
+from ioc.models import IoCodeSubmissionSummary
+from ioc.serializers.IoCodeSubmissionSummarySerializer import IoCodeSubmissionSummarySerializer
 from ..models.material import Material
 from ..models.access import Access
 from accounts.models.user import User
@@ -96,8 +98,15 @@ def get_access(request, material_id: int, user_id: int) -> JsonResponse:
     """
     try:
         access = Access.objects.get(material_id=material_id, user_id=user_id)
+        material: Material = access.material_id
         access = AccessSerializer(access)
-        return JsonResponse(access.data, safe=False, status=status.HTTP_200_OK)
+        if material.material_type == "ioc":
+            summary: IoCodeSubmissionSummary = material.submission_summary.filter(
+                user_id=user_id
+            ).first()
+        access_data = access.data
+        access_data["summary"] = IoCodeSubmissionSummarySerializer(summary).data
+        return JsonResponse(access_data, safe=False, status=status.HTTP_200_OK)
 
     except Access.DoesNotExist:
         return JsonResponse(
