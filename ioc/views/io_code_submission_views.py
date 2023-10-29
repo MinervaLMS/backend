@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
+from ..helpers.submission_summary import update_submission_summary
 from ..serializers.io_code_submission_serializer import IoCodeSubmissionSerializer
 from ..models.io_code_submission import IoCodeSubmission
 
@@ -22,7 +23,13 @@ def create_io_code_submission(request) -> JsonResponse:
     """
     serializer = IoCodeSubmissionSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save()
+        submission: IoCodeSubmission = serializer.save()
+        # update submission summary for this user 
+        update_submission_summary(
+            user=submission.user_id,
+            material=submission.material_id,
+            submission=submission
+        )
         return JsonResponse(
             serializer.data,
             status=status.HTTP_201_CREATED,
