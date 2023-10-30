@@ -56,19 +56,6 @@ def create_ioc_material(data, material):
             # TODO: What happens if this is not valid?
 
 
-def create_htm_material(data, material_id):
-    """Method that creates the htm material on the material html database table"""
-    from rest_framework import serializers
-
-    print("Should've raise validation error, m8.")
-    raise serializers.ValidationError("Raised validation error for html material.")
-
-
-def create_vid_material(data):
-    """Method that creates the vid material on the material video database table"""
-    pass
-
-
 def validate_and_create_specific_material_type(
     validation_data: dict, material: Material
 ) -> None:
@@ -85,18 +72,14 @@ def validate_and_create_specific_material_type(
     # match statement is supposed to be faster than if-else
     match material_type:
         case "IOC":
+            return
             specific_serializer = MaterialIoCodeSerializer(data=validation_data)
         case "HTM":
-            # validation_data["content"] = "MY HTML"
             specific_serializer = MaterialHTMLSerializer(data=validation_data)
         case "VID":
-            validation_data[
-                "external_id"
-            ] = "https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley"
             specific_serializer = MaterialVideoSerializer(data=validation_data)
         case "PDF":
-            # validation_data["content"] = "PDF"
-            specific_serializer = MaterialHTMLSerializer(data=validation_data)
+            pass
         case _:
             pass
 
@@ -119,8 +102,10 @@ def validate_for_specific_material_type(
         # is_valid method of each serializers.
 
         if not material_type_serializer.is_valid():
+            # if it's not valid, delete the material already created
             Material.objects.get(id=material.id).delete()
             raise serializers.ValidationError(material_type_serializer.errors)
     else:
         # if it didn't match any case, delete the material already created
         Material.objects.get(id=material.id).delete()
+        raise serializers.ValidationError("The material type was not recognized")

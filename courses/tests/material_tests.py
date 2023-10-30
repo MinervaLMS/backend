@@ -3,6 +3,7 @@ from rest_framework.test import APIClient
 from rest_framework import status
 from json import loads
 
+from ..models import MaterialHTML, MaterialVideo
 from ..models.course import Course
 from ..models.module import Module
 from ..models.material import Material
@@ -43,7 +44,7 @@ class CreateMaterialIOCTestCase(TestCase):
         self.correct_data = {
             "module_id": self.module.id,
             "name": "JEAN_TRY",
-            "material_type": "ioc",
+            "material_type": "IOC",
             "input": ["4\n1\n2\n3\n4", "8\n1\n5\n2\n3\n2\n3\n4\n5"],
             "output": ["La suma es 10", "La suma es 25"],
             "is_extra": "False",
@@ -92,15 +93,31 @@ class CreateMaterialTestCase(TestCase):
         self.material_data = {
             "module_id": self.module.id,
             "name": "Image to reply",
-            "material_type": "png",
+            "material_type": "HTM",
+            "content": "<p>Test content</p>",
             "is_extra": True,
         }
 
         self.material_invalid_types = {
-            "module_id": 4,
+            "module_id": self.module.id,
             "name": "Papiro",
             "material_type": True,
             "is_extra": 2,
+        }
+
+        self.material_missing_keys = {
+            "module_id": self.module.id,
+            "name": "Papiro",
+            "material_type": "HTM",
+            "is_extra": False,
+        }
+        self.material_video = {
+            "module_id": self.module.id,
+            "name": "My Rick Astley video",
+            "material_type": "VID",
+            "external_id": "https://www.youtube.com/"
+            + "watch?v=dQw4w9WgXcQ&ab_channel=RickAstley",
+            "is_extra": True,
         }
 
         self.client.force_authenticate(self.user)
@@ -110,16 +127,33 @@ class CreateMaterialTestCase(TestCase):
             "/material/create/", self.material_data, format="json"
         )
         self.assertEqual(response.status_code, 201)
+        self.assertEqual(MaterialHTML.objects.count(), 1)
 
     def test_create_blank(self):
         response = self.client.post("/material/create/", {}, format="json")
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 404)
 
     def test_create_invalid_types(self):
         response = self.client.post(
             "/material/create/", self.material_invalid_types, format="json"
         )
         self.assertEqual(response.status_code, 400)
+
+    def test_create_missing_keys(self):
+        response = self.client.post(
+            "/material/create/", self.material_missing_keys, format="json"
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            loads(response.content), {"content": ["This field is required."]}
+        )
+
+    def test_create_correct_video(self):
+        response = self.client.post(
+            "/material/create/", self.material_video, format="json"
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(MaterialVideo.objects.count(), 1)
 
 
 class GetMaterialTestCase(TestCase):

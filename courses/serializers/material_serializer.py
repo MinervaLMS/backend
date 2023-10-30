@@ -45,10 +45,9 @@ class MaterialSerializer(serializers.ModelSerializer):
         it is also created in the ioc table."""
 
         material = Material(**validated_data)
-        validated_data.get("material_type")
         material.save()
 
-        validate_and_create_specific_material_type(validated_data, material)
+        validate_and_create_specific_material_type(self.initial_data, material)
 
         if validated_data.get("material_type") == "IOC":
             create_ioc_material(self.initial_data, material.id)

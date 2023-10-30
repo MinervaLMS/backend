@@ -28,6 +28,26 @@ create_material_schema = AutoSchema(
             schema=coreschema.String(description="Material type"),
         ),
         coreapi.Field(
+            "content",
+            required=False,
+            location="form",
+            type="string",
+            schema=coreschema.String(
+                description="The Markdown for the HTML material or "
+                + "the content of the PDF material."
+                + "Only needed for HTM and PDF types"
+            ),
+        ),
+        coreapi.Field(
+            "external_id",
+            required=False,
+            location="form",
+            type="string",
+            schema=coreschema.String(
+                description="Link of the video related to a " + "video material."
+            ),
+        ),
+        coreapi.Field(
             "is_extra",
             required=True,
             location="form",

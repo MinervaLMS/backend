@@ -36,8 +36,10 @@ def create_material(request) -> JsonResponse:
 
         if serializer.is_valid(raise_exception=True):
             material = serializer.save()
+
             # Update module's material counts
             update_count_created_material(serializer=serializer)
+
             # Create all access objects for the new material
             # TODO: Doing the same thing when a enrollment is created
             create_accesses_for_material(
@@ -49,7 +51,6 @@ def create_material(request) -> JsonResponse:
 
     except serializers.ValidationError as exc:
         return JsonResponse(data=exc.detail, status=status.HTTP_400_BAD_REQUEST)
-    # return JsonResponse(errors, status=status.HTTP_400_BAD_REQUEST)
 
     except Module.DoesNotExist:
         return JsonResponse(
