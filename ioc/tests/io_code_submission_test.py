@@ -38,11 +38,22 @@ class CreateIoCodeSubmissionTestCase(TestCase):
         self.material = Material.objects.create(
             module_id=self.module,
             name="Test material",
-            material_type="I",
+            material_type="IOC",
+            is_extra=False,
+        )
+        self.material_other = Material.objects.create(
+            module_id=self.module,
+            name="Test material",
+            material_type="PDF",
             is_extra=False,
         )
         self.material_ioc = MaterialIoCode.objects.create(
             material_id=self.material,
+            max_time=1000,
+            max_memory=1000,
+        )
+        self.material_ioc = MaterialIoCode.objects.create(
+            material_id=self.material_other,
             max_time=1000,
             max_memory=1000,
         )
@@ -56,6 +67,16 @@ class CreateIoCodeSubmissionTestCase(TestCase):
 
         self.io_code_submission_data = {
             "material_id": self.material.id,
+            "user_id": self.user.id,
+            "code": "print('Hello World')",
+            "execution_time": 1000,
+            "execution_memory": 1000,
+            "completion_rate": 1.0,
+            "language": "py",
+        }
+
+        self.io_code_submission_data_non_ioc = {
+            "material_id": self.material_other.id,
             "user_id": self.user.id,
             "code": "print('Hello World')",
             "execution_time": 1000,
@@ -138,6 +159,24 @@ class CreateIoCodeSubmissionTestCase(TestCase):
             "/iocode/submission/create/", self.io_code_submission_data, format="json"
         )
         self.assertEqual(response.status_code, 201)
+
+    def test_create_non_ioc_material(self) -> None:
+        """Method that tests the creation of a IoCodeSubmission instance
+        with a material with non ioc material_type."""
+
+        response = self.client.post(
+            "/iocode/submission/create/", self.io_code_submission_data_non_ioc, format="json"
+        )
+        self.assertEqual(response.json()['message'], "Material type is not IOC")
+
+    def test_create_wrong_material_id(self) -> None:
+        """Method that tests the creation of a IoCodeSubmission instance
+        with wrong material_id"""
+
+        response = self.client.post(
+            "/iocode/submission/create/", self.io_code_submission_data.update({'material_id' : 999}), format="json"
+        )
+        self.assertEqual(response.json()['message'], "No material found related to given material_id")
 
     def test_create_blank(self) -> None:
         """Method that tests the creation of a IoCodeSubmission

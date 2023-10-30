@@ -3,7 +3,6 @@ from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes, schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-
 from ..helpers.submission_summary import update_submission_summary
 from ..serializers.io_code_submission_serializer import (
     IoCodeSubmissionSerializer,
@@ -11,6 +10,9 @@ from ..serializers.io_code_submission_serializer import (
 )
 from ..models.io_code_submission import IoCodeSubmission
 from ..schemas import io_code_submission_schemas as schemas
+from courses.models.material import Material
+from courses.serializers.material_serializer import MaterialSerializer
+
 
 
 @api_view(["POST"])
@@ -23,8 +25,24 @@ def create_io_code_submission(request) -> JsonResponse:
         request: http request with code submission data for creation
 
     Returns:
-        response (JsonResponse): HTTP response in JSON format
+        response (JsonResponse): HTTP response in JSON format.
+        If the material exists and its material_type
+        is 'ioc', returns 201 created. Otherwise, throws 400 bad request. 
     """
+    try:
+        material_id = request.data['material_id']
+        material = Material.objects.get(id=material_id)
+        material = MaterialSerializer(material)
+    except KeyError:
+        return JsonResponse(
+            {"message": "No material found related to given material_id"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    if material.data['material_type'].lower() != 'ioc':
+        return JsonResponse(
+            {"message": f"Material type is not IOC"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
     serializer = IoCodeSubmissionSerializer(data=request.data)
     if serializer.is_valid():
         submission: IoCodeSubmission = serializer.save()
@@ -34,12 +52,20 @@ def create_io_code_submission(request) -> JsonResponse:
             material=submission.material_id,
             submission=submission,
         )
+    else: 
         return JsonResponse(
-            serializer.data,
-            status=status.HTTP_201_CREATED,
+            serializer.errors, status=status.HTTP_400_BAD_REQUEST
         )
-
-    return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # update submission summary for this user 
+    update_submission_summary(
+        user=submission.user_id,
+        material=submission.material_id,
+        submission=submission
+    )
+    return JsonResponse(
+        serializer.data,
+        status=status.HTTP_201_CREATED,
+    )
 
 
 @api_view(["GET"])
