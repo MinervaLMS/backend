@@ -51,6 +51,11 @@ io_code_submission_urls = [
         io_code_submission_views.delete_io_code_submission,
         name="delete_io_code_submission",
     ),
+    path(
+        "iocode/submission/user/<int:user_id>/<int:material_id>/",
+        io_code_submission_views.get_io_code_all_submission_user,
+        name="get_io_code_all_submission_user",
+    )
 ]
 
 io_code_submission_summary_urls = [
