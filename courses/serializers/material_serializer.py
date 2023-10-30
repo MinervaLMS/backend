@@ -1,10 +1,10 @@
 from rest_framework import serializers
-
 from ..models.material import Material
-
-
-from courses.utils import material_ioc_validate
-from courses.utils import material_ioc_create
+from courses.utils import (
+    material_ioc_validate,
+    validate_and_create_specific_material_type,
+)
+from courses.utils import create_ioc_material
 
 
 class MaterialSerializer(serializers.ModelSerializer):
@@ -24,7 +24,10 @@ class MaterialSerializer(serializers.ModelSerializer):
                 "This order in this module is already in use"
             )
 
-        if data.get("material_type") == "ioc":
+        if data.get("material_type") != data.get("material_type").upper():
+            raise serializers.ValidationError("The material type must be in uppercase.")
+
+        if data.get("material_type") == "IOC":
             result_ioc = material_ioc_validate(self.initial_data)
             if result_ioc:
                 raise serializers.ValidationError(
@@ -42,9 +45,12 @@ class MaterialSerializer(serializers.ModelSerializer):
         it is also created in the ioc table."""
 
         material = Material(**validated_data)
+        validated_data.get("material_type")
         material.save()
 
-        if validated_data.get("material_type") == "ioc":
-            material_ioc_create(self.initial_data, material.id)
+        validate_and_create_specific_material_type(validated_data, material)
+
+        if validated_data.get("material_type") == "IOC":
+            create_ioc_material(self.initial_data, material.id)
 
         return material
