@@ -1,12 +1,13 @@
 """Module for views of IoCodeSubmission model."""
 from django.http import JsonResponse
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from ..helpers.submission_summary import update_submission_summary
-from ..serializers.io_code_submission_serializer import IoCodeSubmissionSerializer
+from ..serializers.io_code_submission_serializer import IoCodeSubmissionSerializer, IoCodeSubmissionUserSerializer
 from ..models.io_code_submission import IoCodeSubmission
+from ..schemas import io_code_submission_schemas as schemas
 
 
 @api_view(["POST"])
@@ -140,3 +141,32 @@ def update_io_code_submission(request, submission_id: int) -> JsonResponse:
         safe=False,
         status=status.HTTP_200_OK,
     )
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+@schema(schemas.get_io_code_all_submission_user_schema)
+def get_io_code_all_submission_user(request, user_id:int, material_id:int) -> JsonResponse:
+    """
+    Get all code submissions submitted by a user for a specific io_code
+
+    Args:
+        request: http request
+        user_id: User's id to get his/her submissions
+        material_id: Material's id to get its submissions
+
+    Returns:
+        Json response with the fields of the serialized code submission if the user
+        making
+        the request is Authenticated, else throws 401 Unauthorized status
+    """
+    submissions = IoCodeSubmission.objects.filter(user_id_id=user_id, material_id_id=material_id)
+
+    if not submissions:
+        return JsonResponse(
+            {"message": "There are not submissions by that user for that io_code"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    serializer = IoCodeSubmissionUserSerializer(submissions, many=True)
+
+    return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)

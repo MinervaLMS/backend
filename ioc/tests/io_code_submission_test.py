@@ -565,3 +565,74 @@ class UpdateIoCodeSubmissionTestCase(TestCase):
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+class GetIoCodeSubmissionUser(TestCase):
+    """Class that tests the get method of the IoCode model by user."""
+
+    def setUp(self):
+        """Method that sets up the client and the data to be used in the tests."""
+        self.client = APIClient()
+
+        self.institution = Institution.objects.create(
+            name="Test Institution",
+            alias="TestInstitution",
+            description="This is a test institution",
+        )
+        self.course = Course.objects.create(
+            name="Test Course",
+            alias="TestCourse",
+            description="This is a test course",
+            institution=self.institution,
+        )
+
+        self.module = Module.objects.create(course_id=self.course, name="Test module")
+
+        self.material = Material.objects.create(
+            module_id=self.module,
+            name="Test material",
+            material_type="I",
+            is_extra=False,
+        )
+        self.user = User.objects.create(
+            email="test@example.com",
+            password="JHuyfub434eknjbv",
+            last_name="test_last_name",
+            first_name="test_first_name",
+        )
+
+        self.io_code_submission = IoCodeSubmission.objects.create(
+            material_id=self.material,
+            user_id=self.user,
+            response_char="A",
+            execution_time=1,
+            execution_memory=1,
+            completion_rate=1.0,
+        )
+
+        self.client.force_authenticate(self.user)
+
+    def test_get_incorrect_user(self) -> None:
+        """Method that tests the get method of the IoCodeSubmission model
+        with an incorrect user id."""
+
+        response = self.client.get(
+            f"/iocode/submission/user/{(self.io_code_submission.user_id.id)+1}/{(self.io_code_submission.material_id)}/"
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_incorrect_material(self) -> None:
+        """Method that tests the get method of the IoCodeSubmission model
+        with an incorrect material id."""
+
+        response = self.client.get(
+            f"/iocode/submission/user/{(self.io_code_submission.user_id)}/{(self.io_code_submission.material_id.id)+1}/"
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_correct(self) -> None:
+        """Method that tests the get method of the IoCodeSubmission
+        model with a correct id."""
+        response = self.client.get(
+            f"/iocode/submission/user/{(self.io_code_submission.user_id.id)}/{(self.io_code_submission.material_id.id)}/"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -73,3 +73,23 @@ class IoCodeSubmissionSerializer(serializers.ModelSerializer):
             "execution_time": instance.execution_time,
             "execution_memory": instance.execution_memory,
         }
+    
+class IoCodeSubmissionUserSerializer(serializers.ModelSerializer):
+    """Class that serializes the IoCodeSubmission model for get all submissions by user"""
+
+    class Meta:
+        """Class that defines the metadata for the serializer,
+        in this case serialezes all the fields"""
+
+        model = IoCodeSubmission
+        fields = "__all__"
+
+    def to_representation(self, instance):
+        """Method that returns a representation of the model"""
+        return {
+            "verdict": instance.response_char,
+            "execution_time": instance.execution_time,
+            "execution_memory": instance.execution_memory,
+            "code": instance.code,
+            "language": instance.language,
+        }
