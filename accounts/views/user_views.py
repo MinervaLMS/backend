@@ -3,6 +3,8 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes, schema
 
+from ioc.models import IoCodeSubmissionSummary
+from ioc.serializers.IoCodeSubmissionSummarySerializer import IoCodeSubmissionSummarySerializer
 from ..models.user import User
 from courses.models import Material, Access
 from ..serializers.user_serializer import UserSerializer
@@ -115,7 +117,14 @@ def get_user_materials(request, user_id: int, module_id: int) -> JsonResponse:
         for serialized_material in serialized_materials.data:
             material = materials.pop(0)
             access: Access = material.access_set.filter(user_id=user_id).first()
-            serialized_material["access"] = AccessSerializer(access).data
+            access_data = AccessSerializer(access).data
+            if material.material_type == "ioc":
+                summary: IoCodeSubmissionSummary = material.submission_summary.filter(
+                    user_id=user_id
+                ).first()
+                access_data["summary"] = IoCodeSubmissionSummarySerializer(summary).data
+
+            serialized_material["access"] = access_data
 
         return JsonResponse(
             data=serialized_materials.data, safe=False, status=status.HTTP_200_OK
