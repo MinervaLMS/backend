@@ -21,6 +21,7 @@ def judge(codesubmission, material_ioc):
         "memory_limit": material_ioc.max_memory,
         "language": codesubmission.language,
     }
+    print(data)
     headers = {"Content-Type": "application/json"}
     response = requests.post(URL_JUDGE, data=json.dumps(data), headers=headers)
     return response.json(), response.status_code

@@ -30,7 +30,7 @@ def material_ioc_create(data, material):
 
     if serializer.is_valid():
         serializer.save()
-        data["problem_id"] = data["name"]
+        data["problem_id"] = str(material)
         judge(data)
         for case in range(len(data["input"])):
             serializer_case = CaseSerializer(
