@@ -118,7 +118,7 @@ def get_user_materials(request, user_id: int, module_id: int) -> JsonResponse:
             material = materials.pop(0)
             access: Access = material.access_set.filter(user_id=user_id).first()
             access_data = AccessSerializer(access).data
-            if material.material_type == "ioc":
+            if str(material.material_type).upper() == "IOC":
                 summary: IoCodeSubmissionSummary = material.submission_summary.filter(
                     user_id=user_id
                 ).first()
