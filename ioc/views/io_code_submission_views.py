@@ -35,9 +35,15 @@ def create_io_code_submission(request) -> JsonResponse:
         material = MaterialSerializer(material)
     except KeyError:
         return JsonResponse(
+            {"message": "No key material_id in request"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    except Material.DoesNotExist:
+        return JsonResponse(
             {"message": "No material found related to given material_id"},
             status=status.HTTP_400_BAD_REQUEST
         )
+
     if material.data['material_type'].lower() != 'ioc':
         return JsonResponse(
             {"message": f"Material type is not IOC"},

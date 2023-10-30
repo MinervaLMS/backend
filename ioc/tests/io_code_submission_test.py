@@ -52,7 +52,7 @@ class CreateIoCodeSubmissionTestCase(TestCase):
             max_time=1000,
             max_memory=1000,
         )
-        self.material_ioc = MaterialIoCode.objects.create(
+        self.material_ioc_other = MaterialIoCode.objects.create(
             material_id=self.material_other,
             max_time=1000,
             max_memory=1000,
@@ -77,6 +77,16 @@ class CreateIoCodeSubmissionTestCase(TestCase):
 
         self.io_code_submission_data_non_ioc = {
             "material_id": self.material_other.id,
+            "user_id": self.user.id,
+            "code": "print('Hello World')",
+            "execution_time": 1000,
+            "execution_memory": 1000,
+            "completion_rate": 1.0,
+            "language": "py",
+        }
+
+        self.io_code_submission_wrong_material_id = {
+            "material_id": 999,
             "user_id": self.user.id,
             "code": "print('Hello World')",
             "execution_time": 1000,
@@ -134,7 +144,7 @@ class CreateIoCodeSubmissionTestCase(TestCase):
         }
 
         self.io_code_submission_data_no_material = {
-            "material_id": self.material.id + 1,
+            "material_id": self.material.id + 2,
             "user_id": self.user.id,
             "execution_time": 1,
             "execution_memory": 1,
@@ -174,7 +184,7 @@ class CreateIoCodeSubmissionTestCase(TestCase):
         with wrong material_id"""
 
         response = self.client.post(
-            "/iocode/submission/create/", self.io_code_submission_data.update({'material_id' : 999}), format="json"
+            "/iocode/submission/create/", self.io_code_submission_wrong_material_id, format="json"
         )
         self.assertEqual(response.json()['message'], "No material found related to given material_id")
 
