@@ -50,7 +50,9 @@ def create_material(request) -> JsonResponse:
             return JsonResponse(response, status=status.HTTP_201_CREATED)
 
     except serializers.ValidationError as exc:
-        return JsonResponse(data=exc.detail, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(
+            data=exc.detail, status=status.HTTP_400_BAD_REQUEST, safe=False
+        )
 
     except Module.DoesNotExist:
         return JsonResponse(

@@ -8,6 +8,7 @@ import requests
 from constants.ioc import LIST_IOC
 from courses.models import Material
 from courses.serializers.material_html_serializer import MaterialHTMLSerializer
+from courses.serializers.material_pdf_serializer import MaterialPDFSerializer
 from courses.serializers.material_video_serializer import MaterialVideoSerializer
 from ioc.serializers.material_io_code_serializer import MaterialIoCodeSerializer
 from ioc.serializers.case_serializer import CaseSerializer
@@ -79,7 +80,7 @@ def validate_and_create_specific_material_type(
         case "VID":
             specific_serializer = MaterialVideoSerializer(data=validation_data)
         case "PDF":
-            pass
+            specific_serializer = MaterialPDFSerializer(data=validation_data)
         case _:
             pass
 
@@ -108,4 +109,6 @@ def validate_for_specific_material_type(
     else:
         # if it didn't match any case, delete the material already created
         Material.objects.get(id=material.id).delete()
-        raise serializers.ValidationError("The material type was not recognized")
+        raise serializers.ValidationError(
+            {"material_type": "The material type was not recognized"}
+        )
