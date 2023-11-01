@@ -1,11 +1,9 @@
 from rest_framework import serializers
 
 from courses.models.module_progress import Module_progress
-from courses.models.module import Module
-from accounts.models.user import User
 
 
-class Module_progressSerializer(serializers.ModelSerializer):
+class ModuleProgressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Module_progress
         fields = "__all__"
@@ -18,7 +16,9 @@ class Module_progressSerializer(serializers.ModelSerializer):
 
         user_id = data.get("user_id")
         module_id = data.get("module_id")
-        if Module_progress.objects.filter(user_id=user_id, module_id=module_id).exists():
+        if Module_progress.objects.filter(
+            user_id=user_id, module_id=module_id
+        ).exists():
             raise serializers.ValidationError(
                 "This user in this module is already in use"
             )
@@ -29,3 +29,9 @@ class Module_progressSerializer(serializers.ModelSerializer):
         module_progress.save()
 
         return module_progress
+
+
+class GetModuleProgressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Module_progress
+        exclude = ("id", "user_id")

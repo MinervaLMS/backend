@@ -59,6 +59,11 @@ extra_urls = [
         user_views.get_user_materials,
         name="get_user_materials",
     ),
+    path(
+        "users/<int:course_id>/<int:user_id>/modules-progress/",
+        user_views.get_user_modules_progress,
+        name="get_user_material",
+    ),
 ]
 
 urlpatterns = register_urls + login_urls + password_reset_urls + extra_urls
