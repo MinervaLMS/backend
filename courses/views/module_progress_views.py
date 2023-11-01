@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from ..models.module import Module
 from ..models.module_progress import Module_progress
-from ..serializers.module_progress_serializer import Module_progressSerializer
+from ..serializers.module_progress_serializer import ModuleProgressSerializer
 from ..schemas import module_progress as schemas
 
 
@@ -24,7 +24,7 @@ def create_module_progress(request) -> JsonResponse:
         response (JsonResponse): HTTP response in JSON format
     """
 
-    serializer = Module_progressSerializer(data=request.data)
+    serializer = ModuleProgressSerializer(data=request.data)
 
     if serializer.is_valid():
         serializer.save()
@@ -70,7 +70,7 @@ def get_module_progress(request, user_id: int, module_id: int) -> JsonResponse:
         )
     if module.module_assessment_materials < module_progress.module_assessment_progress:
         module_progress.module_assessment_progress = module.module_assessment_materials
-    serializer = Module_progressSerializer(module_progress)
+    serializer = ModuleProgressSerializer(module_progress)
     data = serializer.data.copy()
     data["module_instructional_progress"] = (
         round(
@@ -152,7 +152,7 @@ def get_course_module_progress(request, user_id: int, alias: str) -> JsonRespons
                 * 100
                 if module.module_assessment_materials != 0
                 else 0,
-                "order": module.order
+                "order": module.order,
             }
             list_progress.append(data)
     return JsonResponse(list_progress, safe=False, status=status.HTTP_200_OK)
