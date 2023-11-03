@@ -295,7 +295,8 @@ class CreateIoCodeSubmissionTestCase(TestCase):
         return_value=(
             {
                 "submission_id": 72,
-                "verdict": "Judge execution: code compilation or problem_id don't exist.",
+                "verdict": """Judge execution: code compilation
+                or problem_id don't exist.""",
             },
             201,
         ),

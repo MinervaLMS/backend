@@ -24,11 +24,11 @@ def create_io_code_submission(request) -> JsonResponse:
     serializer = IoCodeSubmissionSerializer(data=request.data)
     if serializer.is_valid():
         submission: IoCodeSubmission = serializer.save()
-        # update submission summary for this user 
+        # update submission summary for this user
         update_submission_summary(
             user=submission.user_id,
             material=submission.material_id,
-            submission=submission
+            submission=submission,
         )
         return JsonResponse(
             serializer.data,

@@ -152,7 +152,7 @@ def get_course_module_progress(request, user_id: int, alias: str) -> JsonRespons
                 * 100
                 if module.module_assessment_materials != 0
                 else 0,
-                "order": module.order
+                "order": module.order,
             }
             list_progress.append(data)
     return JsonResponse(list_progress, safe=False, status=status.HTTP_200_OK)
