@@ -3,7 +3,7 @@ from rest_framework import serializers
 from courses.models.module_progress import Module_progress
 
 
-class Module_progressSerializer(serializers.ModelSerializer):
+class ModuleProgressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Module_progress
         fields = "__all__"
@@ -29,3 +29,9 @@ class Module_progressSerializer(serializers.ModelSerializer):
         module_progress.save()
 
         return module_progress
+
+
+class GetModuleProgressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Module_progress
+        exclude = ("id", "user_id")

@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("courses", "0007_alter_access_last_view_alter_access_views"),
-        ("ioc", "0004_case"),
+        ("ioc", "0004_2_case"),
     ]
 
     operations = [

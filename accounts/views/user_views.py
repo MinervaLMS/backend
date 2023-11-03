@@ -3,13 +3,21 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes, schema
 
+from ioc.models import IoCodeSubmissionSummary
+from ioc.serializers.IoCodeSubmissionSummarySerializer import (
+    IoCodeSubmissionSummarySerializer,
+)
 from ..models.user import User
+from courses.models import Course
 from courses.models import Material, Access
+from courses.models.module_progress import Module_progress
+from courses.models.module import Module
 from ..serializers.user_serializer import UserSerializer
 from courses.serializers.access_serializer import AccessSerializer
 from courses.serializers.material_serializer import MaterialSerializer
 from ..schemas import user_schemas as schemas
 from courses.serializers.course_serializer import CourseEnrollmentSerializer
+from courses.serializers.module_progress_serializer import GetModuleProgressSerializer
 
 
 @api_view(["GET"])
@@ -115,7 +123,14 @@ def get_user_materials(request, user_id: int, module_id: int) -> JsonResponse:
         for serialized_material in serialized_materials.data:
             material = materials.pop(0)
             access: Access = material.access_set.filter(user_id=user_id).first()
-            serialized_material["access"] = AccessSerializer(access).data
+            access_data = AccessSerializer(access).data
+            if str(material.material_type).upper() == "IOC":
+                summary: IoCodeSubmissionSummary = material.submission_summary.filter(
+                    user_id=user_id
+                ).first()
+                access_data["summary"] = IoCodeSubmissionSummarySerializer(summary).data
+
+            serialized_material["access"] = access_data
 
         return JsonResponse(
             data=serialized_materials.data, safe=False, status=status.HTTP_200_OK
@@ -124,5 +139,50 @@ def get_user_materials(request, user_id: int, module_id: int) -> JsonResponse:
     except User.DoesNotExist:
         return JsonResponse(
             data={"message": "There is not a user with that id"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_user_modules_progress(request, course_id: int, user_id: int):
+    """
+    Get the all the modules progress of a user in a course
+    and also returns the course min-advance
+
+    Args:
+        request : request http
+        course_id (int): Course's id
+        user_id (int): User's id
+    """
+
+    try:
+        course: Course = Course.objects.get(id=course_id)
+        course_modules = Module.objects.filter(course_id=course.id).order_by("order")
+
+        module_progress = Module_progress.objects.filter(
+            user_id=user_id, module_id__in=course_modules
+        ).order_by("module_id")
+        module_progress_data = GetModuleProgressSerializer(
+            module_progress, many=True
+        ).data
+
+        return JsonResponse(
+            data={
+                "course_min_advance": course.min_assessment_progress,
+                "module_progress": module_progress_data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    except User.DoesNotExist:
+        return JsonResponse(
+            data={"message": "There is not a user with that id"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    except Course.DoesNotExist:
+        return JsonResponse(
+            data={"message": "There is not a course with that id"},
             status=status.HTTP_404_NOT_FOUND,
         )

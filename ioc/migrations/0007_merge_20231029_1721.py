@@ -5,7 +5,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("ioc", "0004_remove_iocodesubmission_char_check_and_more"),
+        ("ioc", "0004_1_remove_iocodesubmission_char_check_and_more"),
         ("ioc", "0006_alter_iocodesubmissionsummary_min_execution_time"),
     ]
 
