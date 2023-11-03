@@ -73,9 +73,11 @@ class IoCodeSubmissionSerializer(serializers.ModelSerializer):
             "execution_time": instance.execution_time,
             "execution_memory": instance.execution_memory,
         }
-    
+
+
 class IoCodeSubmissionUserSerializer(serializers.ModelSerializer):
-    """Class that serializes the IoCodeSubmission model for get all submissions by user"""
+    """Class that serializes the IoCodeSubmission
+    model for get all submissions by user"""
 
     class Meta:
         """Class that defines the metadata for the serializer,

@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes, schema
-from rest_framework import status
+from rest_framework import status, serializers
 from rest_framework.permissions import IsAuthenticated
 
 from ..models.module import Module
@@ -28,15 +28,18 @@ def create_material(request) -> JsonResponse:
     Returns:
         response (JsonResponse): HTTP response in JSON format
     """
+    material: Material | None = None
     try:
         module: Module = Module.objects.get(id=request.data.get("module_id"))
 
         serializer = MaterialSerializer(data=request.data)
 
-        if serializer.is_valid():
-            material: Material = serializer.save()
+        if serializer.is_valid(raise_exception=True):
+            material = serializer.save()
+
             # Update module's material counts
             update_count_created_material(serializer=serializer)
+
             # Create all access objects for the new material
             # TODO: Doing the same thing when a enrollment is created
             create_accesses_for_material(
@@ -46,7 +49,10 @@ def create_material(request) -> JsonResponse:
             response["message"] = "Material created successfully"
             return JsonResponse(response, status=status.HTTP_201_CREATED)
 
-        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except serializers.ValidationError as exc:
+        return JsonResponse(
+            data=exc.detail, status=status.HTTP_400_BAD_REQUEST, safe=False
+        )
 
     except Module.DoesNotExist:
         return JsonResponse(

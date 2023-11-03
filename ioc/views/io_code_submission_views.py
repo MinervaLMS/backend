@@ -5,7 +5,10 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from ..helpers.submission_summary import update_submission_summary
-from ..serializers.io_code_submission_serializer import IoCodeSubmissionSerializer, IoCodeSubmissionUserSerializer
+from ..serializers.io_code_submission_serializer import (
+    IoCodeSubmissionSerializer,
+    IoCodeSubmissionUserSerializer,
+)
 from ..models.io_code_submission import IoCodeSubmission
 from ..schemas import io_code_submission_schemas as schemas
 
@@ -25,11 +28,11 @@ def create_io_code_submission(request) -> JsonResponse:
     serializer = IoCodeSubmissionSerializer(data=request.data)
     if serializer.is_valid():
         submission: IoCodeSubmission = serializer.save()
-        # update submission summary for this user 
+        # update submission summary for this user
         update_submission_summary(
             user=submission.user_id,
             material=submission.material_id,
-            submission=submission
+            submission=submission,
         )
         return JsonResponse(
             serializer.data,
@@ -142,10 +145,13 @@ def update_io_code_submission(request, submission_id: int) -> JsonResponse:
         status=status.HTTP_200_OK,
     )
 
+
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 @schema(schemas.get_io_code_all_submission_user_schema)
-def get_io_code_all_submission_user(request, user_id:int, material_id:int) -> JsonResponse:
+def get_io_code_all_submission_user(
+    request, user_id: int, material_id: int
+) -> JsonResponse:
     """
     Get all code submissions submitted by a user for a specific io_code
 
@@ -159,7 +165,9 @@ def get_io_code_all_submission_user(request, user_id:int, material_id:int) -> Js
         making
         the request is Authenticated, else throws 401 Unauthorized status
     """
-    submissions = IoCodeSubmission.objects.filter(user_id_id=user_id, material_id_id=material_id)
+    submissions = IoCodeSubmission.objects.filter(
+        user_id_id=user_id, material_id_id=material_id
+    )
 
     if not submissions:
         return JsonResponse(
