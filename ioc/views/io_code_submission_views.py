@@ -44,7 +44,7 @@ def create_io_code_submission(request) -> JsonResponse:
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    if material.data['material_type'].lower() != 'ioc':
+    if material.data['material_type'] != 'IOC':
         return JsonResponse(
             {"message": f"Material type is not IOC"},
             status=status.HTTP_400_BAD_REQUEST
@@ -58,20 +58,14 @@ def create_io_code_submission(request) -> JsonResponse:
             material=submission.material_id,
             submission=submission,
         )
-    else: 
         return JsonResponse(
-            serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            serializer.data,
+            status=status.HTTP_201_CREATED,
         )
-    # update submission summary for this user 
-    update_submission_summary(
-        user=submission.user_id,
-        material=submission.material_id,
-        submission=submission
-    )
     return JsonResponse(
-        serializer.data,
-        status=status.HTTP_201_CREATED,
+        serializer.errors, status=status.HTTP_400_BAD_REQUEST
     )
+   
 
 
 @api_view(["GET"])
