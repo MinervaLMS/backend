@@ -1,10 +1,8 @@
 from rest_framework import serializers
 from ..models.material import Material
 from courses.utils import (
-    material_ioc_validate,
     validate_and_create_specific_material_type,
 )
-from courses.utils import create_ioc_material
 
 
 class MaterialSerializer(serializers.ModelSerializer):
@@ -29,17 +27,6 @@ class MaterialSerializer(serializers.ModelSerializer):
                 {"material_type": "The material type must be in uppercase."}
             )
 
-        if data.get("material_type") == "IOC":
-            result_ioc = material_ioc_validate(self.initial_data)
-            if result_ioc:
-                raise serializers.ValidationError(
-                    {"material_type": f"The value {result_ioc[0]} is missing."}
-                )
-            if self.initial_data["max_memory"] < 300:
-                raise serializers.ValidationError(
-                    {"max_memory": "The value max_memory must be greater than 300."}
-                )
-
         return data
 
     def create(self, validated_data):
@@ -50,8 +37,5 @@ class MaterialSerializer(serializers.ModelSerializer):
         material.save()
 
         validate_and_create_specific_material_type(self.initial_data, material)
-
-        if validated_data.get("material_type") == "IOC":
-            create_ioc_material(self.initial_data, material.id)
 
         return material
