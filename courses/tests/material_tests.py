@@ -10,6 +10,7 @@ from ..models.material import Material
 
 from accounts.models.user import User
 from institutions.models.institution import Institution
+from ioc.models.case import Case
 
 
 class CreateMaterialIOCTestCase(TestCase):
@@ -66,6 +67,14 @@ class CreateMaterialIOCTestCase(TestCase):
             "/material/create/", self.correct_data, format="json"
         )
         self.assertEqual(response.status_code, 201)
+
+    def test_create_cases_correct(self):
+        self.client.post("/material/create/", self.correct_data, format="json")
+        self.assertEqual(Case.objects.count(), 2)
+
+    def test_create_case_wrong(self):
+        self.client.post("/material/create/", self.incomplete_data, format="json")
+        self.assertEqual(Case.objects.count(), 0)
 
 
 class CreateMaterialTestCase(TestCase):

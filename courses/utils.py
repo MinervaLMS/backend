@@ -5,7 +5,6 @@ from rest_framework.serializers import ModelSerializer
 from constants.ioc import URL_PROBLEM
 import json
 import requests
-from constants.ioc import LIST_IOC
 from courses.models import Material
 from courses.serializers.material_html_serializer import MaterialHTMLSerializer
 from courses.serializers.material_pdf_serializer import MaterialPDFSerializer
@@ -22,39 +21,19 @@ def judge(data):
     return response.json(), response.status_code
 
 
-def material_ioc_validate(data):
-    """Method that validates if the ioc material has all the required fields"""
-    missing = [element for element in LIST_IOC if element not in data]
-    return missing
-
-
-# ------Methods for material creation in their specific tables------
-
-
-def create_ioc_material(data, material):
-    """Method that creates the ioc material on the judge files
-    and the cases associated with it."""
-
-    data["material_id"] = material
-    serializer = MaterialIoCodeSerializer(data=data)
-
-    if serializer.is_valid():
-        serializer.save()
-        data["problem_id"] = data["name"]
-        judge(data)
-        for case in range(len(data["input"])):
-            serializer_case = CaseSerializer(
-                data={
-                    "id_case": case,
-                    "input": data["input"][case],
-                    "output": data["output"][case],
-                    "material_io_code_id": serializer.data["id"],
-                }
-            )
-
-            if serializer_case.is_valid():
-                serializer_case.save()
-            # TODO: What happens if this is not valid?
+def creation_case(data):
+    """Method that creates the cases on the judge files."""
+    for case in range(len(data["input"])):
+        case_serializer = CaseSerializer(
+            data={
+                "input": data["input"][case],
+                "output": data["output"][case],
+                "id_case": case,
+                "material_io_code_id": data["material_io_code_id"],
+            }
+        )
+        if case_serializer.is_valid():
+            case_serializer.save()
 
 
 def validate_and_create_specific_material_type(
@@ -73,7 +52,6 @@ def validate_and_create_specific_material_type(
     # match statement is supposed to be faster than if-else
     match material_type:
         case "IOC":
-            return
             specific_serializer = MaterialIoCodeSerializer(data=validation_data)
         case "HTM":
             specific_serializer = MaterialHTMLSerializer(data=validation_data)
@@ -90,7 +68,13 @@ def validate_and_create_specific_material_type(
     # So we create the specific material
     # -------------------------#
 
-    specific_serializer.save()
+    specific_instance = specific_serializer.save()
+
+    if material_type == "IOC":
+        validation_data["problem_id"] = str(material.id)
+        judge(validation_data)
+        validation_data["material_io_code_id"] = specific_instance.id
+        creation_case(validation_data)
 
 
 def validate_for_specific_material_type(
