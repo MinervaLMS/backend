@@ -12,13 +12,12 @@ def update_submission_summary(user: User, material: Material, submission: IoCode
     io_code: MaterialIoCode = material.materialiocode
 
     if summary:
-        print(summary.attempts)
         if submission.response_char == "A" and (not summary.hits):
             # First hit
             summary.hits = 1
-            print(io_code.max_points - (io_code.points_penalty * summary.attempts))
             summary.points = (
-                    io_code.max_points - (io_code.points_penalty * summary.attempts)
+                    max(io_code.max_points - (io_code.points_penalty * summary.attempts),
+                        io_code.min_points)
             )
             summary.min_execution_time = submission.execution_time
             summary.min_execution_memory = submission.execution_memory
@@ -51,3 +50,4 @@ def update_submission_summary(user: User, material: Material, submission: IoCode
             max_completion_rate=0,
         )
         summary.save()
+
